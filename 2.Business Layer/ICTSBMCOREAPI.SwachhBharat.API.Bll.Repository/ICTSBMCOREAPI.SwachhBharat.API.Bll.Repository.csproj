@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\3.DataAcess Layer\ICTSBMCOREAPI.Dal.DataContexts\ICTSBMCOREAPI.Dal.DataContexts.csproj" />
+    <ProjectReference Include="..\..\ICTSBMCOREAPI.SwachhBharat.API.Bll.Services\ICTSBMCOREAPI.SwachhBharat.API.Bll.Services.csproj" />
+    <ProjectReference Include="..\ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels\ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.csproj" />
+  </ItemGroup>
+
+</Project>
