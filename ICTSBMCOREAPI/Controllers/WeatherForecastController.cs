@@ -59,6 +59,7 @@ namespace ICTSBMCOREAPI.Controllers
             {
                 _logger.LogError(ex.ToString(), ex);
                 return houseCount;
+
             }
 
         }
