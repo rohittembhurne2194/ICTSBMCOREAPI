@@ -43,6 +43,7 @@ namespace ICTSBMCOREAPI.Controllers
         [ApiConventionMethod(typeof(DefaultApiConventions),nameof(DefaultApiConventions.Get))]
         public int GetHouseCount(int AppId)
         {
+
             int houseCount = 0;
             try
             {
