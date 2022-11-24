@@ -91,15 +91,16 @@ namespace ICTSBMCOREAPI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseSwagger();
-            app.UseSwaggerUI(c => 
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ICTSBM API");
-                c.RoutePrefix = "";
-            });
+            
 
             if (env.IsDevelopment())
             {
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ICTSBM API");
+                    c.RoutePrefix = "";
+                });
                 app.UseDeveloperExceptionPage();
             }
 
