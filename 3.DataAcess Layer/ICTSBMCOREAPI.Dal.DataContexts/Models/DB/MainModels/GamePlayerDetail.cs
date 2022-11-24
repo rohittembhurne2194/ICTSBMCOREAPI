@@ -7,7 +7,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.MainModels
 {
     public partial class GamePlayerDetail
     {
-        public int Id { get; set; }
+        public int ID { get; set; }
         public string PlayerId { get; set; }
         public int? GameId { get; set; }
         public string Name { get; set; }

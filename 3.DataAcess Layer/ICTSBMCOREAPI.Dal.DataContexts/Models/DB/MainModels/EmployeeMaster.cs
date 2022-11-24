@@ -14,9 +14,9 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.MainModels
         public string Password { get; set; }
         public string EmpMobileNumber { get; set; }
         public string EmpAddress { get; set; }
-        public string Type { get; set; }
-        public bool? IsActive { get; set; }
-        public string IsActiveUlb { get; set; }
-        public DateTime? LastModifyDateEntry { get; set; }
+        public string type { get; set; }
+        public bool? isActive { get; set; }
+        public string isActiveULB { get; set; }
+        public DateTime? lastModifyDateEntry { get; set; }
     }
 }

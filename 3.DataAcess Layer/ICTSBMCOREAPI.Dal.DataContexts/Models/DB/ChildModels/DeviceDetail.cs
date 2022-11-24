@@ -8,10 +8,10 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
     public partial class DeviceDetail
     {
         public int DeviceDetailId { get; set; }
-        public string DeviceId { get; set; }
-        public string Fcmid { get; set; }
+        public string DeviceID { get; set; }
+        public string FCMID { get; set; }
         public string DeviceType { get; set; }
-        public string ReferenceId { get; set; }
+        public string ReferenceID { get; set; }
         public DateTime? InstallDate { get; set; }
     }
 }

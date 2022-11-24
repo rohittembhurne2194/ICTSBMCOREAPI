@@ -7,7 +7,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 {
     public partial class ZoneMaster
     {
-        public int ZoneId { get; set; }
-        public string Name { get; set; }
+        public int zoneId { get; set; }
+        public string name { get; set; }
     }
 }

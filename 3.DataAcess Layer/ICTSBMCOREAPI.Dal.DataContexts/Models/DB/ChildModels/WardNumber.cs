@@ -9,6 +9,6 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
     {
         public int Id { get; set; }
         public string WardNo { get; set; }
-        public int? ZoneId { get; set; }
+        public int? zoneId { get; set; }
     }
 }

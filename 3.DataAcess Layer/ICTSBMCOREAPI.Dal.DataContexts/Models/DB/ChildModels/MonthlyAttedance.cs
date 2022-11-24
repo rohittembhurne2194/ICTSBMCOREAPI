@@ -7,11 +7,11 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 {
     public partial class MonthlyAttedance
     {
-        public int Id { get; set; }
-        public int? UserId { get; set; }
+        public int ID { get; set; }
+        public int? userId { get; set; }
         public string EmployeeType { get; set; }
         public string UserName { get; set; }
-        public int? MonthName { get; set; }
+        public int? Month_name { get; set; }
         public string Day1 { get; set; }
         public string Day2 { get; set; }
         public string Day3 { get; set; }
@@ -43,10 +43,10 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
         public string Day29 { get; set; }
         public string Day30 { get; set; }
         public string Day31 { get; set; }
-        public string TotalMonthDays { get; set; }
-        public int? YearName { get; set; }
-        public int? PCount { get; set; }
-        public int? HCount { get; set; }
-        public int? ACount { get; set; }
+        public string TOTAL_MONTH_DAYS { get; set; }
+        public int? YEAR_NAME { get; set; }
+        public int? P_Count { get; set; }
+        public int? H_Count { get; set; }
+        public int? A_Count { get; set; }
     }
 }

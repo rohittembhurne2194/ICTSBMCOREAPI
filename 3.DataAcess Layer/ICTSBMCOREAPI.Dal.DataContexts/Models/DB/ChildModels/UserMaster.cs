@@ -7,23 +7,23 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 {
     public partial class UserMaster
     {
-        public int UserId { get; set; }
-        public string UserName { get; set; }
-        public string UserNameMar { get; set; }
-        public string UserLoginId { get; set; }
-        public string UserPassword { get; set; }
-        public string UserMobileNumber { get; set; }
-        public string UserAddress { get; set; }
-        public string UserProfileImage { get; set; }
+        public int userId { get; set; }
+        public string userName { get; set; }
+        public string userNameMar { get; set; }
+        public string userLoginId { get; set; }
+        public string userPassword { get; set; }
+        public string userMobileNumber { get; set; }
+        public string userAddress { get; set; }
+        public string userProfileImage { get; set; }
         public string Type { get; set; }
-        public string UserEmployeeNo { get; set; }
-        public string UserDesignation { get; set; }
-        public string ImoNo { get; set; }
-        public string BloodGroup { get; set; }
-        public bool? IsActive { get; set; }
-        public string GcTarget { get; set; }
+        public string userEmployeeNo { get; set; }
+        public string userDesignation { get; set; }
+        public string imoNo { get; set; }
+        public string bloodGroup { get; set; }
+        public bool? isActive { get; set; }
+        public string gcTarget { get; set; }
         public string EmployeeType { get; set; }
-        public string ImoNo2 { get; set; }
-        public string ShiftIds { get; set; }
+        public string imoNo2 { get; set; }
+        public string shiftIds { get; set; }
     }
 }

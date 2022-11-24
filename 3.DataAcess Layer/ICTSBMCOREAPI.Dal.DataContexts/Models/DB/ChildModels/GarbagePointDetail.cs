@@ -7,18 +7,18 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 {
     public partial class GarbagePointDetail
     {
-        public int GpId { get; set; }
-        public string GpName { get; set; }
-        public string GpNameMar { get; set; }
-        public string GpLat { get; set; }
-        public string GpLong { get; set; }
-        public string QrCode { get; set; }
-        public int? ZoneId { get; set; }
-        public int? WardId { get; set; }
-        public int? AreaId { get; set; }
+        public int gpId { get; set; }
+        public string gpName { get; set; }
+        public string gpNameMar { get; set; }
+        public string gpLat { get; set; }
+        public string gpLong { get; set; }
+        public string qrCode { get; set; }
+        public int? zoneId { get; set; }
+        public int? wardId { get; set; }
+        public int? areaId { get; set; }
         public string ReferanceId { get; set; }
-        public string GpAddress { get; set; }
-        public DateTime? Modified { get; set; }
-        public int? UserId { get; set; }
+        public string gpAddress { get; set; }
+        public DateTime? modified { get; set; }
+        public int? userId { get; set; }
     }
 }

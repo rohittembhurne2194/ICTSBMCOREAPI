@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 {
-    public partial class Questionnaire
+    public partial class questionnaire
     {
-        public int? QNumber { get; set; }
-        public string QText { get; set; }
-        public string QResponse { get; set; }
+        public int? Q_Number { get; set; }
+        public string Q_Text { get; set; }
+        public string Q_Response { get; set; }
     }
 }

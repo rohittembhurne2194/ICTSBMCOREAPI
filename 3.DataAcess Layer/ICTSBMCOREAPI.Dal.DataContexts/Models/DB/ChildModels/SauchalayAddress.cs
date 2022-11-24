@@ -8,7 +8,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
     public partial class SauchalayAddress
     {
         public int Id { get; set; }
-        public string SauchalayId { get; set; }
+        public string SauchalayID { get; set; }
         public string Address { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string Lat { get; set; }

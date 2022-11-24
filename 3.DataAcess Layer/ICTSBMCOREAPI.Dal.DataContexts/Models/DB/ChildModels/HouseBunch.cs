@@ -7,7 +7,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 {
     public partial class HouseBunch
     {
-        public int BunchId { get; set; }
-        public string Bunchname { get; set; }
+        public int bunchId { get; set; }
+        public string bunchname { get; set; }
     }
 }

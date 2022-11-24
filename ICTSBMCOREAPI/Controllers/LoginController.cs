@@ -1,4 +1,6 @@
 ﻿using ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository;
+using ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -9,23 +11,25 @@ using System.Threading.Tasks;
 
 namespace ICTSBMCOREAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize]
+    [Route("api/Account")]
     [ApiController]
     public class LoginController : ControllerBase
     {
         private readonly ILogger<LoginController> _logger;
-        private readonly IRepository _repository;
+        private readonly IRepository objRep;
 
         public LoginController(ILogger<LoginController> logger,IRepository repository)
         {
             _logger = logger;
-            _repository = repository;
+            objRep = repository;
         }
 
-        [HttpPost("login")]
+        [HttpPost("getTocken")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromHeader] int AppId)
         {
-            var result = await _repository.LoginAsync(AppId);
+            var result = await objRep.LoginAsync(AppId);
             if (string.IsNullOrEmpty(result))
             {
                 return Unauthorized();
@@ -33,5 +37,17 @@ namespace ICTSBMCOREAPI.Controllers
 
             return Ok(result);
         }
+        [HttpPost("Login")]
+        public async Task<SBUser> GetLogin([FromHeader] int AppId, [FromHeader] string EmpType, [FromBody]SBUser objlogin)
+        {
+            //Request.Headers.TryGetValue("appId", out var id);
+            //int AppId = int.Parse(id);
+            //Request.Headers.TryGetValue("EmpType", out var EmpType);
+            
+            SBUser objresponse = await objRep.CheckUserLoginAsync(objlogin.userLoginId, objlogin.userPassword, objlogin.imiNo, AppId, EmpType);
+            return objresponse;
+        }
+
+
     }
 }

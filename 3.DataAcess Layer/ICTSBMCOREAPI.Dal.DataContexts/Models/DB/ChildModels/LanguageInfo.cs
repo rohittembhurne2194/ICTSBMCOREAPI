@@ -7,8 +7,8 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 {
     public partial class LanguageInfo
     {
-        public int Id { get; set; }
-        public string LanguageType { get; set; }
-        public string LanguageCode { get; set; }
+        public int id { get; set; }
+        public string languageType { get; set; }
+        public string languageCode { get; set; }
     }
 }

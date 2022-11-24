@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.MainModels
 {
-    public partial class GoogleApidetail
+    public partial class GoogleAPIDetail
     {
         public int Id { get; set; }
-        public string GoogleApi { get; set; }
+        public string GoogleAPI { get; set; }
     }
 }

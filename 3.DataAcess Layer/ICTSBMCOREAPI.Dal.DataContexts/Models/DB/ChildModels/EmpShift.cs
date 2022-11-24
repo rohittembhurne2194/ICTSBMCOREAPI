@@ -7,9 +7,9 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 {
     public partial class EmpShift
     {
-        public int ShiftId { get; set; }
-        public string ShiftName { get; set; }
-        public string ShiftStart { get; set; }
-        public string ShiftEnd { get; set; }
+        public int shiftId { get; set; }
+        public string shiftName { get; set; }
+        public string shiftStart { get; set; }
+        public string shiftEnd { get; set; }
     }
 }

@@ -7,23 +7,23 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 {
     public partial class DumpYardDetail
     {
-        public int DyId { get; set; }
-        public string DyName { get; set; }
-        public string DyNameMar { get; set; }
-        public string DyLat { get; set; }
-        public string DyLong { get; set; }
-        public string DyQrcode { get; set; }
-        public int? ZoneId { get; set; }
-        public int? WardId { get; set; }
-        public int? AreaId { get; set; }
+        public int dyId { get; set; }
+        public string dyName { get; set; }
+        public string dyNameMar { get; set; }
+        public string dyLat { get; set; }
+        public string dyLong { get; set; }
+        public string dyQRCode { get; set; }
+        public int? zoneId { get; set; }
+        public int? wardId { get; set; }
+        public int? areaId { get; set; }
         public string ReferanceId { get; set; }
-        public string DyAddress { get; set; }
-        public DateTime? LastModifiedDate { get; set; }
-        public int? UserId { get; set; }
+        public string dyAddress { get; set; }
+        public DateTime? lastModifiedDate { get; set; }
+        public int? userId { get; set; }
         public string EmployeeType { get; set; }
-        public string QrcodeImage { get; set; }
-        public bool? Qrstatus { get; set; }
-        public DateTime? QrstatusDate { get; set; }
+        public string QRCodeImage { get; set; }
+        public bool? QRStatus { get; set; }
+        public DateTime? QRStatusDate { get; set; }
         public byte[] BinaryQrCodeImage { get; set; }
         public DateTime? DataEntryDate { get; set; }
     }

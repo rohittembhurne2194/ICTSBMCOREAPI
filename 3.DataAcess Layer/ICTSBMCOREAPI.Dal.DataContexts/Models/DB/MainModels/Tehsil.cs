@@ -5,14 +5,14 @@ using System.Collections.Generic;
 
 namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.MainModels
 {
-    public partial class Tehsil
+    public partial class tehsil
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string NameMar { get; set; }
-        public string Latitude { get; set; }
-        public string Longitude { get; set; }
-        public int? State { get; set; }
-        public int? District { get; set; }
+        public int id { get; set; }
+        public string name { get; set; }
+        public string name_mar { get; set; }
+        public string latitude { get; set; }
+        public string longitude { get; set; }
+        public int? state { get; set; }
+        public int? district { get; set; }
     }
 }

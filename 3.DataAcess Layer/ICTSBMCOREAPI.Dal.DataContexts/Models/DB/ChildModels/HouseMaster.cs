@@ -7,30 +7,30 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 {
     public partial class HouseMaster
     {
-        public int HouseId { get; set; }
-        public string HouseNumber { get; set; }
-        public string HouseOwner { get; set; }
-        public string HouseOwnerMar { get; set; }
-        public string HouseOwnerMobile { get; set; }
-        public string HouseAddress { get; set; }
-        public string HouseLat { get; set; }
-        public string HouseLong { get; set; }
-        public string HouseQrcode { get; set; }
+        public int houseId { get; set; }
+        public string houseNumber { get; set; }
+        public string houseOwner { get; set; }
+        public string houseOwnerMar { get; set; }
+        public string houseOwnerMobile { get; set; }
+        public string houseAddress { get; set; }
+        public string houseLat { get; set; }
+        public string houseLong { get; set; }
+        public string houseQRCode { get; set; }
         public int? ZoneId { get; set; }
         public int? AreaId { get; set; }
         public int? WardNo { get; set; }
         public string ReferanceId { get; set; }
-        public DateTime? Modified { get; set; }
-        public int? UserId { get; set; }
-        public string Fcmid { get; set; }
-        public DateTime? LastModifiedEntry { get; set; }
-        public string RfidtagId { get; set; }
+        public DateTime? modified { get; set; }
+        public int? userId { get; set; }
+        public string FCMID { get; set; }
+        public DateTime? lastModifiedEntry { get; set; }
+        public string RFIDTagId { get; set; }
         public string WasteType { get; set; }
-        public string QrcodeImage { get; set; }
+        public string QRCodeImage { get; set; }
         public string OccupancyStatus { get; set; }
-        public string PropertyType { get; set; }
-        public bool? Qrstatus { get; set; }
-        public DateTime? QrstatusDate { get; set; }
+        public string Property_Type { get; set; }
+        public bool? QRStatus { get; set; }
+        public DateTime? QRStatusDate { get; set; }
         public byte[] BinaryQrCodeImage { get; set; }
     }
 }

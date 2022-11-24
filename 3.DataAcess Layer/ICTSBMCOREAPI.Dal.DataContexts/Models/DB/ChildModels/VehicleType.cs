@@ -7,9 +7,9 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 {
     public partial class VehicleType
     {
-        public int VtId { get; set; }
-        public string Description { get; set; }
-        public string DescriptionMar { get; set; }
-        public bool? IsActive { get; set; }
+        public int vtId { get; set; }
+        public string description { get; set; }
+        public string descriptionMar { get; set; }
+        public bool? isActive { get; set; }
     }
 }

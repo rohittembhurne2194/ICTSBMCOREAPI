@@ -7,7 +7,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.MainModels
 {
     public partial class Subscription
     {
-        public int SubscriptionId { get; set; }
-        public string SubscriptionName { get; set; }
+        public int subscriptionId { get; set; }
+        public string subscriptionName { get; set; }
     }
 }

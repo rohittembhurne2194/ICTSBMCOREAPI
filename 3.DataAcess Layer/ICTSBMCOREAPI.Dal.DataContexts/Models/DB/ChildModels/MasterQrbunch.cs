@@ -5,11 +5,11 @@ using System.Collections.Generic;
 
 namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 {
-    public partial class MasterQrbunch
+    public partial class MasterQRBunch
     {
         public int MasterId { get; set; }
         public int? HouseBunchId { get; set; }
-        public string Qrlist { get; set; }
-        public bool? Isactive { get; set; }
+        public string QRList { get; set; }
+        public bool? ISActive { get; set; }
     }
 }
