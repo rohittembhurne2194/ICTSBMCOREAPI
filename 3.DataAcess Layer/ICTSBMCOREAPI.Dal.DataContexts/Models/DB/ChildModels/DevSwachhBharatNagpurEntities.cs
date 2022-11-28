@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -8,11 +9,11 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 {
     public partial class DevSwachhBharatNagpurEntities : DbContext
     {
-        private int AppId;
-        public DevSwachhBharatNagpurEntities(int AppId)
-        {
-            this.AppId = AppId;
-        }
+        //private int AppId;
+        //public DevSwachhBharatNagpurEntities(int AppId)
+        //{
+        //    this.AppId = AppId;
+        //}
 
         public DevSwachhBharatNagpurEntities()
         {
@@ -84,24 +85,24 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
         public virtual DbSet<view_Location> view_Locations { get; set; }
         public virtual DbSet<view_SLocation> view_SLocations { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                //optionsBuilder.UseSqlServer("data source=202.65.157.253;initial catalog=LIVEAdvanceEtapalliGhantaGadi;persist security info=True;user id=appynitty;password=BigV$Telecom;MultipleActiveResultSets=True;App=EntityFramework");
-                if (AppId > 0)
-                {
-                    optionsBuilder.UseSqlServer(SwachhBharatAppConnection.GetConnectionString(AppId));
-                }
-                else
-                {
-                    optionsBuilder.UseSqlServer("data source=202.65.157.253;initial catalog=LIVEAdvanceEtapalliGhantaGadi;persist security info=True;user id=appynitty;password=BigV$Telecom;MultipleActiveResultSets=True;App=EntityFramework");
+//        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+//        {
+//            if (!optionsBuilder.IsConfigured)
+//            {
+//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+//                //optionsBuilder.UseSqlServer("data source=202.65.157.253;initial catalog=LIVEAdvanceEtapalliGhantaGadi;persist security info=True;user id=appynitty;password=BigV$Telecom;MultipleActiveResultSets=True;App=EntityFramework");
+//                if (AppId > 0)
+//                {
+//                    optionsBuilder.UseSqlServer(SwachhBharatAppConnection.GetConnectionString(AppId));
+//                }
+//                else
+//                {
+//                    optionsBuilder.UseSqlServer("data source=202.65.157.253;initial catalog=LIVEAdvanceEtapalliGhantaGadi;persist security info=True;user id=appynitty;password=BigV$Telecom;MultipleActiveResultSets=True;App=EntityFramework");
 
-                }
+//                }
 
-            }
-        }
+//            }
+//        }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

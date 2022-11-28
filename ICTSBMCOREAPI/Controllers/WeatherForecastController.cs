@@ -1,4 +1,5 @@
-﻿using ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels;
+﻿using ICTSBMCOREAPI.Dal.DataContexts.Models.DB;
+using ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -20,7 +21,7 @@ namespace ICTSBMCOREAPI.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
-        private DevSwachhBharatNagpurEntities _devSwachhBharatNagpurEntities;
+        private DevICTSBMChildEntities _DevICTSBMChildEntities;
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
@@ -48,9 +49,9 @@ namespace ICTSBMCOREAPI.Controllers
             try
             {
 
-                using (_devSwachhBharatNagpurEntities = new DevSwachhBharatNagpurEntities(AppId))
+                using (_DevICTSBMChildEntities = new DevICTSBMChildEntities(AppId))
                 {
-                    houseCount = _devSwachhBharatNagpurEntities.HouseMasters.Count();
+                    houseCount = _DevICTSBMChildEntities.HouseMasters.Count();
                 }
                 //throw new Exception("exception occured........");
                 return houseCount;

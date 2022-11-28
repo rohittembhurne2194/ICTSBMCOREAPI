@@ -25,7 +25,7 @@ namespace ICTSBMCOREAPI.Controllers
             objRep = repository;
         }
 
-        [HttpPost("getTocken")]
+        [HttpPost("getToken")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromHeader] int AppId)
         {
