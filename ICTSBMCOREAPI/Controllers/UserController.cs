@@ -44,5 +44,15 @@ namespace ICTSBMCOREAPI.Controllers
             objDetail = await objRep.SaveUserAttendenceAsync(obj, AppId, 1, batteryStatus);
             return objDetail;
         }
+
+        [HttpPost]
+        [Route("Save/UserLocation")]
+        public async Task<List<SyncResult>> SaveUserLocation([FromHeader] int AppId, [FromHeader] string batteryStatus, [FromHeader] int typeId, [FromHeader] string EmpType, [FromBody] List<SBUserLocation> obj)
+        {
+
+            List<SyncResult> objDetail = new List<SyncResult>();
+            objDetail = await objRep.SaveUserLocationAsync(obj, AppId, batteryStatus, typeId, EmpType);
+            return objDetail;
+        }
     }
 }

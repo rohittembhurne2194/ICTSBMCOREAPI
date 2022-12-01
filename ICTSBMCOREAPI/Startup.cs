@@ -17,6 +17,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.OpenApi.Models;
+using ICTSBMCOREAPI.Dal.DataContexts.Models.DB;
+
 namespace ICTSBMCOREAPI
 {
     public class Startup
@@ -33,6 +35,8 @@ namespace ICTSBMCOREAPI
         {
             services.AddDbContext<DevSwachhBharatMainEntities>();
             services.AddDbContext<DevSwachhBharatNagpurEntities>();
+            services.AddDbContext<DevICTSBMChildEntities>();
+            services.AddDbContext<DevICTSBMMainEntities>();
             services.AddControllers();
             services.AddSwaggerGen(s =>
             {

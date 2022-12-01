@@ -1,30 +1,37 @@
-﻿using ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels;
+﻿using ICTSBMCOREAPI.Dal.DataContexts.Models.DB;
+using ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels;
+using ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildSPModels;
 using ICTSBMCOREAPI.Dal.DataContexts.Models.DB.MainModels;
+using ICTSBMCOREAPI.Dal.DataContexts.Models.DB.MainSPModels;
 using ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 {
     public class Repository : IRepository
     {
-        private readonly DevSwachhBharatMainEntities dbMain;
+        private readonly DevICTSBMMainEntities dbMain;
         private readonly IConfiguration _configuration;
         private readonly ILogger<Repository> _logger;
 
-        public Repository(DevSwachhBharatMainEntities devSwachhBharatMainEntities, IConfiguration configuration, ILogger<Repository> logger)
+        public Repository(DevICTSBMMainEntities devICTSBMMainEntities, IConfiguration configuration, ILogger<Repository> logger)
         {
-            dbMain = devSwachhBharatMainEntities;
+            dbMain = devICTSBMMainEntities;
             _configuration = configuration;
             _logger = logger;
         }
@@ -56,7 +63,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 var token = new JwtSecurityToken(
                     issuer: _configuration["JWT:ValidIssuer"],
                     audience: _configuration["JWT:ValidAudience"],
-                    expires: DateTime.Now.AddMinutes(10),
+                    expires: DateTime.Now.AddMinutes(20),
                     claims: authClaims,
                     signingCredentials: new SigningCredentials(authSigninkey, SecurityAlgorithms.Aes256Encryption));
                 return new JwtSecurityTokenHandler().WriteToken(token);
@@ -108,7 +115,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             SBUser user = new SBUser();
             try
             {
-                using (DevSwachhBharatNagpurEntities db = new DevSwachhBharatNagpurEntities(AppId))
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
                 {
                     var objmain = await dbMain.AppDetails.Where(x => x.AppId == AppId).FirstOrDefaultAsync();
                     var AppDetailURL = objmain.baseImageUrlCMS + objmain.basePath + objmain.UserProfile + "/";
@@ -394,7 +401,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             SBUser user = new SBUser();
             try
             {
-                using (DevSwachhBharatNagpurEntities db = new DevSwachhBharatNagpurEntities(AppId))
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
                 {
                     var objmain = await dbMain.AppDetails.Where(x => x.AppId == AppId).FirstOrDefaultAsync();
                     var AppDetailURL = objmain.baseImageUrlCMS + objmain.basePath + objmain.UserProfile + "/";
@@ -590,7 +597,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             SBUser user = new SBUser();
             try
             {
-                using (DevSwachhBharatNagpurEntities db = new DevSwachhBharatNagpurEntities(AppId))
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
                 {
                     var objmain = await dbMain.AppDetails.Where(x => x.AppId == AppId).FirstOrDefaultAsync();
                     var AppDetailURL = objmain.baseImageUrlCMS + objmain.basePath + objmain.UserProfile + "/";
@@ -785,7 +792,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             SBUser user = new SBUser();
             try
             {
-                using (DevSwachhBharatNagpurEntities db = new DevSwachhBharatNagpurEntities(AppId))
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
                 {
                     var objmain = await dbMain.AppDetails.Where(x => x.AppId == AppId).FirstOrDefaultAsync();
                     var AppDetailURL = objmain.baseImageUrlCMS + objmain.basePath + objmain.UserProfile + "/";
@@ -990,12 +997,12 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
         public async Task<Result> SaveUserAttendenceForNormalAsync(SBUserAttendence obj, int AppId, int type, string batteryStatus)
         {
-            
+
             Result result = new Result();
             try
             {
 
-                using (DevSwachhBharatNagpurEntities db = new DevSwachhBharatNagpurEntities(AppId))
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
                 {
                     var user = await db.UserMasters.Where(c => c.userId == obj.userId && c.EmployeeType == null).FirstOrDefaultAsync();
                     var Vehicaldetail = await db.Vehical_QR_Masters.Where(c => c.ReferanceId == obj.ReferanceId && c.VehicalNumber != null && c.VehicalType != null).FirstOrDefaultAsync();
@@ -1004,7 +1011,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         if (user.isActive == true)
                         {
                             //Daily_Attendance data = db.Daily_Attendance.Where(c => c.daDate == EntityFunctions.TruncateTime(obj.daDate) && c.userId == obj.userId && (c.endTime == null || c.endTime == "")).FirstOrDefault();
-                            Daily_Attendance data = await db.Daily_Attendances.Where(c => c.userId == obj.userId && (c.endTime == null || c.endTime == "") && c.EmployeeType == null).FirstOrDefaultAsync ();
+                            Daily_Attendance data = await db.Daily_Attendances.Where(c => c.userId == obj.userId && (c.endTime == null || c.endTime == "") && c.EmployeeType == null).FirstOrDefaultAsync();
                             if (data != null)
                             {
                                 data.endTime = obj.startTime;
@@ -1124,8 +1131,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                         try
                         {
-                            DateTime.TryParseExact(obj.daDate.ToString("d"), "d", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dtObj);
-                            Daily_Attendance objdata = await db.Daily_Attendances.Where(c => c.daDate == dtObj && c.userId == obj.userId && (c.endTime == "" || c.endTime == null) && c.EmployeeType == null).FirstOrDefaultAsync();
+                            //DateTime.TryParseExact(obj.daDate.ToString("d"), "d", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dtObj);
+                            Daily_Attendance objdata = await db.Daily_Attendances.Where(c => EF.Functions.DateDiffDay(c.daDate, obj.daDate) == 0 && c.userId == obj.userId && (c.endTime == "" || c.endTime == null) && c.EmployeeType == null).FirstOrDefaultAsync();
                             if (objdata != null)
                             {
 
@@ -1268,7 +1275,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             {
 
 
-                using (DevSwachhBharatNagpurEntities db = new DevSwachhBharatNagpurEntities(AppId))
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
                 {
                     var user = await db.UserMasters.Where(c => c.userId == obj.userId && c.EmployeeType == "L").FirstOrDefaultAsync();
 
@@ -1362,8 +1369,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                         try
                         {
-                            DateTime.TryParseExact(obj.daDate.ToString("d"), "d", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dtObj);
-                            Daily_Attendance objdata = await db.Daily_Attendances.Where(c => c.daDate == dtObj && c.userId == obj.userId && (c.endTime == "" || c.endTime == null) && c.EmployeeType == "L").FirstOrDefaultAsync();
+                            //DateTime.TryParseExact(obj.daDate.ToString("d"), "d", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dtObj);
+                            Daily_Attendance objdata = await db.Daily_Attendances.Where(c => EF.Functions.DateDiffDay(c.daDate, obj.daDate) == 0 && c.userId == obj.userId && (c.endTime == "" || c.endTime == null) && c.EmployeeType == "L").FirstOrDefaultAsync();
                             if (objdata != null)
                             {
 
@@ -1443,7 +1450,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 return result;
                             }
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             _logger.LogError(ex.ToString(), ex);
                             result.status = "error";
@@ -1467,7 +1474,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             Result result = new Result();
             try
             {
-                using (DevSwachhBharatNagpurEntities db = new DevSwachhBharatNagpurEntities(AppId))
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
                 {
                     var user = await db.UserMasters.Where(c => c.userId == obj.userId && c.EmployeeType == "S").FirstOrDefaultAsync();
 
@@ -1561,8 +1568,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                         try
                         {
-                            DateTime.TryParseExact(obj.daDate.ToString("d"), "d", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dtObj);
-                            Daily_Attendance objdata = await db.Daily_Attendances.Where(c => c.daDate == dtObj && c.userId == obj.userId && (c.endTime == "" || c.endTime == null) && c.EmployeeType == "S").FirstOrDefaultAsync();
+                            //DateTime.TryParseExact(obj.daDate.ToString("d"), "d", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dtObj);
+                            Daily_Attendance objdata = await db.Daily_Attendances.Where(c => EF.Functions.DateDiffDay(c.daDate, obj.daDate) == 0 && c.userId == obj.userId && (c.endTime == "" || c.endTime == null) && c.EmployeeType == "S").FirstOrDefaultAsync();
                             if (objdata != null)
                             {
 
@@ -1665,7 +1672,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             Result result = new Result();
             try
             {
-                using (DevSwachhBharatNagpurEntities db = new DevSwachhBharatNagpurEntities(AppId))
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
                 {
                     var user = await db.UserMasters.Where(c => c.userId == obj.userId && c.EmployeeType == "D").FirstOrDefaultAsync();
                     var dy = await db.DumpYardDetails.Where(x => x.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
@@ -1750,7 +1757,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     return result;
                                 }
 
-                                catch(Exception ex)
+                                catch (Exception ex)
                                 {
                                     _logger.LogError(ex.ToString(), ex);
                                     result.status = "error";
@@ -1773,8 +1780,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                             try
                             {
-                                DateTime.TryParseExact(obj.daDate.ToString("d"), "d", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dtObj);
-                                Daily_Attendance objdata = await db.Daily_Attendances.Where(c => c.daDate == dtObj && c.userId == obj.userId && (c.endTime == "" || c.endTime == null) && c.EmployeeType == "D").FirstOrDefaultAsync();
+                                //DateTime.TryParseExact(obj.daDate.ToString("d"), "d", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dtObj);
+                                Daily_Attendance objdata = await db.Daily_Attendances.Where(c => EF.Functions.DateDiffDay(c.daDate, obj.daDate) == 0 && c.userId == obj.userId && (c.endTime == "" || c.endTime == null) && c.EmployeeType == "D").FirstOrDefaultAsync();
                                 if (objdata != null)
                                 {
 
@@ -1866,7 +1873,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     return result;
                                 }
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 _logger.LogError(ex.ToString(), ex);
                                 result.status = "error";
@@ -1894,6 +1901,561 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 return result;
             }
 
+        }
+        public async Task<List<SyncResult>> SaveUserLocationAsync(List<SBUserLocation> obj, int AppId, string batteryStatus, int typeId, string EmpType)
+        {
+            List<SyncResult> result = new List<SyncResult>();
+            if (EmpType == "N" || EmpType == "S" || EmpType == "L")
+            {
+                result = await SaveUserLocationNSLAsync(obj, AppId, batteryStatus, typeId, EmpType);
+            }
+
+            if (EmpType == "SA")
+            {
+                result = await SaveUserLocationSAAsync(obj, AppId, batteryStatus, typeId, EmpType);
+            }
+
+            return result;
+        }
+        public async Task<List<SyncResult>> SaveUserLocationNSLAsync(List<SBUserLocation> obj, int AppId, string batteryStatus, int typeId, string EmpType)
+        {
+
+            using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+            {
+                try
+                {
+                    List<SyncResult> result = new List<SyncResult>();
+                    var distCount = "";
+
+                    if (typeId == 0)
+                    {
+                        foreach (var x in obj)
+                        {
+                            DateTime Dateeee = Convert.ToDateTime(x.datetime);
+                            DateTime newTime = Dateeee;
+                            DateTime oldTime;
+                            TimeSpan span = TimeSpan.Zero;
+
+                            //var gcd = db.Locations.Where(c => c.userId == x.userId && c.type == null && EntityFunctions.TruncateTime(c.datetime) == EntityFunctions.TruncateTime(Dateeee)).OrderByDescending(c => c.locId).FirstOrDefault();
+
+                            var gcd = await db.Locations.Where(c => c.userId == x.userId && c.type == null && EF.Functions.DateDiffDay(c.datetime, Dateeee) == 0).OrderByDescending(c => c.locId).FirstOrDefaultAsync();
+                            if (gcd != null)
+                            {
+                                oldTime = gcd.datetime.Value;
+                                span = newTime.Subtract(oldTime);
+                            }
+
+                            if (gcd == null || span.TotalMinutes >= 9)
+                            {
+                                //    var IsSameRecord_Location = db.Locations.Where(c => c.userId == x.userId && c.datetime == x.datetime).FirstOrDefault();
+
+                                //if (IsSameRecord_Location == null)
+                                //{
+                                var u = await db.UserMasters.Where(c => c.userId == x.userId).FirstOrDefaultAsync();
+
+                                DateTime Offlinedate = Convert.ToDateTime(x.datetime);
+                                //var atten = db.Daily_Attendance.Where(c => c.userId == x.userId & c.endTime == "" & c.daDate == EntityFunctions.TruncateTime(x.OfflineId == 0 ? DateTime.Now : Offlinedate)).FirstOrDefault();
+                                //DateTime.TryParseExact(Offlinedate.ToString("d"), "d", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dtObj);
+
+                                var atten = await db.Daily_Attendances.Where(c => c.userId == x.userId & EF.Functions.DateDiffDay(c.daDate, Offlinedate) == 0).FirstOrDefaultAsync();
+
+                                if (atten == null)
+                                {
+                                    result.Add(new SyncResult()
+                                    {
+                                        ID = Convert.ToInt32(x.OfflineId),
+                                        isAttendenceOff = true,
+                                        status = "error",
+                                        message = "Your duty is currently off, please start again.. ",
+                                        messageMar = "आपली ड्यूटी सध्या बंद आहे, कृपया पुन्हा सुरू करा..",
+                                    });
+
+                                    //return result;
+                                    continue;
+                                }
+
+                                if (u != null & x.userId > 0)
+                                {
+                                    string addr = "", ar = "";
+                                    addr = Address(x.lat + "," + x.@long);
+                                    if (addr != "")
+                                    {
+                                        ar = area(addr);
+                                    }
+
+
+                                    //Location objdata = new Location();
+                                    //objdata.userId = obj.userId;
+                                    //objdata.gcDate = DateTime.Now;
+                                    //objdata.Lat = obj.Lat;
+                                    //    Location loc = new Location();
+                                    List<SqlParameter> parms = new List<SqlParameter>
+                                                                    {
+                                                                        // Create parameter(s)    
+                                                                        new SqlParameter { ParameterName = "@userid", Value = x.userId },
+                                                                        new SqlParameter { ParameterName = "@typeId", Value = 0 }
+                                                                    };
+                                    //var locc = db.SP_UserLatLongDetail(x.userId, 0).FirstOrDefault();
+                                    var Listlocc = await db.SP_UserLatLongDetail_Results.FromSqlRaw<SP_UserLatLongDetail_Result>("EXEC SP_UserLatLongDetail @userid, @typeId", parms.ToArray()).ToListAsync();
+                                    var locc = Listlocc == null ? null : Listlocc.FirstOrDefault();
+                                    //var locc = await db.Database.ex("SP_UserLatLongDetail @userid,@typeId", parms);
+                                    if (locc == null || locc.lat == "" || locc.@long == "")
+                                    {
+                                        //string a = objdata.Lat;
+                                        //string b = objdata.Long;
+
+                                        string a = x.lat;
+                                        string b = x.@long;
+
+                                        //var dist = db.SP_DistanceCount(Convert.ToDouble(a), Convert.ToDouble(b), Convert.ToDouble(x.lat), Convert.ToDouble(x.@long)).FirstOrDefault();
+
+                                        List<SqlParameter> parms1 = new List<SqlParameter>
+                                                                    {
+                                                                        // Create parameter(s)    
+                                                                        new SqlParameter { ParameterName = "@sLat", Value = Convert.ToDouble(a) },
+                                                                        new SqlParameter { ParameterName = "@sLong", Value = Convert.ToDouble(b) },
+                                                                        new SqlParameter { ParameterName = "@dLat", Value = Convert.ToDouble(x.lat) },
+                                                                        new SqlParameter { ParameterName = "@dLong", Value = Convert.ToDouble(x.@long) }
+                                                                    };
+                                        var Listdist = await db.SP_DistanceCount_Results.FromSqlRaw<SP_DistanceCount_Result>("EXEC SP_DistanceCount @sLat,@sLong,@dLat,@dLong", parms1.ToArray()).ToListAsync();
+                                        var dist = Listdist == null ? null : Listdist.FirstOrDefault();
+                                        distCount = dist.Distance_in_KM.ToString();
+                                    }
+                                    else
+                                    {
+
+                                        // var dist = db.SP_DistanceCount(Convert.ToDouble(locc.lat), Convert.ToDouble(locc.@long), Convert.ToDouble(x.lat), Convert.ToDouble(x.@long)).FirstOrDefault();
+                                        List<SqlParameter> parms1 = new List<SqlParameter>
+                                                                    {
+                                                                        // Create parameter(s)    
+                                                                        new SqlParameter { ParameterName = "@sLat", Value = Convert.ToDouble(locc.lat) },
+                                                                        new SqlParameter { ParameterName = "@sLong", Value = Convert.ToDouble(locc.@long) },
+                                                                        new SqlParameter { ParameterName = "@dLat", Value = Convert.ToDouble(x.lat) },
+                                                                        new SqlParameter { ParameterName = "@dLong", Value = Convert.ToDouble(x.@long) }
+                                                                    };
+                                        var Listdist = await db.SP_DistanceCount_Results.FromSqlRaw<SP_DistanceCount_Result>("EXEC SP_DistanceCount @sLat,@sLong,@dLat,@dLong", parms1.ToArray()).ToListAsync();
+                                        var dist = Listdist == null ? null : Listdist.FirstOrDefault();
+                                        distCount = dist.Distance_in_KM.ToString();
+                                    }
+
+                                    if (EmpType == "N")
+                                    {
+                                        EmpType = null;
+                                    }
+
+                                    db.Locations.Add(new Location()
+                                    {
+                                        userId = x.userId,
+                                        lat = x.lat,
+                                        _long = x.@long,
+                                        datetime = x.datetime,
+                                        address = addr,
+                                        area = ar,
+                                        batteryStatus = batteryStatus,
+                                        Distnace = Convert.ToDecimal(distCount),
+                                        CreatedDate = DateTime.Now,
+                                        EmployeeType = EmpType,
+                                    });
+                                    await db.SaveChangesAsync();
+                                }
+                            }
+
+                            result.Add(new SyncResult()
+                            {
+                                ID = Convert.ToInt32(x.OfflineId),
+                                status = "success",
+                                message = "Uploaded successfully",
+                                messageMar = "सबमिट यशस्वी",
+                            });
+
+
+                        }
+
+                    }
+                    else if (typeId == 1)
+                    {
+                        foreach (var x in obj)
+                        {
+
+                            DateTime newTime = x.datetime;
+                            DateTime oldTime;
+                            TimeSpan span = TimeSpan.Zero;
+                            var IsSameRecordQr_Location = await db.Qr_Locations.Where(c => c.empId == x.userId && c.type == null && EF.Functions.DateDiffDay(c.datetime, x.datetime) == 0).OrderByDescending(c => c.locId).FirstOrDefaultAsync();
+                            if (IsSameRecordQr_Location != null)
+                            {
+                                oldTime = IsSameRecordQr_Location.datetime.Value;
+                                span = newTime.Subtract(oldTime);
+                            }
+
+                            if (IsSameRecordQr_Location == null || span.Minutes >= 9)
+
+                            {
+                                var u = await db.QrEmployeeMasters.Where(c => c.qrEmpId == x.userId).FirstOrDefaultAsync();
+
+                                DateTime Offlinedate = Convert.ToDateTime(x.datetime);
+                                var atten = await db.Qr_Employee_Daily_Attendances.Where(c => c.qrEmpId == x.userId & c.endTime == "" & EF.Functions.DateDiffDay(c.startDate, x.OfflineId == 0 ? DateTime.Now : Offlinedate) == 0).FirstOrDefaultAsync();
+                                if (atten == null)
+                                {
+                                    result.Add(new SyncResult()
+                                    {
+                                        ID = Convert.ToInt32(x.OfflineId),
+                                        isAttendenceOff = true,
+                                        status = "error",
+                                        message = "Your duty is currently off, please start again.. ",
+                                        messageMar = "आपली ड्यूटी सध्या बंद आहे, कृपया पुन्हा सुरू करा..",
+                                    });
+
+                                    //return result;
+                                    continue;
+                                }
+
+                                if (u != null & x.userId > 0)
+                                {
+                                    string addr = "", ar = "";
+                                    addr = Address(x.lat + "," + x.@long);
+                                    if (addr != "")
+                                    {
+                                        ar = area(addr);
+                                    }
+
+                                    //Location objdata = new Location();
+                                    //objdata.userId = obj.userId;
+                                    //objdata.gcDate = DateTime.Now;
+                                    //objdata.Lat = obj.Lat;
+                                    //    Location loc = new Location();
+
+
+                                    //var locc = db.SP_UserLatLongDetail(x.userId, typeId).FirstOrDefault();
+                                    List<SqlParameter> parms = new List<SqlParameter>
+                                                                    {
+                                                                        // Create parameter(s)    
+                                                                        new SqlParameter { ParameterName = "@userid", Value = x.userId },
+                                                                        new SqlParameter { ParameterName = "@typeId", Value = typeId }
+                                                                    };
+                                    var Listlocc = await db.SP_UserLatLongDetail_Results.FromSqlRaw<SP_UserLatLongDetail_Result>("EXEC SP_UserLatLongDetail @userid,@typeId", parms.ToArray()).ToListAsync();
+                                    var locc = Listlocc == null ? null : Listlocc.FirstOrDefault();
+                                    if (locc == null || locc.lat == "" || locc.@long == "")
+                                    {
+                                        //string a = objdata.Lat;
+                                        //string b = objdata.Long;
+
+                                        string a = x.lat;
+                                        string b = x.@long;
+
+                                        //var dist = db.SP_DistanceCount(Convert.ToDouble(a), Convert.ToDouble(b), Convert.ToDouble(x.lat), Convert.ToDouble(x.@long)).FirstOrDefault();
+                                        List<SqlParameter> parms1 = new List<SqlParameter>
+                                                                    {
+                                                                        // Create parameter(s)    
+                                                                        new SqlParameter { ParameterName = "@sLat", Value = Convert.ToDouble(a) },
+                                                                        new SqlParameter { ParameterName = "@sLong", Value = Convert.ToDouble(b) },
+                                                                        new SqlParameter { ParameterName = "@dLat", Value = Convert.ToDouble(x.lat) },
+                                                                        new SqlParameter { ParameterName = "@dLong", Value = Convert.ToDouble(x.@long) }
+                                                                    };
+                                        var Listdist = await db.SP_DistanceCount_Results.FromSqlRaw<SP_DistanceCount_Result>("EXEC SP_DistanceCount @sLat,@sLong,@dLat,@dLong", parms1.ToArray()).ToListAsync();
+                                        var dist = Listdist == null ? null : Listdist.FirstOrDefault();
+                                        distCount = dist.Distance_in_KM.ToString();
+                                    }
+                                    else
+                                    {
+
+                                        //var dist = db.SP_DistanceCount(Convert.ToDouble(locc.lat), Convert.ToDouble(locc.@long), Convert.ToDouble(x.lat), Convert.ToDouble(x.@long)).FirstOrDefault();
+                                        List<SqlParameter> parms1 = new List<SqlParameter>
+                                                                    {
+                                                                        // Create parameter(s)    
+                                                                        new SqlParameter { ParameterName = "@sLat", Value = Convert.ToDouble(locc.lat) },
+                                                                        new SqlParameter { ParameterName = "@sLong", Value = Convert.ToDouble(locc.@long) },
+                                                                        new SqlParameter { ParameterName = "@dLat", Value = Convert.ToDouble(x.lat) },
+                                                                        new SqlParameter { ParameterName = "@dLong", Value = Convert.ToDouble(x.@long) }
+                                                                    };
+                                        var Listdist = await db.SP_DistanceCount_Results.FromSqlRaw<SP_DistanceCount_Result>("EXEC SP_DistanceCount @sLat,@sLong,@dLat,@dLong", parms1.ToArray()).ToListAsync();
+                                        var dist = Listdist == null ? null : Listdist.FirstOrDefault();
+                                        distCount = dist.Distance_in_KM.ToString();
+                                    }
+
+
+                                    db.Qr_Locations.Add(new Qr_Location()
+                                    {
+                                        empId = x.userId,
+                                        lat = x.lat,
+                                        _long = x.@long,
+                                        datetime = x.datetime,
+                                        address = addr,
+                                        area = ar,
+                                        batteryStatus = batteryStatus,
+                                        Distnace = Convert.ToDecimal(distCount),
+
+                                    });
+                                    await db.SaveChangesAsync();
+
+                                    DateTime newTimeh = DateTime.Now;
+                                    DateTime oldTimeh;
+                                    TimeSpan spanh = TimeSpan.Zero;
+                                    var hd = await db.HouseMasters.Where(c => c.houseLat != null && c.houseLong != null && EF.Functions.DateDiffDay(c.modified, newTimeh) == 0).OrderByDescending(c => c.houseId).FirstOrDefaultAsync();
+                                    if (hd != null)
+                                    {
+                                        oldTimeh = hd.modified.Value;
+                                        spanh = newTimeh.Subtract(oldTimeh);
+                                    }
+
+                                    if (spanh.Minutes >= 9)
+                                    {
+                                        var app = dbMain.AppDetails.Where(c => c.AppId == AppId).FirstOrDefault();
+                                        app.FAQ = "2";
+                                    }
+
+
+                                    DateTime newTimed = DateTime.Now;
+                                    DateTime oldTimed;
+                                    TimeSpan spand = TimeSpan.Zero;
+                                    var dy = await db.DumpYardDetails.Where(c => c.dyLat != null && c.dyLong != null && EF.Functions.DateDiffDay(c.lastModifiedDate, newTimed) == 0).OrderByDescending(c => c.dyId).FirstOrDefaultAsync();
+                                    if (dy != null)
+                                    {
+                                        oldTimed = dy.lastModifiedDate.Value;
+                                        spand = newTimed.Subtract(oldTimed);
+                                    }
+
+                                    if (spand.Minutes >= 9)
+                                    {
+                                        var app = await dbMain.AppDetails.Where(c => c.AppId == AppId).FirstOrDefaultAsync();
+                                        app.FAQ = "2";
+                                    }
+
+
+                                    DateTime newTimes = DateTime.Now;
+                                    DateTime oldTimes;
+                                    TimeSpan spans = TimeSpan.Zero;
+                                    var st = await db.StreetSweepingDetails.Where(c => c.SSLat != null && c.SSLong != null && EF.Functions.DateDiffDay(c.lastModifiedDate, newTimes) == 0).OrderByDescending(c => c.SSId).FirstOrDefaultAsync();
+                                    if (st != null)
+                                    {
+                                        oldTimes = st.lastModifiedDate.Value;
+                                        spans = newTimes.Subtract(oldTimes);
+                                    }
+
+                                    if (spans.Minutes >= 9)
+                                    {
+                                        var app = await dbMain.AppDetails.Where(c => c.AppId == AppId).FirstOrDefaultAsync();
+                                        app.FAQ = "2";
+                                    }
+
+
+                                    DateTime newTimel = DateTime.Now;
+                                    DateTime oldTimel;
+                                    TimeSpan spanl = TimeSpan.Zero;
+                                    var lw = await db.LiquidWasteDetails.Where(c => c.LWLat != null && c.LWLong != null && EF.Functions.DateDiffDay(c.lastModifiedDate, newTimel) == 0).OrderByDescending(c => c.LWId).FirstOrDefaultAsync();
+                                    if (lw != null)
+                                    {
+                                        oldTimel = lw.lastModifiedDate.Value;
+                                        spanl = newTimel.Subtract(oldTimel);
+                                    }
+
+                                    if (spanl.Minutes >= 9)
+                                    {
+                                        var app = await dbMain.AppDetails.Where(c => c.AppId == AppId).FirstOrDefaultAsync();
+                                        app.FAQ = "2";
+                                    }
+
+                                    if (hd == null && dy == null && st == null && lw == null)
+                                    {
+                                        var app = await dbMain.AppDetails.Where(c => c.AppId == AppId).FirstOrDefaultAsync();
+                                        app.FAQ = "0";
+                                    }
+                                    if ((spanl.Minutes <= 9 && lw != null) || (spans.Minutes <= 9 && st != null) || (spand.Minutes <= 9 && dy != null) || (spanh.Minutes <= 9 && hd != null))
+                                    {
+                                        var app = await dbMain.AppDetails.Where(c => c.AppId == AppId).FirstOrDefaultAsync();
+                                        app.FAQ = "1";
+                                    }
+                                    await dbMain.SaveChangesAsync();
+                                    //List<AppDetail> AppDetailss = dbMain.AppDetails.FromSqlRaw<AppDetail>("exec [Update_Trigger]").ToList();
+                                }
+                            }
+
+                            result.Add(new SyncResult()
+                            {
+                                ID = Convert.ToInt32(x.OfflineId),
+                                status = "success",
+                                message = "Uploaded successfully",
+                                messageMar = "सबमिट यशस्वी",
+                            });
+                        }
+                    }
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString(), ex);
+                    List<SyncResult> objres = new List<SyncResult>();
+                    objres.Add(new SyncResult()
+                    {
+                        ID = 0,
+                        status = "error",
+                        messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..",
+                        message = "Something is wrong,Try Again.. ",
+                    });
+
+
+                    return objres;
+                }
+
+            }
+
+        }
+
+        public async Task<List<SyncResult>> SaveUserLocationSAAsync(List<SBUserLocation> obj, int AppId, string batteryStatus, int typeId, string EmpType)
+        {
+           
+               
+
+                    try
+                    {
+                        List<SyncResult> result = new List<SyncResult>();
+                        var distCount = "";
+
+
+                        foreach (var x in obj)
+                        {
+                            DateTime Dateeee = Convert.ToDateTime(x.datetime);
+                            DateTime newTime = Dateeee;
+                            DateTime oldTime;
+                            TimeSpan span = TimeSpan.Zero;
+                            var gcd = await dbMain.UR_Locations.Where(c => c.empId == x.userId && c.type == null && EF.Functions.DateDiffDay(c.datetime, Dateeee) == 0).OrderByDescending(c => c.locId).FirstOrDefaultAsync();
+                            if (gcd != null)
+                            {
+                                oldTime = gcd.datetime.Value;
+                                span = newTime.Subtract(oldTime);
+                            }
+
+                            if (gcd == null || span.Minutes >= 9)
+                            {
+
+                                var u = await dbMain.EmployeeMasters.Where(c => c.EmpId == x.userId && c.isActive == true).FirstOrDefaultAsync();
+                                DateTime Offlinedate = Convert.ToDateTime(x.datetime);
+
+
+                                var atten = await dbMain.HSUR_Daily_Attendances.Where(c => c.userId == x.userId & EF.Functions.DateDiffDay(c.daDate, Offlinedate) == 0).FirstOrDefaultAsync();
+
+                                if (atten == null)
+                                {
+                                    result.Add(new SyncResult()
+                                    {
+                                        OfflineId = Convert.ToInt32(x.OfflineId),
+                                        isAttendenceOff = true,
+                                        status = "error",
+                                        message = "Your duty is currently off, please start again.. ",
+                                        messageMar = "आपली ड्यूटी सध्या बंद आहे, कृपया पुन्हा सुरू करा..",
+                                    });
+
+                                    //return result;
+                                    continue;
+                                }
+
+                                if (u != null & x.userId > 0)
+                                {
+                                    string addr = "", ar = "";
+                                    addr = Address(x.lat + "," + x.@long);
+                                    if (addr != "")
+                                    {
+                                        ar = area(addr);
+                                    }
+
+
+                                //var locc = await db.SP_UserLatLongDetailMains(x.userId, typeId).FirstOrDefault();
+                                List<SqlParameter> parms = new List<SqlParameter>
+                                                                    {
+                                                                        // Create parameter(s)    
+                                                                        new SqlParameter { ParameterName = "@userid", Value = x.userId },
+                                                                        new SqlParameter { ParameterName = "@typeId", Value = typeId }
+                                                                    };
+                                var locc = await dbMain.SP_UserLatLongDetailMain_Results.FromSqlRaw<SP_UserLatLongDetailMain_Result>("EXEC SP_UserLatLongDetailMain @userid,@typeId", parms).FirstOrDefaultAsync();
+
+
+                                if (locc == null || locc.lat == "" || locc.@long == "")
+                                    {
+
+
+                                        string a = x.lat;
+                                        string b = x.@long;
+
+                                //var dist = dbMain.SP_DistanceCount(Convert.ToDouble(a), Convert.ToDouble(b), Convert.ToDouble(x.lat), Convert.ToDouble(x.@long)).FirstOrDefault();
+                                List<SqlParameter> parms1 = new List<SqlParameter>
+                                                                    {
+                                                                        // Create parameter(s)    
+                                                                        new SqlParameter { ParameterName = "@sLat", Value = Convert.ToDouble(a) },
+                                                                        new SqlParameter { ParameterName = "@sLong", Value = Convert.ToDouble(b) },
+                                                                        new SqlParameter { ParameterName = "@dLat", Value = Convert.ToDouble(x.lat) },
+                                                                        new SqlParameter { ParameterName = "@dLong", Value = Convert.ToDouble(x.@long) }
+                                                                    };
+                                var dist = await dbMain.SP_DistanceCount_Main_Results.FromSqlRaw<SP_DistanceCount_Main_Result>("EXEC SP_DistanceCount @sLat,@sLong,@dLat,@dLong", parms1).FirstOrDefaultAsync();
+
+                                distCount = dist.Distance_in_KM.ToString();
+                                    }
+                                    else
+                                    {
+                                //var dist = dbMain.SP_DistanceCount(Convert.ToDouble(locc.lat), Convert.ToDouble(locc.@long), Convert.ToDouble(x.lat), Convert.ToDouble(x.@long)).FirstOrDefault();
+                                List<SqlParameter> parms1 = new List<SqlParameter>
+                                                                    {
+                                                                        // Create parameter(s)    
+                                                                        new SqlParameter { ParameterName = "@sLat", Value = Convert.ToDouble(locc.lat) },
+                                                                        new SqlParameter { ParameterName = "@sLong", Value = Convert.ToDouble(locc.@long) },
+                                                                        new SqlParameter { ParameterName = "@dLat", Value = Convert.ToDouble(x.lat) },
+                                                                        new SqlParameter { ParameterName = "@dLong", Value = Convert.ToDouble(x.@long) }
+                                                                    };
+                                var dist = await dbMain.SP_DistanceCount_Main_Results.FromSqlRaw<SP_DistanceCount_Main_Result>("EXEC SP_DistanceCount @sLat,@sLong,@dLat,@dLong", parms1).FirstOrDefaultAsync();
+
+                                distCount = dist.Distance_in_KM.ToString();
+                                    }
+
+
+
+                            dbMain.UR_Locations.Add(new UR_Location()
+                                    {
+                                        empId = x.userId,
+                                        lat = x.lat,
+                                        _long = x.@long,
+                                        datetime = x.datetime,
+                                        address = addr,
+                                        area = ar,
+                                        batteryStatus = batteryStatus,
+                                        Distnace = Convert.ToDecimal(distCount),
+                                        CreatedDate = DateTime.Now,
+                                        type = null,
+                                    });
+                            await dbMain.SaveChangesAsync();
+                                }
+                            }
+
+                            result.Add(new SyncResult()
+                            {
+                                OfflineId = Convert.ToInt32(x.OfflineId),
+                                status = "success",
+                                message = "Uploaded successfully",
+                                messageMar = "सबमिट यशस्वी",
+                            });
+
+
+                        }
+
+
+
+                        return result;
+                    }
+                    catch (Exception ex)
+                    {
+                    _logger.LogError(ex.ToString(), ex);
+                    List<SyncResult> objres = new List<SyncResult>();
+                        objres.Add(new SyncResult()
+                        {
+                            OfflineId = 0,
+                            status = "error",
+                            messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..",
+                            message = "Something is wrong,Try Again.. ",
+                        });
+
+
+                        return objres;
+                    }
+
+               
+            
         }
 
         public string Address(string location)
@@ -1943,6 +2505,54 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 result = Convert.ToInt32(str);
                 return result;
             }
+        }
+
+        public async Task<DataTable> SqlHelperExecSP(string spName, List<SqlParameter> parms, int AppID)
+        {
+
+            var data = new DataTable();
+            try
+            {
+                using (var db = new DevICTSBMChildEntities(AppID))
+                {
+                    var conn = db.Database.GetDbConnection();
+                    var connectionState = conn.State;
+                    try
+                    {
+                        if (connectionState != ConnectionState.Open) conn.Open();
+                        using (var cmd = conn.CreateCommand())
+                        {
+                            cmd.CommandText = spName;
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            if(parms != null)
+                            {
+                                foreach(var parm in parms)
+                                {
+                                    cmd.Parameters.Add(parm);
+                                }
+                            }
+                            using (var reader = await cmd.ExecuteReaderAsync())
+                            {
+                                data.Load(reader);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // error handling
+                        return data;
+                    }
+                    finally
+                    {
+                        if (connectionState != ConnectionState.Closed) conn.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return data;
+            }
+            return data;
         }
     }
 }
