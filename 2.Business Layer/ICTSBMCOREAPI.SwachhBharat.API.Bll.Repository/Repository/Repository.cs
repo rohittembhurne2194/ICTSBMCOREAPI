@@ -50,13 +50,15 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                  new Claim("AppId",AppId.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
             };
-                var authSigninkey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]));
+             var authSigninkey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]));
+              //  var Key = Base64UrlEncoder.DecodeBytes("9ST5hQe5dUNfAJOQZAtt19uiDhNtKKUt");
+            //    SymmetricSecurityKey signingKey = new SymmetricSecurityKey(Key);
                 var token = new JwtSecurityToken(
                     issuer: _configuration["JWT:ValidIssuer"],
                     audience: _configuration["JWT:ValidAudience"],
                     expires: DateTime.Now.AddMinutes(10),
                     claims: authClaims,
-                    signingCredentials: new SigningCredentials(authSigninkey, SecurityAlgorithms.HmacSha256Signature));
+                    signingCredentials: new SigningCredentials(authSigninkey, SecurityAlgorithms.Aes256Encryption));
                 return new JwtSecurityTokenHandler().WriteToken(token);
             }
             catch (Exception ex)
