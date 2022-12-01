@@ -31,7 +31,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB
                 //optionsBuilder.UseSqlServer("data source=202.65.157.253;initial catalog=LIVEAdvanceEtapalliGhantaGadi;persist security info=True;user id=appynitty;password=BigV$Telecom;MultipleActiveResultSets=True;App=EntityFramework");
                 if (AppId > 0)
                 {
-                    optionsBuilder.UseSqlServer(SwachhBharatAppConnection.GetConnectionString(AppId));
+                    optionsBuilder.UseSqlServer(SwachhBharatAppConnection.GetConnectionString(AppId),options => options.EnableRetryOnFailure(20));
                 }
                 else
                 {
@@ -43,12 +43,28 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB
         }
         public DbSet<SP_UserLatLongDetail_Result> SP_UserLatLongDetail_Results { get; set; }
         public DbSet<SP_DistanceCount_Result> SP_DistanceCount_Results { get; set; }
+        public DbSet<sp_MsgNotification_Result> sp_MsgNotification_Results { get; set; }
+        public DbSet<GetQrWorkHistory_Result> GetQrWorkHistory_Results { get; set; }
+        public DbSet<SP_HousePointDumpDetails_Scanify_Result> SP_HousePointDumpDetails_Scanify_Results { get; set; }
+        public DbSet<VehicleList_TypeWise_Result> VehicleList_TypeWise_Results { get; set; }
+        public DbSet<GetAttendenceDetailsTotal_Result> GetAttendenceDetailsTotal_Results { get; set; }
+        public DbSet<GetAttendenceDetailsTotalLiquid_Result> GetAttendenceDetailsTotalLiquid_Results { get; set; }
+        public DbSet<GetAttendenceDetailsTotalStreet_Result> GetAttendenceDetailsTotalStreet_Results { get; set; }
+        public DbSet<GetAttendenceDetailsTotalDump_Result> GetAttendenceDetailsTotalDump_Results { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<SP_UserLatLongDetail_Result>().HasNoKey();
             modelBuilder.Entity<SP_DistanceCount_Result>().HasNoKey();
-           
+            modelBuilder.Entity<sp_MsgNotification_Result>().HasNoKey();
+            modelBuilder.Entity<GetQrWorkHistory_Result>().HasNoKey();
+            modelBuilder.Entity<SP_HousePointDumpDetails_Scanify_Result>().HasNoKey();
+            modelBuilder.Entity<VehicleList_TypeWise_Result>().HasNoKey();
+            modelBuilder.Entity<GetAttendenceDetailsTotal_Result>().HasNoKey();
+            modelBuilder.Entity<GetAttendenceDetailsTotalLiquid_Result>().HasNoKey();
+            modelBuilder.Entity<GetAttendenceDetailsTotalStreet_Result>().HasNoKey();
+            modelBuilder.Entity<GetAttendenceDetailsTotalDump_Result>().HasNoKey();
+
         }
     }
 }

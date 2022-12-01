@@ -54,5 +54,66 @@ namespace ICTSBMCOREAPI.Controllers
             objDetail = await objRep.SaveUserLocationAsync(obj, AppId, batteryStatus, typeId, EmpType);
             return objDetail;
         }
+
+        [HttpGet]
+        [Route("Get/User")]
+        public async Task<SBUserView> GetUser([FromHeader] int AppId, [FromHeader] int userId, [FromHeader] int typeId)
+        {
+            
+            SBUserView objDetail = new SBUserView();
+            objDetail = await objRep.GetUserAsync(AppId, userId, typeId);
+            return objDetail;
+        }
+        [HttpGet]
+        [Route("Get/VersionUpdate")]
+        public async Task<Result> GetVersionUpdate([FromHeader] int AppId, [FromHeader] string version)
+        {
+            Result objDetail = new Result();
+            objDetail = await objRep.GetVersionUpdateAsync(version, AppId);
+            return objDetail;
+
+        }
+
+        [HttpGet]
+        [Route("Get/IsAttendence")]
+        public async Task<Result> CheckAttendence([FromHeader] int AppId, [FromHeader] int userId, [FromHeader] int typeId)
+        {
+            
+            Result objDetail = new Result();
+            objDetail = await objRep.CheckAttendenceAsync(userId, AppId, typeId);
+            return objDetail;
+
+        }
+        [HttpPost]
+        [Route("Save/AttendenceOffline")]
+        public async Task<List<SyncResult1>> SaveUserAttendenceOffline([FromHeader] int AppId, [FromHeader] string date, [FromHeader] string EmpType, [FromBody]List<SBUserAttendence> obj)
+        {
+            List<SyncResult1> objDetail = new List<SyncResult1>();
+            objDetail = await objRep.SaveUserAttendenceOfflineAsync(obj, AppId, date, EmpType);
+            return objDetail;
+        }
+        [HttpGet]
+        [Route("Get/WorkHistory")]
+        //api/BookATable/GetBookAtableList
+        public async Task<List<SBWorkDetails>> GetWork([FromHeader] int AppId, [FromHeader] int userId, [FromHeader] int year, [FromHeader] int month, [FromHeader] string EmpType)
+        {
+            
+            List<SBWorkDetails> objDetail = new List<SBWorkDetails>();
+            objDetail = await objRep.GetUserWorkAsync(userId, year, month, AppId, EmpType);
+            return objDetail.OrderByDescending(c => c.date).ToList();
+        }
+
+        [HttpGet]
+        [Route("Get/WorkHistory/Details")]
+        //api/BookATable/GetBookAtableList
+        public async Task<List<SBWorkDetailsHistory>> GetWorkDetails([FromHeader] int AppId, [FromHeader] int userId, [FromHeader] int languageId, [FromHeader] DateTime fdate)
+        {
+            
+           
+            List<SBWorkDetailsHistory> objDetail = new List<SBWorkDetailsHistory>();
+            objDetail = await objRep.GetUserWorkDetailsAsync(fdate, AppId, userId, languageId);
+            return objDetail;
+        }
+
     }
 }

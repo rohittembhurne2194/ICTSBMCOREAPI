@@ -33,10 +33,10 @@ namespace ICTSBMCOREAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<DevSwachhBharatMainEntities>();
-            services.AddDbContext<DevSwachhBharatNagpurEntities>();
-            services.AddDbContext<DevICTSBMChildEntities>();
-            services.AddDbContext<DevICTSBMMainEntities>();
+            services.AddDbContext<DevSwachhBharatMainEntities>(ServiceLifetime.Transient);
+            services.AddDbContext<DevSwachhBharatNagpurEntities>(ServiceLifetime.Transient);
+            services.AddDbContext<DevICTSBMChildEntities>(ServiceLifetime.Transient);
+            services.AddDbContext<DevICTSBMMainEntities>(ServiceLifetime.Transient);
             services.AddControllers();
             services.AddSwaggerGen(s =>
             {
