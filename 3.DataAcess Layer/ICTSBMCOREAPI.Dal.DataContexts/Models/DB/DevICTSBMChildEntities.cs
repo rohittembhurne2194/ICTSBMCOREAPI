@@ -51,6 +51,11 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB
         public DbSet<GetAttendenceDetailsTotalLiquid_Result> GetAttendenceDetailsTotalLiquid_Results { get; set; }
         public DbSet<GetAttendenceDetailsTotalStreet_Result> GetAttendenceDetailsTotalStreet_Results { get; set; }
         public DbSet<GetAttendenceDetailsTotalDump_Result> GetAttendenceDetailsTotalDump_Results { get; set; }
+        public DbSet<CollecctionArea_Result> CollecctionArea_Results { get; set; }
+        public DbSet<CollecctionAreaForLiquid_Result> CollecctionAreaForLiquid_Results { get; set; }
+        public DbSet<CollecctionAreaForStreet_Result> CollecctionAreaForStreet_Results { get; set; }
+        public DbSet<GetMobile_Result> GetMobile_Results { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -64,7 +69,10 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB
             modelBuilder.Entity<GetAttendenceDetailsTotalLiquid_Result>().HasNoKey();
             modelBuilder.Entity<GetAttendenceDetailsTotalStreet_Result>().HasNoKey();
             modelBuilder.Entity<GetAttendenceDetailsTotalDump_Result>().HasNoKey();
-
+            modelBuilder.Entity<CollecctionArea_Result>().HasNoKey();
+            modelBuilder.Entity<CollecctionAreaForLiquid_Result>().HasNoKey();
+            modelBuilder.Entity<CollecctionAreaForStreet_Result>().HasNoKey();
+            modelBuilder.Entity<GetMobile_Result>().HasNoKey();
         }
     }
 }

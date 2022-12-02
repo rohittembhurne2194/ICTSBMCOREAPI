@@ -9482,6 +9482,792 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         }
 
 
+        public async Task<List<CMSBZoneVM>> GetZoneAsync(int AppId, string SearchString)
+        {
+            List<CMSBZoneVM> data = new List<CMSBZoneVM>();
+            try
+            {
+                using (var db = new DevICTSBMChildEntities(AppId))
+                {
+                    data = await db.ZoneMasters.Select(x => new CMSBZoneVM
+                    {
+                        zoneId = x.zoneId,
+                        name = x.name
+                    }).ToListAsync();
+
+                    foreach (var item in data)
+                    {
+
+                        if (item.name == null || item.name == "")
+                            item.name = "";
+                    }
+                    if (!string.IsNullOrEmpty(SearchString))
+                    {
+                        var model = data.Where(c => c.name.ToUpper().ToString().Contains(SearchString.ToUpper())).ToList();
+
+                        data = model.ToList();
+                    }
+                    return data.OrderByDescending(c => c.zoneId).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return data;
+            }
+        }
+        public async Task<List<CMSBWardZoneVM>> GetWardZoneListAsync(int AppId)
+        {
+            List<CMSBWardZoneVM> data = new List<CMSBWardZoneVM>();
+            try
+            {
+                using (var db = new DevICTSBMChildEntities(AppId))
+                {
+                    data = await db.WardNumbers.Select( x => new CMSBWardZoneVM
+                    {
+                        WardID = x.Id,
+                        WardNo = x.WardNo,
+                        zoneId = x.zoneId,
+                        Zone =  db.ZoneMasters.Where(c => c.zoneId == x.zoneId).Select(c => c.name).FirstOrDefault()
+                    }).ToListAsync();
+
+                    return data.OrderByDescending(c => c.WardID).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return data;
+            }
+            
+
+        }
+        public async Task<List<CMSBAreaVM>> GetAreaListAsync(int AppId, string SearchString)
+        {
+            List<CMSBAreaVM> data = new List<CMSBAreaVM>();
+            try
+            {
+                using (var db = new DevICTSBMChildEntities(AppId))
+                {
+                    data = await db.TeritoryMasters.Select( x => new CMSBAreaVM
+                    {
+                        id = x.Id,
+                        area = x.Area,
+                        areaMar = x.AreaMar,
+                        wardId = x.wardId,
+                        Wardno = db.WardNumbers.Where(v => v.Id == x.wardId).Select(v => v.WardNo).FirstOrDefault()
+                    }).ToListAsync();
+
+                    foreach (var item in data)
+                    {
+                        item.area = checkNull(item.area);
+                        item.areaMar = checkNull(item.areaMar);
+                        item.Wardno = checkNull(item.Wardno);
+                        string zone = string.Empty;
+                        if (!string.IsNullOrEmpty(item.Wardno))
+                        {
+                            int wa = Convert.ToInt32(await db.WardNumbers.Where(c => c.WardNo == item.Wardno).Select(c => c.zoneId).FirstOrDefaultAsync());
+                            zone = await db.ZoneMasters.Where(c => c.zoneId == wa).Select(c => c.name).FirstOrDefaultAsync();
+                            item.Wardno = item.Wardno + " (" + zone + ")";
+                        }
+                        else
+                        {
+                            item.Wardno = item.Wardno + " (" + zone + ")";
+                        }
+
+                    }
+                    if (!string.IsNullOrEmpty(SearchString))
+                    {
+                        var model = data.Where(c => c.area.ToUpper().ToString().Contains(SearchString.ToUpper()) || c.areaMar.ToString().ToUpper().ToString().Contains(SearchString.ToUpper()) ||
+                         c.Wardno.ToString().Contains(SearchString.ToUpper())).ToList();
+
+                        data = model.ToList();
+                    }
+                    return data.OrderByDescending(c => c.id).ToList();
+                }
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return data;
+
+            }
+            
+
+        }
+
+        public async Task<List<SBArea>> GetCollectionAreaAsync(int AppId, int type, string EmpType)
+        {
+            List<SBArea> obj = new List<SBArea>();
+
+            if (EmpType == "N")
+            {
+                obj = await GetCollectionAreaForNormalAsync(AppId, type);
+            }
+            if (EmpType == "L")
+            {
+                obj = await GetCollectionAreaForLiquidAsync(AppId, type);
+            }
+            if (EmpType == "S")
+            {
+                obj = await GetCollectionAreaForStreetAsync(AppId, type);
+            }
+            return obj;
+
+        }
+        public async Task<List<SBArea>> GetCollectionAreaForNormalAsync(int AppId, int type)
+        {
+            List<SBArea> obj = new List<SBArea>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                {
+                    //var data = db.CollecctionArea(type).ToList();
+                    List<SqlParameter> parms = new List<SqlParameter>
+                                                {
+                                                    // Create parameter(s)    
+                                                    new SqlParameter { ParameterName = "@type", Value = type }
+                                                };
+                    var data = await db.CollecctionArea_Results.FromSqlRaw<CollecctionArea_Result>("EXEC CollecctionArea @type", parms.ToArray()).ToListAsync();
+
+                    
+
+                    foreach (var x in data)
+                    {
+
+                        obj.Add(new SBArea()
+                        {
+                            id = x.Id,
+                            area = checkNull(x.Area).Trim(),
+                            areaMar = checkNull(x.AreaMar).Trim()
+                        });
+                    }
+
+                }
+                return obj;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+            }
+        }
+        public async Task<List<SBArea>> GetCollectionAreaForLiquidAsync(int AppId, int type)
+        {
+            List<SBArea> obj = new List<SBArea>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                {
+                    //var data = db.CollecctionAreaForLiquid(type).ToList();
+                    List<SqlParameter> parms = new List<SqlParameter>
+                                                {
+                                                    // Create parameter(s)    
+                                                    new SqlParameter { ParameterName = "@type", Value = type }
+                                                };
+                    var data = await db.CollecctionAreaForLiquid_Results.FromSqlRaw<CollecctionAreaForLiquid_Result>("EXEC CollecctionAreaForLiquid @type", parms.ToArray()).ToListAsync();
+
+                    foreach (var x in data)
+                    {
+
+                        obj.Add(new SBArea()
+                        {
+                            id = x.Id,
+                            area = checkNull(x.Area).Trim(),
+                            areaMar = checkNull(x.AreaMar).Trim()
+                        });
+                    }
+
+                }
+                return obj;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+
+            }
+        }
+
+        public async Task<List<SBArea>> GetCollectionAreaForStreetAsync(int AppId, int type)
+        {
+            List<SBArea> obj = new List<SBArea>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                {
+                    //var data = db.CollecctionAreaForStreet(type).ToList();
+
+                    List<SqlParameter> parms = new List<SqlParameter>
+                                                {
+                                                    // Create parameter(s)    
+                                                    new SqlParameter { ParameterName = "@type", Value = type }
+                                                };
+                    var data = await db.CollecctionAreaForStreet_Results.FromSqlRaw<CollecctionAreaForStreet_Result>("EXEC CollecctionAreaForStreet @type", parms.ToArray()).ToListAsync();
+
+
+                    foreach (var x in data)
+                    {
+
+                        obj.Add(new SBArea()
+                        {
+                            id = x.Id,
+                            area = checkNull(x.Area).Trim(),
+                            areaMar = checkNull(x.AreaMar).Trim()
+                        });
+                    }
+
+                }
+                return obj;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+
+            }
+        }
+
+        public async Task<List<HouseDetailsVM>> GetAreaHouseAsync(int AppId, int areaId, string EmpType)
+        {
+
+            List<HouseDetailsVM> obj = new List<HouseDetailsVM>();
+            if (EmpType == "N")
+            {
+                obj = await GetAreaHouseForNormalAsync(AppId, areaId);
+            }
+            if (EmpType == "L")
+            {
+                obj = await GetAreaHouseForLiquidAsync(AppId, areaId);
+            }
+            if (EmpType == "S")
+            {
+                obj = await GetAreaHousForStreetAsync(AppId, areaId);
+            }
+
+            if (EmpType == "D")
+            {
+                obj = await GetDumpListAsync(AppId);
+            }
+
+            if (EmpType == "V")
+            {
+                obj = await GetVehicleListAsync(AppId);
+            }
+
+
+            return obj;
+
+        }
+
+
+        public async Task<List<HouseDetailsVM>> GetAreaHouseForNormalAsync(int AppId, int areaId)
+        {
+            List<HouseDetailsVM> obj = new List<HouseDetailsVM>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                {
+                    var data = await db.Vw_GetHouseNumbers.Where(c => c.AreaId == areaId).ToListAsync();
+                    if (AppId == 1003)
+                    {
+                        foreach (var x in data)
+                        {
+
+                            obj.Add(new HouseDetailsVM()
+                            {
+                                houseid = x.ReferanceId,
+                                houseNumber = x.ReferanceId,
+                            });
+                        }
+                    }
+                    else
+                    {
+
+                        foreach (var x in data)
+                        {
+                            string HouseN = "";
+                            if (x.houseNumber == null || x.houseNumber == "")
+                            {
+                                HouseN = x.ReferanceId;
+                            }
+                            else { HouseN = x.houseNumber; }
+                            obj.Add(new HouseDetailsVM()
+                            {
+                                houseid = x.ReferanceId,
+                                houseNumber = HouseN,
+
+                            });
+                        }
+                    }
+
+                }
+                return obj;
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+            }
+            
+        }
+
+        public async Task<List<HouseDetailsVM>> GetAreaHouseForLiquidAsync(int AppId, int areaId)
+        {
+            List<HouseDetailsVM> obj = new List<HouseDetailsVM>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                {
+                    var data = await db.Vw_GetLiquidNumbers.Where(c => c.AreaId == areaId).ToListAsync();
+                    if (AppId == 1003)
+                    {
+                        foreach (var x in data)
+                        {
+
+                            obj.Add(new HouseDetailsVM()
+                            {
+                                houseid = x.ReferanceId,
+                                houseNumber = x.ReferanceId,
+                            });
+                        }
+                    }
+                    else
+                    {
+
+                        foreach (var x in data)
+                        {
+                            string HouseN = "";
+                            //if (x.houseNumber == null || x.houseNumber == "")
+                            //{
+                            //    HouseN = x.ReferanceId;
+                            //}
+                            //else { HouseN = x.houseNumber; }
+                            obj.Add(new HouseDetailsVM()
+                            {
+                                houseid = x.ReferanceId,
+                                houseNumber = x.ReferanceId,
+
+                            });
+                        }
+                    }
+
+                }
+                return obj;
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+            }
+        }
+
+
+        public async Task<List<HouseDetailsVM>> GetAreaHousForStreetAsync(int AppId, int areaId)
+        {
+            List<HouseDetailsVM> obj = new List<HouseDetailsVM>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                {
+                    var data = await db.Vw_GetStreetNumbers.Where(c => c.AreaId == areaId).ToListAsync();
+                    if (AppId == 1003)
+                    {
+                        foreach (var x in data)
+                        {
+
+                            obj.Add(new HouseDetailsVM()
+                            {
+                                houseid = x.ReferanceId,
+                                houseNumber = x.ReferanceId,
+                            });
+                        }
+                    }
+                    else
+                    {
+
+                        foreach (var x in data)
+                        {
+                            string HouseN = "";
+                            //if (x.houseNumber == null || x.houseNumber == "")
+                            //{
+                            //    HouseN = x.ReferanceId;
+                            //}
+                            //else { HouseN = x.houseNumber; }
+                            obj.Add(new HouseDetailsVM()
+                            {
+                                houseid = x.ReferanceId,
+                                houseNumber = x.ReferanceId,
+
+                            });
+                        }
+                    }
+
+                }
+                return obj;
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+
+            }
+            
+        }
+        public async Task<List<HouseDetailsVM>> GetDumpListAsync(int AppId)
+        {
+            List<HouseDetailsVM> obj = new List<HouseDetailsVM>();
+            try
+            {
+
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                {
+                    var data = await db.DumpYardDetails.ToListAsync();
+
+
+                    foreach (var x in data)
+                    {
+
+                        obj.Add(new HouseDetailsVM()
+                        {
+                            houseid = x.ReferanceId,
+                            houseNumber = x.ReferanceId,
+
+                        });
+                    }
+
+
+                }
+                return obj;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+
+            }
+            
+        }
+
+        public async Task<List<HouseDetailsVM>> GetVehicleListAsync(int AppId)
+        {
+            List<HouseDetailsVM> obj = new List<HouseDetailsVM>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                {
+                    var data = await db.Vehical_QR_Masters.Where(c => c.VehicalType != null && c.VehicalNumber != null).ToListAsync();
+
+
+                    foreach (var x in data)
+                    {
+
+                        obj.Add(new HouseDetailsVM()
+                        {
+                            houseid = x.ReferanceId,
+                            houseNumber = x.ReferanceId,
+
+                        });
+                    }
+
+
+                }
+                return obj;
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+
+            }
+            
+        }
+
+
+        public async Task<CollectionAppAreaLatLong> GetAppAreaLatLongAsync(int appId)
+        {
+            CollectionAppAreaLatLong obj = new CollectionAppAreaLatLong();
+            try
+            {
+                using (DevICTSBMMainEntities db = new DevICTSBMMainEntities())
+                {
+                    var data = await db.AppDetails.Where(c => c.AppId == appId).FirstOrDefaultAsync();
+
+                    obj.AppId = appId;
+                    obj.AppAreaLatLong = data.AppAreaLatLong;
+                    obj.IsAreaActive = data.IsAreaActive;
+
+                }
+                return obj;
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+
+            }
+           
+            
+        }
+
+
+
+
+        public async Task<Result> SendSMSToHOuseAsync(int area, int AppId)
+        {
+
+            Result res = new Result();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
+                {
+                    var appdetails = await dbMain.AppDetails.Where(c => c.AppId == AppId).FirstOrDefaultAsync();
+                    //var data = db.HouseMasters.Where(c => c.AreaId == area).ToList();
+                    //foreach (var x in data)
+                    //{
+                    //    string msg;
+                    //    if (AppId == 1)
+                    //    {
+                    //        msg = "नमस्कार! घंटागाडीचे आगमन आपल्या क्षेत्रात झालेले आहे. आपल्या घरातून लवकरच कचरा संकलित करण्यात येईल. आपणास विनंती आहे कि कृपया आपल्या घरातील ओला व सुका असा वर्गीकृत कचरा आमच्या सफाई सेवकास सुपूर्द करावा. कचरा संकलन न झाल्यास कृपया खालील दिलेल्या क्रमांकावर संपर्क करून तक्रार/सूचना नोंदवावी. धन्यवाद. " + appdetails.yoccContact + " आपल्या सेवेशी" + appdetails.AppName_mar + ".";
+                    //    }
+                    //    else {
+                    //        msg = "नमस्कार! घंटागाडीचे आगमन आपल्या क्षेत्रात झालेले आहे. आपल्या घरातून लवकरच कचरा संकलित करण्यात येईल. आपणास विनंती आहे कि कृपया आपल्या घरातील ओला व सुका असा वर्गीकृत कचरा आमच्या सफाई सेवकास सुपूर्द करावा. धन्यवाद. " + appdetails.yoccContact + " आपल्या सेवेशी" + appdetails.AppName_mar + ".";
+                    //    }
+                    //    sendSMS(msg, x.houseOwnerMobile);
+
+                    //}
+
+                    //string mob = db.GetMobile(Convert.ToInt32(area)).FirstOrDefault().mob;
+                    List<SqlParameter> parms = new List<SqlParameter>
+                                                {
+                                                    // Create parameter(s)    
+                                                    new SqlParameter { ParameterName = "@areaId", Value = area }
+                                                };
+                    var ListMob = await db.GetMobile_Results.FromSqlRaw<GetMobile_Result>("EXEC GetMobile @areaId", parms.ToArray()).ToListAsync();
+                    string mob = ListMob == null ? "" : ListMob.FirstOrDefault().mob;
+
+                    string msg, msgMar;
+
+
+
+                    if (appdetails.LanguageId == 3)
+                    {
+                        //  msg = "प्रिय नागरिक, कन्नड नगरपरिषदेची घंटागाडी १५ मिनिटाच्या आत आपल्या घरासमोर कचरा संकलनासाठी येत आहे. तरी आपण ओला व सुका कचरा वेगवेगळा करून गाडीत टाकावा. आपली सौ स्वातीताई संतोषभाऊ कोल्हे" + appdetails.yoccContact + " आपल्या सेवेशी" + appdetails.AppName_mar + ".";
+                        msg = "" + appdetails.MsgForBroadcast + " " + appdetails.yoccContact + " आपकी सेवा में " + appdetails.AppName_mar + "|";
+                        sendSMSmar(msg, mob);
+                    }
+                    if (appdetails.LanguageId == 4)
+                    {
+                        //  msg = "प्रिय नागरिक, कन्नड नगरपरिषदेची घंटागाडी १५ मिनिटाच्या आत आपल्या घरासमोर कचरा संकलनासाठी येत आहे. तरी आपण ओला व सुका कचरा वेगवेगळा करून गाडीत टाकावा. आपली सौ स्वातीताई संतोषभाऊ कोल्हे" + appdetails.yoccContact + " आपल्या सेवेशी" + appdetails.AppName_mar + ".";
+                        msg = "" + appdetails.MsgForBroadcast + " " + appdetails.yoccContact + " आपल्या सेवेशी" + appdetails.AppName_mar + ".";
+                        sendSMSmar(msg, mob);
+                    }
+                    else if (AppId == 1 && appdetails.LanguageId == 4)
+                    {
+                        // msgMar = "नमस्कार! घंटागाडीचे आगमन आपल्या क्षेत्रात झालेले आहे. आपल्या घरातून लवकरच कचरा संकलित करण्यात येईल. आपणास विनंती आहे कि कृपया आपल्या घरातील ओला व सुका असा वर्गीकृत कचरा आमच्या सफाई सेवकास सुपूर्द करावा. कचरा संकलन न झाल्यास कृपया खालील दिलेल्या क्रमांकावर संपर्क करून तक्रार/सूचना नोंदवावी. धन्यवाद. " + appdetails.yoccContact + " आपल्या सेवेशी" + appdetails.AppName_mar + ".";
+
+                        //msg = "Dear citizen, garbage collection van will arrive in your area very shortly. Kindly keep the waste in dry and wet segregated form ready and submit it to the sanitary worker. Thank you " + appdetails.AppName + ".";
+
+                        //   msg= "Dear citizen, garbage collection van will arrive in your area very shortly.Kindly keep the dry and wet segregated waste ready & submit it to the sanitary worker.Thank you " + appdetails.AppName + ".";
+
+                        msg = "" + appdetails.MsgForBroadcast + " " + appdetails.AppName + ".";
+                        sendSMS(msg, mob);
+                    }
+
+
+                    else
+                    {
+                        // msgMar = "नमस्कार! घंटागाडीचे आगमन आपल्या क्षेत्रात झालेले आहे. आपल्या घरातून लवकरच कचरा संकलित करण्यात येईल. आपणास विनंती आहे कि कृपया आपल्या घरातील ओला व सुका असा वर्गीकृत कचरा आमच्या सफाई सेवकास सुपूर्द करावा. धन्यवाद. " + appdetails.yoccContact + " आपल्या सेवेशी" + appdetails.AppName_mar + ".";
+
+                        //  msg = "Dear citizen, garbage collection van will arrive in your area very shortly.Kindly keep the dry and wet segregated waste ready & submit it to the sanitary worker.Thank you " + appdetails.AppName + ".";
+                        if (appdetails.LanguageId == 1)
+                        {
+                            msg = "" + appdetails.MsgForBroadcast + " " + appdetails.AppName + ".";
+                        }
+                        else
+                        {
+                            msg = "" + appdetails.MsgForBroadcast + " " + appdetails.AppName + ".";
+                            sendSMS(msg, mob);
+                        }
+                    }
+
+
+                    var FCM = from h in db.HouseMasters
+                              join d in db.DeviceDetails on h.ReferanceId equals d.ReferenceID
+                              select new { FCMID = d };
+
+                    //var FCM = db.HouseMasters
+                    //  .Where(y => y.AreaId == area & y.FCMID != null)
+                    //  .ToList();
+
+                    List<String> ArrayList = new List<String>();
+                    if (FCM != null)
+                    {
+                        foreach (var x in FCM)
+                        {
+                            ArrayList.Add(x.FCMID.FCMID);
+                        }
+                    }
+                    PushNotificationMessageBroadCast(msg, ArrayList, appdetails.AppName, appdetails.Android_GCM_pushNotification_Key);
+
+                }
+                res.status = "success";
+                return res;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return res;
+            }
+            
+
+
+        }
+
+
+        public async Task<List<GarbagePointDetailsVM>> GetAreaPointAsync(int AppId, int areaId)
+        {
+
+            List<GarbagePointDetailsVM> obj = new List<GarbagePointDetailsVM>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                {
+                    var data = await db.GarbagePointDetails.Where(c => c.areaId == areaId).ToListAsync();
+                    if(data != null && data.Count > 0)
+                    {
+                        foreach (var x in data)
+                        {
+                            string HouseN = "";
+                            if (x.gpName == null || x.gpName == "")
+                            {
+                                HouseN = x.ReferanceId;
+                            }
+                            else { HouseN = x.gpName; }
+                            obj.Add(new GarbagePointDetailsVM()
+                            {
+                                gpId = x.ReferanceId,
+                                gpName = HouseN,
+
+                            });
+                        }
+                    }
+                    
+
+                }
+                return obj;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+            }
+
+        }
+
+        public async Task<List<DumpYardPointDetailsVM>> GetDumpYardAreaAsync(int AppId, int areaId)
+        {
+
+            List<DumpYardPointDetailsVM> obj = new List<DumpYardPointDetailsVM>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                {
+                    var data = await db.DumpYardDetails.Where(c => c.areaId == areaId).ToListAsync();
+                    if(data != null && data.Count > 0)
+                    {
+                        foreach (var x in data)
+                        {
+                            string HouseN = "";
+                            if (x.dyName == null || x.dyName == "")
+                            {
+                                HouseN = x.ReferanceId;
+                            }
+                            else { HouseN = x.dyName; }
+                            obj.Add(new DumpYardPointDetailsVM()
+                            {
+                                dyId = x.ReferanceId,
+                                dyName = HouseN,
+
+                            });
+                        }
+                    }
+                    
+
+                }
+                return obj;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+
+            }
+
+        }
+
+        public async Task<SyncResult2> GetUserMobileIdentificationAsync(int appId, int userId, bool isSync, int batteryStatus, string imeinos)
+        {
+            SyncResult2 result = new SyncResult2();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(appId))
+                {
+                    Daily_Attendance attendance = new Daily_Attendance();
+                    var mob = await db.UserMasters.Where(c => c.userId == userId).FirstOrDefaultAsync();
+                    if (mob != null)
+                    {
+                        string imei1 = mob.imoNo;
+                        string imei2 = mob.imoNo2;
+                        if (mob.imoNo != null && mob.imoNo2 != null)
+                        {
+                            if (mob.imoNo == imeinos)
+                            {
+                                mob.imoNo = null;
+                                result.IsInSync = true;
+                                result.UserId = userId;
+                                result.batterystatus = batteryStatus;
+                                result.imei = imei1;
+                                mob.imoNo = mob.imoNo2;
+                                mob.imoNo2 = null;
+                                await db.SaveChangesAsync();
+                            }
+                            else
+                            {
+                                result.IsInSync = false;
+                                result.UserId = userId;
+                                result.batterystatus = batteryStatus;
+                                result.imei = imei2;
+                            }
+                        }
+                        else
+                        {
+                            result.IsInSync = false;
+                            result.UserId = userId;
+                            result.batterystatus = batteryStatus;
+                            result.imei = imei1;
+                        }
+                    }
+                    
+
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return result;
+
+            }
+            
+        }
 
         public string checkNull(string str)
         {
