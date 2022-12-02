@@ -49,10 +49,10 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpPost]
         [Route("Save/QrHPDCollections")]
-        public async Task<Result> SaveQrHPDCollections([FromHeader] int AppId, [FromHeader] string refid, [FromHeader] int Gctype, [FromBody]BigVQRHPDVM obj)
+        public async Task<Result> SaveQrHPDCollections([FromHeader] int AppId, [FromHeader] string referanceId, [FromHeader] int gcType, [FromBody]BigVQRHPDVM obj)
         {
             
-            string referanceid = (refid == "" ? "" : refid);
+            string referanceid = (referanceId == "" ? "" : referanceId);
             
             string houseid1 = obj.ReferanceId;
             string[] houseList = houseid1.Split(',');
@@ -64,7 +64,7 @@ namespace ICTSBMCOREAPI.Controllers
 
             }
 
-            string[] referancList = refid.Split(',');
+            string[] referancList = referanceId.Split(',');
 
             if (referancList.Length > 1)
             {
@@ -72,7 +72,7 @@ namespace ICTSBMCOREAPI.Controllers
 
             }
             Result objDetail = new Result();
-            objDetail = await objRep.SaveQrHPDCollectionsAsync(obj, AppId, referanceid, Gctype);
+            objDetail = await objRep.SaveQrHPDCollectionsAsync(obj, AppId, referanceid, gcType);
             return objDetail;
         }
 
