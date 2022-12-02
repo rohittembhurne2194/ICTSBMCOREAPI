@@ -15,10 +15,24 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         Task<SBUser> CheckUserLoginForLiquidAsync(string userName, string password, string imi, int AppId, string EmpType);
         Task<SBUser> CheckUserLoginForStreetAsync(string userName, string password, string imi, int AppId, string EmpType);
         Task<Qr_Location> FillLocationDetailsAsync(BigVQRHPDVM obj, int AppId, bool IsOffline);
+        Task<CollectionAppAreaLatLong> GetAppAreaLatLongAsync(int appId);
+        Task<List<HouseDetailsVM>> GetAreaHouseAsync(int AppId, int areaId, string EmpType);
+        Task<List<HouseDetailsVM>> GetAreaHouseForLiquidAsync(int AppId, int areaId);
+        Task<List<HouseDetailsVM>> GetAreaHouseForNormalAsync(int AppId, int areaId);
+        Task<List<HouseDetailsVM>> GetAreaHousForStreetAsync(int AppId, int areaId);
+        Task<List<CMSBAreaVM>> GetAreaListAsync(int AppId, string SearchString);
+        Task<List<GarbagePointDetailsVM>> GetAreaPointAsync(int AppId, int areaId);
+        Task<List<SBArea>> GetCollectionAreaAsync(int AppId, int type, string EmpType);
+        Task<List<SBArea>> GetCollectionAreaForLiquidAsync(int AppId, int type);
+        Task<List<SBArea>> GetCollectionAreaForNormalAsync(int AppId, int type);
+        Task<List<SBArea>> GetCollectionAreaForStreetAsync(int AppId, int type);
+        Task<List<HouseDetailsVM>> GetDumpListAsync(int AppId);
+        Task<List<DumpYardPointDetailsVM>> GetDumpYardAreaAsync(int AppId, int areaId);
         Task<List<SBWorkDetails>> GetQrWorkHistoryAsync(int userId, int year, int month, int appId);
         Task<List<BigVQrworkhistorydetails>> GetQrWorkHistoryDetailsAsync(DateTime date, int AppId, int userId);
         Task<BigVQRHPDVM2> GetScanifyHouseDetailsDataAsync(int appId, string ReferenceId, int gcType);
         Task<SBUserView> GetUserAsync(int AppId, int userId, int typeId);
+        Task<SyncResult2> GetUserMobileIdentificationAsync(int appId, int userId, bool isSync, int batteryStatus, string imeinos);
         Task<List<SBWorkDetails>> GetUserWorkAsync(int userId, int year, int month, int appId, string EmpType);
         Task<List<SBWorkDetailsHistory>> GetUserWorkDetailsAsync(DateTime date, int appId, int userId, int languageId);
         Task<List<SBWorkDetails>> GetUserWorkForDumpAsync(int userId, int year, int month, int appId);
@@ -27,7 +41,10 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         Task<List<SBWorkDetails>> GetUserWorkForStreetAsync(int userId, int year, int month, int appId);
         Task<List<SBVehicleType>> GetVehicleAsync(int appId);
         Task<List<VehicleList>> GetVehicleListAsync(int appId, int VehicleTypeId);
+        Task<List<HouseDetailsVM>> GetVehicleListAsync(int AppId);
         Task<Result> GetVersionUpdateAsync(string version, int AppId);
+        Task<List<CMSBWardZoneVM>> GetWardZoneListAsync(int AppId);
+        Task<List<CMSBZoneVM>> GetZoneAsync(int AppId, string SearchString);
 
         //Task<SBUser> CheckUserLoginForNormalAsync(string userName, string password, string imi, int AppId, string EmpType);
         public Task<string> LoginAsync(int AppId);
@@ -56,5 +73,6 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         Task<List<SyncResult>> SaveUserLocationAsync(List<SBUserLocation> obj, int AppId, string batteryStatus, int typeId, string EmpType);
         Task<List<SyncResult>> SaveUserLocationNSLAsync(List<SBUserLocation> obj, int AppId, string batteryStatus, int typeId, string EmpType);
         Task<CollectionSyncResult> SaveUserLocationOfflineSyncAsync(SBGarbageCollectionView obj, int AppId, int typeId);
+        Task<Result> SendSMSToHOuseAsync(int area, int AppId);
     }
 }

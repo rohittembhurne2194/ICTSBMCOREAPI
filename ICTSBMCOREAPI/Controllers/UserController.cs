@@ -114,6 +114,117 @@ namespace ICTSBMCOREAPI.Controllers
             objDetail = await objRep.GetUserWorkDetailsAsync(fdate, AppId, userId, languageId);
             return objDetail;
         }
+        [HttpGet]
+        [Route("Get/Zone")]
+        public async Task<List<CMSBZoneVM>> GetZone(int AppId, string SearchString)
+        {
+            List<CMSBZoneVM> objDetail = new List<CMSBZoneVM>();
+           
+            objDetail = await objRep.GetZoneAsync(AppId, SearchString);
+            return objDetail;
+        }
+        [HttpGet]
+        [Route("Get/WardZoneList")]
+        public async Task<List<CMSBWardZoneVM>> GetWardZoneList(int AppId)
+        {
+            List<CMSBWardZoneVM> objDetail = new List<CMSBWardZoneVM>();
+            objDetail = await objRep.GetWardZoneListAsync(AppId);
+            return objDetail;
+        }
 
+        [HttpGet]
+        [Route("Get/AreaList")]
+        public async Task<List<CMSBAreaVM>> GetAreaList(int AppId, string SearchString)
+        {
+
+            List<CMSBAreaVM> objDetail = new List<CMSBAreaVM>();
+            objDetail = await objRep.GetAreaListAsync(AppId, SearchString);
+            return objDetail;
+
+        }
+        [HttpGet]
+        [Route("Get/CollectionArea")]
+        public async Task<List<SBArea>> GetColectionArea([FromHeader] int AppId, [FromHeader] int type, [FromHeader] string EmpType)
+        {
+
+            List<SBArea> objDetail = new List<SBArea>();
+
+            objDetail = await objRep.GetCollectionAreaAsync(AppId, type, EmpType);
+            return objDetail;
+
+        }
+
+
+        [HttpGet]
+        [Route("Get/AreaHouse")]
+        public async Task<List<HouseDetailsVM>> GetHouseAreaWise([FromHeader] int AppId, [FromHeader] int areaId, [FromHeader] string EmpType)
+        {
+
+            List<HouseDetailsVM> objDetail = new List<HouseDetailsVM>();
+            objDetail = await objRep.GetAreaHouseAsync(AppId, areaId, EmpType);
+            return objDetail;
+
+        }
+
+
+        [HttpGet]
+        [Route("Get/AppAreaLatLong")]
+        //api/BookATable/GetBookAtableList
+        public async Task<CollectionAppAreaLatLong> GetAppAreaLatLong([FromHeader] int AppId)
+        {
+            
+            CollectionAppAreaLatLong objDetail = new CollectionAppAreaLatLong();
+            objDetail = await objRep.GetAppAreaLatLongAsync(AppId);
+            return objDetail;
+        }
+
+
+        [HttpGet]
+        [Route("Get/SendSms")]
+        public async Task<Result> SendNotificationt([FromHeader] int AppId, [FromHeader] int areaId)
+        {
+            Result objDetail = new Result();
+            objDetail = await objRep.SendSMSToHOuseAsync(areaId, AppId);
+            return objDetail;
+
+        }
+
+
+
+        [HttpGet]
+        [Route("Get/AreaPoint")]
+        public async Task<List<GarbagePointDetailsVM>> GetPointAreaWise([FromHeader] int AppId, [FromHeader] int areaId)
+        {
+
+            List<GarbagePointDetailsVM> objDetail = new List<GarbagePointDetailsVM>();
+            objDetail = await objRep.GetAreaPointAsync(AppId, areaId);
+            return objDetail;
+
+        }
+
+
+        [HttpGet]
+        [Route("Get/DumpYardPoint")]
+        public async Task<List<DumpYardPointDetailsVM>> GetDumpYardAreaWise([FromHeader] int AppId, [FromHeader] int areaId)
+        {
+
+            List<DumpYardPointDetailsVM> objDetail = new List<DumpYardPointDetailsVM>();
+            objDetail = await objRep.GetDumpYardAreaAsync(AppId, areaId);
+            return objDetail;
+
+        }
+
+        [HttpGet]
+        [Route("Get/GetUserMobileIdentification")]
+        public async Task<SyncResult2> GetUserMobileIdentification([FromHeader] int AppId, [FromHeader] int userId, [FromHeader] bool isSync, [FromHeader] int batteryStatus, [FromHeader] string imeinos)
+        {
+
+            SyncResult2 objDetail = new SyncResult2();
+
+            objDetail = await objRep.GetUserMobileIdentificationAsync(AppId, userId, isSync, batteryStatus, imeinos);
+            return objDetail;
+        }
     }
+    
 }
+
