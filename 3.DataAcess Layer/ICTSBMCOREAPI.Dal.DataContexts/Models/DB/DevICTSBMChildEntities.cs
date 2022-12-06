@@ -55,6 +55,12 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB
         public DbSet<CollecctionAreaForLiquid_Result> CollecctionAreaForLiquid_Results { get; set; }
         public DbSet<CollecctionAreaForStreet_Result> CollecctionAreaForStreet_Results { get; set; }
         public DbSet<GetMobile_Result> GetMobile_Results { get; set; }
+        public DbSet<SP_HouseScanifyDetails_Result> SP_HouseScanifyDetails_Results { get; set; }
+        public DbSet<SP_HouseScanify_Result> SP_HouseScanify_Results { get; set; }
+        public DbSet<SP_HouseDetailsApp_Result> SP_HouseDetailsApp_Results { get; set; }
+        public DbSet<SP_DumpYardDetailsApp_Result> SP_DumpYardDetailsApp_Results { get; set; }
+        public DbSet<SP_LiquidDetailsApp_Result> SP_LiquidDetailsApp_Results { get; set; }
+        public DbSet<SP_StreetDetailsApp_Result> SP_StreetDetailsApp_Results { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -73,6 +79,13 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB
             modelBuilder.Entity<CollecctionAreaForLiquid_Result>().HasNoKey();
             modelBuilder.Entity<CollecctionAreaForStreet_Result>().HasNoKey();
             modelBuilder.Entity<GetMobile_Result>().HasNoKey();
+            modelBuilder.Entity<SP_HouseScanifyDetails_Result>().HasNoKey();
+            modelBuilder.Entity<SP_HouseScanify_Result>().HasNoKey();
+            modelBuilder.Entity<SP_HouseDetailsApp_Result>().HasNoKey();
+            modelBuilder.Entity<SP_DumpYardDetailsApp_Result>().HasNoKey();
+            modelBuilder.Entity<SP_LiquidDetailsApp_Result>().HasNoKey();
+            modelBuilder.Entity<SP_StreetDetailsApp_Result>().HasNoKey();
+
         }
     }
 }

@@ -10268,6 +10268,1895 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             }
             
         }
+        public async Task<SBUser> CheckSupervisorUserLoginAsync(string userName, string password, string EmpType)
+        {
+            SBUser user = new SBUser();
+            try
+            {
+                if (EmpType == "A")
+                {
+                    user = await SupervisorLoginAsync(userName, password, EmpType);
+                }
+                else
+                {
+                    user.name = "";
+                    user.userId = 0;
+                    user.userLoginId = "";
+                    user.userPassword = "";
+                    user.status = "error";
+                    user.gtFeatures = false;
+                    user.EmpType = "";
+                    user.imiNo = "";
+                    user.message = "Employee Type Does not Match.";
+                    user.messageMar = "कर्मचारी प्रकार जुळत नाही.";
+                }
+                return user;
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return user;
+            }
+            
+        }
+        public async Task<List<NameULB>> GetUlbAsync(int userId, string EmpType, string Status)
+        {
+            List<NameULB> obj = new List<NameULB>();
+            try
+            {
+                using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
+                {
+                    var ids = await dbMain.EmployeeMasters.Where(c => c.EmpId == userId).Select(c => c.isActiveULB).FirstOrDefaultAsync();
+                    if (ids != null)
+                    {
+
+                        string[] authorsList = ids.Split(',');
+                        foreach (string author in authorsList)
+                        {
+                            if (Status == "false")
+                            {
+                                var data = await dbMain.AppDetails.Where(c => c.AppId.ToString().ToLower().Contains(author.ToLower())).ToListAsync();
+                                foreach (var x in data)
+                                {
+                                    obj.Add(new NameULB()
+                                    {
+                                        ulb = (x.AppName.ToString()),
+                                        appid = (x.AppId),
+                                        faq = x.FAQ,
+                                    });
+                                }
+                            }
+                            else if (Status == "true")
+                            {
+                                var data = await dbMain.AppDetails.Where(c => c.AppId.ToString().ToLower().Contains(author.ToLower()) && c.FAQ != "0").ToListAsync();
+                                foreach (var x in data)
+                                {
+                                    obj.Add(new NameULB()
+                                    {
+                                        ulb = (x.AppName.ToString()),
+                                        appid = (x.AppId),
+                                        faq = x.FAQ,
+                                    });
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (Status == "false")
+                        {
+                            var data = await dbMain.AppDetails.Where(c => c.IsActive == true && c.AppId != 3088).ToListAsync();
+                            foreach (var x in data)
+                            {
+                                obj.Add(new NameULB()
+                                {
+                                    ulb = (x.AppName.ToString()),
+                                    appid = (x.AppId),
+                                    faq = x.FAQ,
+                                });
+                            }
+                        }
+                        else if (Status == "true")
+                        {
+                            var data = await dbMain.AppDetails.Where(c => c.IsActive == true && c.FAQ != "0" && c.AppId != 3088).ToListAsync();
+                            foreach (var x in data)
+                            {
+                                obj.Add(new NameULB()
+                                {
+                                    ulb = (x.AppName.ToString()),
+                                    appid = (x.AppId),
+                                    faq = x.FAQ,
+                                });
+                            }
+                        }
+
+
+                    }
+                }
+                return obj.OrderBy(c => c.ulb).ToList();
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+            }
+            
+        }
+        public async Task<HSDashboard> GetSelectedUlbDataAsync(int userId, string EmpType, int appId)
+        {
+            HSDashboard model = new HSDashboard();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(appId))
+                using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
+                {
+                    var appdetails = await dbMain.AppDetails.Where(c => c.AppId == appId).FirstOrDefaultAsync();
+                    //var data = db.SP_HouseScanifyDetails(appId).First();
+                    List<SqlParameter> parms = new List<SqlParameter>
+                                                {
+                                                    // Create parameter(s)    
+                                                    new SqlParameter { ParameterName = "@appId", Value = appId }
+                                                };
+                    var Listdata = await db.SP_HouseScanifyDetails_Results.FromSqlRaw<SP_HouseScanifyDetails_Result>("EXEC SP_HouseScanifyDetails @appId", parms.ToArray()).ToListAsync();
+                    var data = Listdata == null ? null : Listdata.FirstOrDefault();
+
+
+                    if (data != null)
+                    {
+                        model.AppId = appdetails.AppId;
+                        model.AppName = appdetails.AppName;
+                        model.TotalHouse = data.TotalHouse;
+                        model.TotalHouseUpdated = data.TotalHouseUpdated;
+                        model.TotalHouseUpdated_CurrentDay = data.TotalHouseUpdated_CurrentDay;
+                        model.TotalPoint = data.TotalPoint;
+                        model.TotalPointUpdated = data.TotalPointUpdated;
+                        model.TotalPointUpdated_CurrentDay = data.TotalPointUpdated_CurrentDay;
+                        model.TotalDump = data.TotalDump;
+                        model.TotalDumpUpdated = data.TotalDumpUpdated;
+                        model.TotalDumpUpdated_CurrentDay = data.TotalDumpUpdated_CurrentDay;
+
+                        model.TotalLiquid = data.TotalLiquid;
+                        model.TotalLiquidUpdated = data.TotalLiquidUpdated;
+                        model.TotalLiquidUpdated_CurrentDay = data.TotalLiquidUpdated_CurrentDay;
+
+                        model.TotalStreet = data.TotalStreet;
+                        model.TotalStreetUpdated = data.TotalStreetUpdated;
+                        model.TotalStreetUpdated_CurrentDay = data.TotalStreetUpdated_CurrentDay;
+
+                        return model;
+                    }
+
+                    else
+                    {
+                        return model;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return model;
+            }
+        }
+        public async Task<List<HSEmployee>> GetQREmployeeListAsync(int userId, string EmpType, int appId)
+        {
+            List<HSEmployee> obj = new List<HSEmployee>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(appId))
+                {
+                    {
+                        var data = await db.QrEmployeeMasters.Where(c => c.isActive == true).ToListAsync();
+                        if(data != null && data.Count > 0)
+                        {
+                            foreach (var x in data)
+                            {
+                                obj.Add(new HSEmployee()
+                                {
+                                    EmployeeName = (x.qrEmpName.ToString()),
+                                    EmployeeID = (x.qrEmpId),
+                                });
+                            }
+
+                        }
+                        
+                    }
+                    if (obj != null && obj.Count > 0)
+                        return obj.OrderBy(c => c.EmployeeName).ToList();
+                    else
+                        return obj;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+            }
+
+        }
+        public async Task<List<HouseScanifyEmployeeDetails>> GetQREmployeeDetailsListAsync(int userId, string EmpType, int appId, int QrEmpID, bool status)
+        {
+            List<HouseScanifyEmployeeDetails> obj = new List<HouseScanifyEmployeeDetails>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(appId))
+                {
+                    {
+                        if (QrEmpID != 0)
+                        {
+                            var data = await db.QrEmployeeMasters.Where(c => c.qrEmpId == QrEmpID).ToListAsync();
+                            if (data != null && data.Count > 0)
+                            {
+                                foreach (var x in data)
+                                {
+                                    obj.Add(new HouseScanifyEmployeeDetails()
+                                    {
+                                        qrEmpId = x.qrEmpId,
+                                        qrEmpName = x.qrEmpName.ToString(),
+                                        qrEmpLoginId = x.qrEmpLoginId,
+                                        qrEmpPassword = x.qrEmpPassword,
+                                        qrEmpMobileNumber = x.qrEmpMobileNumber,
+                                        qrEmpAddress = x.qrEmpAddress,
+                                        type = x.type,
+                                        typeId = x.typeId,
+                                        imoNo = x.imoNo,
+                                        bloodGroup = x.bloodGroup,
+                                        isActive = x.isActive,
+                                        target = x.target,
+                                        lastModifyDate = x.lastModifyDate,
+                                    });
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var data = await db.QrEmployeeMasters.Where(c => c.isActive == status).ToListAsync();
+                            if (data != null && data.Count > 0)
+                            {
+                                foreach (var x in data)
+                                {
+                                    obj.Add(new HouseScanifyEmployeeDetails()
+                                    {
+                                        qrEmpId = x.qrEmpId,
+                                        qrEmpName = x.qrEmpName.ToString(),
+                                        qrEmpLoginId = x.qrEmpLoginId,
+                                        qrEmpPassword = x.qrEmpPassword,
+                                        qrEmpMobileNumber = x.qrEmpMobileNumber,
+                                        qrEmpAddress = x.qrEmpAddress,
+                                        type = x.type,
+                                        typeId = x.typeId,
+                                        imoNo = x.imoNo,
+                                        bloodGroup = x.bloodGroup,
+                                        isActive = x.isActive,
+                                        target = x.target,
+                                        lastModifyDate = x.lastModifyDate,
+                                    });
+                                }
+                            }
+                        }
+
+                    }
+                    if (obj != null && obj.Count > 0)
+                        return obj.OrderByDescending(c => c.qrEmpId).ToList();
+                    else
+                        return obj;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+            }
+
+        }
+        public async Task<IEnumerable<HouseScanifyDetailsGridRow>> GetHouseScanifyDetailsAsync(int qrEmpId, DateTime FromDate, DateTime Todate, int appId)
+        {
+            List<HouseScanifyDetailsGridRow> obj = new List<HouseScanifyDetailsGridRow>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(appId))
+                {
+
+                    //var data = db.SP_HouseScanify(FromDate, Todate, qrEmpId).ToList();
+                    List<SqlParameter> parms = new List<SqlParameter>
+                                                {
+                                                    // Create parameter(s)    
+                                                    new SqlParameter { ParameterName = "@fdate", Value = FromDate },
+                                                    new SqlParameter { ParameterName = "@tdate", Value = Todate },
+                                                    new SqlParameter { ParameterName = "@userid", Value = qrEmpId }
+                                                };
+                    var data = await db.SP_HouseScanify_Results.FromSqlRaw<SP_HouseScanify_Result>("EXEC SP_HouseScanify @fdate,@tdate,@userid", parms.ToArray()).ToListAsync();
+
+
+
+                    if (data != null && data.Count > 0)
+                    {
+                        foreach (var x in data)
+                        {
+                            var data1 = await db.Qr_Employee_Daily_Attendances.Where(c => c.qrEmpId == x.qrEMpId && EF.Functions.DateDiffDay(c.startDate, FromDate) <= 0 && EF.Functions.DateDiffDay(c.startDate, Todate) >= 0 ).ToListAsync();
+
+                            if (data1 != null && data1.Count != 0)
+                            {
+                                obj.Add(new HouseScanifyDetailsGridRow()
+                                {
+                                    qrEmpId = x.qrEMpId,
+                                    qrEmpName = x.qrEmpName,
+                                    qrEmpNameMar = x.qrEmpNameMar,
+                                    qrEmpMobileNumber = x.qrEmpMobileNumber,
+                                    qrEmpAddress = x.qrEmpAddress,
+                                    qrEmpLoginId = x.qrEmpLoginId,
+                                    qrEmpPassword = x.qrEmpPassword,
+                                    isActive = x.isActive,
+                                    bloodGroup = x.bloodGroup,
+                                    lastModifyDate = x.lastModifyDate,
+                                    HouseCount = x.HouseCount,
+                                    PointCount = x.PointCount,
+                                    DumpCount = x.DumpCount,
+                                    LiquidCount = x.LiquidCount,
+                                    StreetCount = x.StreetCount,
+                                });
+                            }
+
+
+                        }
+                    }
+
+                    if (obj != null && obj.Count > 0)
+                        return obj.OrderByDescending(c => c.LiquidCount).ThenByDescending(c => c.HouseCount).ThenByDescending(c => c.StreetCount);
+                    else
+                        return obj;
+                    
+
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+            }
+            
+        }
+
+        public async Task<SBUser> SupervisorLoginAsync(string userName, string password, string EmpType)
+        {
+            SBUser user = new SBUser();
+            try
+            {
+                using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
+                {
+                    var obj = await dbMain.EmployeeMasters.Where(c => c.LoginId == userName & c.Password == password & c.isActive == true).FirstOrDefaultAsync();
+                    if (obj == null)
+                    {
+                        user.name = "";
+                        user.userId = 0;
+                        user.userLoginId = "";
+                        user.userPassword = "";
+                        user.status = "error";
+                        user.gtFeatures = false;
+                        user.EmpType = "";
+                        user.imiNo = "";
+                        user.message = "UserName or Passward not Match.";
+                        user.messageMar = "वापरकर्ता नाव किंवा पासवर्ड जुळत नाही.";
+                    }
+                    else if (obj != null && obj.LoginId == userName && obj.Password == password)
+                    {
+
+                        user.name = obj.EmpName;
+                        user.userId = obj.EmpId;
+                        user.userLoginId = obj.LoginId;
+                        user.userPassword = obj.Password;
+                        user.EmpType = checkNull(obj.type); ;
+                        user.imiNo = "";
+                        user.type = "";
+                        user.gtFeatures = true;
+                        user.status = "success"; user.message = "Login Successfully"; user.messageMar = "लॉगिन यशस्वी";
+                    }
+
+                    return user;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return user;
+
+            }
+        }
+
+        public async Task<IEnumerable<HSAttendanceGrid>> GetAttendanceDetailsAsync(int userId, DateTime FromDate, DateTime Todate, int appId)
+        {
+            List<HSAttendanceGrid> obj = new List<HSAttendanceGrid>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(appId))
+                {
+
+                    var data = await (from t1 in db.Qr_Employee_Daily_Attendances
+                                      join t2 in db.QrEmployeeMasters on t1.qrEmpId equals t2.qrEmpId
+                                      select new
+                                      {
+                                          t1.qrEmpDaId,
+                                          t1.qrEmpId,
+                                          t1.startDate,
+                                          t1.endDate,
+                                          t1.startTime,
+                                          t1.endTime,
+                                          t1.startLat,
+                                          t1.startLong,
+                                          t1.endLat,
+                                          t1.endLong,
+                                          t1.startNote,
+                                          t1.endNote,
+                                          t2.qrEmpName,
+
+                                      }).OrderByDescending(c => c.startDate).ThenByDescending(c => c.startTime).ToListAsync();
+
+                    //return obj.OrderBy(c => c.Date).ThenByDescending(c => c.StartTime);
+
+                    //var data = db.Qr_Employee_Daily_Attendance.OrderByDescending(c => c.qrEmpDaId).ToList();
+
+                    if (data != null && data.Count > 0)
+                    {
+                        if (Convert.ToDateTime(FromDate).ToString("dd/MM/yyyy") == Convert.ToDateTime(DateTime.Now).ToString("dd/MM/yyyy"))
+                        {
+                            data = data.OrderByDescending(c => c.qrEmpDaId).Where(c => (c.startDate == FromDate || c.endDate == FromDate || c.endTime == "")).ToList();
+                        }
+                        else
+                        {
+
+                            data = data.OrderByDescending(c => c.qrEmpDaId).Where(c => (c.startDate >= FromDate && c.startDate <= Todate) || (c.startDate >= FromDate && c.startDate <= Todate)).ToList();
+                        }
+
+                        if (userId > 0)
+                        {
+                            var model = data.OrderByDescending(c => c.qrEmpDaId).Where(c => c.qrEmpId == userId).ToList();
+
+                            data = model.ToList();
+                        }
+
+                        foreach (var x in data)
+                        {
+
+                            DateTime cDate = DateTime.Now;
+
+                            TimeSpan timespan = new TimeSpan(00, 00, 00);
+                            DateTime time = DateTime.Now.Add(timespan);
+                            string displayTime = time.ToString("hh:mm tt");
+
+
+                            string displayTime1 = Convert.ToDateTime(x.startDate).ToString("MM/dd/yyyy");
+                            string sTime = Convert.ToDateTime(x.startTime).ToString("HH:mm:ss");
+
+                            var a = (Convert.ToDateTime(x.startDate).ToString("MM/dd/yyyy"));
+                            var b = x.endDate == null ? Convert.ToDateTime(cDate).ToString("MM/dd/yyyy") : Convert.ToDateTime(x.endDate).ToString("MM/dd/yyyy");
+
+                            string Time1 = (x.startTime).ToString();
+                            string Time2 = ((x.endTime == "" ? displayTime : x.endTime).ToString());
+
+                            DateTime startDate = Convert.ToDateTime(a + " " + Time1);
+                            DateTime endDate = Convert.ToDateTime(b + " " + Time2);
+                            var houseCount = await db.HouseMasters.Where(c => c.modified >= startDate && c.modified <= endDate && c.userId == x.qrEmpId).CountAsync();
+                            var liquidCount = await db.LiquidWasteDetails.Where(c => c.lastModifiedDate >= startDate && c.lastModifiedDate <= endDate && c.userId == x.qrEmpId).CountAsync();
+                            var streetCount = await db.StreetSweepingDetails.Where(c => c.lastModifiedDate >= startDate && c.lastModifiedDate <= endDate && c.userId == x.qrEmpId).CountAsync();
+                            var dumpyardcount = await db.DumpYardDetails.Where(c => c.lastModifiedDate >= startDate && c.lastModifiedDate <= endDate && c.userId == x.qrEmpId).CountAsync();
+
+                            string endate = "";
+                            if (x.endDate == null)
+                            {
+                                endate = "";
+                            }
+                            else
+                            {
+                                endate = Convert.ToDateTime(x.endDate).ToString("dd/MM/yyyy");
+                            }
+                            obj.Add(new HSAttendanceGrid()
+                            {
+                                qrEmpDaId = x.qrEmpDaId,
+                                qrEmpId = Convert.ToInt32(x.qrEmpId),
+                                userName = x.qrEmpName,
+                                startDate = Convert.ToDateTime(x.startDate).ToString("dd/MM/yyyy"),
+                                endDate = endate,
+                                startTime = checkNull(x.startTime),
+                                endTime = checkNull(x.endTime),
+                                startLat = checkNull(x.startLat),
+                                startLong = checkNull(x.startLong),
+                                endLat = checkNull(x.endLat),
+                                endLong = checkNull(x.endLong),
+                                startNote = checkNull(x.startNote),
+                                endNote = checkNull(x.endNote),
+                                CompareDate = x.startDate,
+                                HouseCount = houseCount,
+                                LiquidCount = liquidCount,
+                                StreetCount = streetCount,
+                                DumpYardCount = dumpyardcount,
+                                daDateTIme = (displayTime1 + " " + sTime)
+
+
+
+                            });
+                        }
+
+
+                    }
+                    if (obj != null && obj.Count > 0)
+                        return obj.OrderByDescending(c => c.qrEmpDaId).ToList();
+                    else
+                        return obj;
+                }
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+            }
+
+        }
+
+        public async Task<IEnumerable<HSHouseDetailsGrid>> GetHouseDetailsAsync(int userId, DateTime FromDate, DateTime Todate, int appId, string ReferanceId)
+        {
+            List<HSHouseDetailsGrid> obj = new List<HSHouseDetailsGrid>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(appId))
+                {
+                    List<SqlParameter> parms = new List<SqlParameter>
+                                                {
+                                                    // Create parameter(s)    
+                                                    new SqlParameter { ParameterName = "@fdate", Value = FromDate },
+                                                    new SqlParameter { ParameterName = "@tdate", Value = Todate },
+                                                    new SqlParameter { ParameterName = "@userid", Value = userId },
+                                                    new SqlParameter { ParameterName = "@referanceId", Value = ReferanceId }
+                                                };
+                    var data = await db.SP_HouseDetailsApp_Results.FromSqlRaw<SP_HouseDetailsApp_Result>("EXEC SP_HouseDetailsApp @fdate,@tdate,@userid,@referanceId", parms.ToArray()).ToListAsync();
+                    if (data != null && data.Count > 0)
+                    {
+                        obj = data.Select(x => new HSHouseDetailsGrid
+                        {
+                            houseId = x.houseId,
+                            Name = x.qrEmpName,
+                            Lat = x.houseLat,
+                            Long = x.houseLong,
+                            QRCodeImage = x.QRCodeImage,
+                            ReferanceId = x.ReferanceId,
+                            modifiedDate = x.modified.HasValue ? Convert.ToDateTime(x.modified).ToString("dd/MM/yyyy hh:mm tt") : "",
+                            QRStatus = x.QRStatus,
+
+
+                        }).ToList();
+                    }
+
+                    return obj;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+
+            }
+        }
+        public async Task<IEnumerable<HSDumpYardDetailsGrid>> GetDumpYardDetailsAsync(int userId, DateTime FromDate, DateTime Todate, int appId)
+        {
+            List<HSDumpYardDetailsGrid> obj = new List<HSDumpYardDetailsGrid>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(appId))
+                {
+
+                    List<SqlParameter> parms = new List<SqlParameter>
+                                                {
+                                                    // Create parameter(s)    
+                                                    new SqlParameter { ParameterName = "@fdate", Value = FromDate },
+                                                    new SqlParameter { ParameterName = "@tdate", Value = Todate },
+                                                    new SqlParameter { ParameterName = "@userid", Value = userId }
+                                                };
+                    var data = await db.SP_DumpYardDetailsApp_Results.FromSqlRaw<SP_DumpYardDetailsApp_Result>("EXEC SP_DumpYardDetailsApp @fdate,@tdate,@userid", parms.ToArray()).ToListAsync();
+                    if (data != null && data.Count > 0)
+                    {
+                        obj = data.Select(x => new HSDumpYardDetailsGrid
+                        {
+                            dyId = x.dyId,
+                            Name = x.qrEmpName,
+                            Lat = x.dyLat,
+                            Long = x.dyLong,
+                            QRCodeImage = x.QRCodeImage,
+                            ReferanceId = x.ReferanceId,
+                            modifiedDate = x.lastModifiedDate.HasValue ? Convert.ToDateTime(x.lastModifiedDate).ToString("dd/MM/yyyy hh:mm tt") : "",
+                            QRStatus = x.QRStatus,
+
+
+                        }).ToList();
+                    }
+
+                    return obj;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+            }
+        }
+
+        public async Task<IEnumerable<HSLiquidDetailsGrid>> GetLiquidDetailsAsync(int userId, DateTime FromDate, DateTime Todate, int appId)
+        {
+            List<HSLiquidDetailsGrid> obj = new List<HSLiquidDetailsGrid>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(appId))
+                {
+                    List<SqlParameter> parms = new List<SqlParameter>
+                                                {
+                                                    // Create parameter(s)    
+                                                    new SqlParameter { ParameterName = "@fdate", Value = FromDate },
+                                                    new SqlParameter { ParameterName = "@tdate", Value = Todate },
+                                                    new SqlParameter { ParameterName = "@userid", Value = userId }
+                                                };
+                    var data = await db.SP_LiquidDetailsApp_Results.FromSqlRaw<SP_LiquidDetailsApp_Result>("EXEC SP_LiquidDetailsApp @fdate,@tdate,@userid", parms.ToArray()).ToListAsync();
+
+                    if (data != null && data.Count > 0)
+                    {
+                        obj = data.Select(x => new HSLiquidDetailsGrid
+                        {
+                            LWId = x.LWId,
+                            Name = x.qrEmpName,
+                            Lat = x.LWLat,
+                            Long = x.LWLong,
+                            QRCodeImage = x.QRCodeImage,
+                            ReferanceId = x.ReferanceId,
+                            modifiedDate = x.lastModifiedDate.HasValue ? Convert.ToDateTime(x.lastModifiedDate).ToString("dd/MM/yyyy hh:mm tt") : "",
+                            QRStatus = x.QRStatus,
+
+                        }).ToList();
+                    }
+
+                    return obj;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+            }
+        }
+
+
+        public async Task<IEnumerable<HSStreetDetailsGrid>> GetStreetDetailsAsync(int userId, DateTime FromDate, DateTime Todate, int appId)
+        {
+            List<HSStreetDetailsGrid> obj = new List<HSStreetDetailsGrid>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(appId))
+                {
+
+                    List<SqlParameter> parms = new List<SqlParameter>
+                                                {
+                                                    // Create parameter(s)    
+                                                    new SqlParameter { ParameterName = "@fdate", Value = FromDate },
+                                                    new SqlParameter { ParameterName = "@tdate", Value = Todate },
+                                                    new SqlParameter { ParameterName = "@userid", Value = userId }
+                                                };
+                    var data = await db.SP_StreetDetailsApp_Results.FromSqlRaw<SP_StreetDetailsApp_Result>("EXEC SP_StreetDetailsApp @fdate,@tdate,@userid", parms.ToArray()).ToListAsync();
+
+                    if (data != null && data.Count > 0)
+                    {
+                        obj = data.Select(x => new HSStreetDetailsGrid
+                        {
+                            SSId = x.SSId,
+                            Name = x.qrEmpName,
+                            Lat = x.SSLat,
+                            Long = x.SSLong,
+                            QRCodeImage = x.QRCodeImage,
+                            ReferanceId = x.ReferanceId,
+                            modifiedDate = x.lastModifiedDate.HasValue ? Convert.ToDateTime(x.lastModifiedDate).ToString("dd/MM/yyyy hh:mm tt") : "",
+                            QRStatus = x.QRStatus,
+
+                        }).ToList();
+                    }
+
+                    return obj;
+                }
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+            }
+        }
+        public async Task<List<UserRoleDetails>> UserRoleListAsync(int userId, string EmpType, bool status, int EmpId)
+        {
+            List<UserRoleDetails> obj = new List<UserRoleDetails>();
+            try
+            {
+                using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
+                {
+                    if (EmpId != 0)
+                    {
+                        var data = await dbMain.EmployeeMasters.Where(c => c.isActive == status && c.EmpId == EmpId).ToListAsync();
+                        if (data != null && data.Count > 0)
+                        {
+                            foreach (var x in data)
+                            {
+                                obj.Add(new UserRoleDetails()
+                                {
+                                    EmpId = x.EmpId,
+                                    EmpName = x.EmpName.ToString(),
+                                    LoginId = x.LoginId,
+                                    Password = x.Password,
+                                    EmpMobileNumber = x.EmpMobileNumber,
+                                    EmpAddress = x.EmpAddress,
+                                    type = x.type,
+                                    isActive = x.isActive,
+                                    isActiveULB = x.isActiveULB,
+                                    LastModifyDateEntry = Convert.ToDateTime(x.lastModifyDateEntry).ToString("dd-MM-yyyy hh:mm"),
+                                });
+                            }
+                        }
+                        
+                    }
+                    else
+                    {
+                        var data = await dbMain.EmployeeMasters.Where(c => c.isActive == status).ToListAsync();
+                        if (data != null && data.Count > 0)
+                        {
+
+                            foreach (var x in data)
+                            {
+                                obj.Add(new UserRoleDetails()
+                                {
+                                    EmpId = x.EmpId,
+                                    EmpName = x.EmpName.ToString(),
+                                    LoginId = x.LoginId,
+                                    Password = x.Password,
+                                    EmpMobileNumber = x.EmpMobileNumber,
+                                    EmpAddress = x.EmpAddress,
+                                    type = x.type,
+                                    isActive = x.isActive,
+                                    isActiveULB = x.isActiveULB,
+                                    LastModifyDateEntry = Convert.ToDateTime(x.lastModifyDateEntry).ToString("dd-MM-yyyy hh:mm"),
+                                });
+                            }
+                        }
+                        
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+            }
+            if (obj != null && obj.Count > 0)
+                return obj.OrderByDescending(c => c.EmpId).ToList();
+            else
+                return obj;
+        }
+
+
+        public async Task<CollectionSyncResult> SaveAddEmployeeAsync(HouseScanifyEmployeeDetails obj, int AppId)
+        {
+            CollectionSyncResult result = new CollectionSyncResult();
+            QrEmployeeMaster objdata = new QrEmployeeMaster();
+            using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+            {
+                try
+                {
+                    if (obj.qrEmpId != 0)
+                    {
+                        var model = await db.QrEmployeeMasters.Where(c => c.qrEmpId == obj.qrEmpId).FirstOrDefaultAsync();
+                        if (model != null)
+                        {
+
+                            //var isrecord = db.QrEmployeeMasters.Where(x => x.qrEmpName == obj.qrEmpName && x.isActive == true).FirstOrDefault();
+                            //if (isrecord == null)
+                            //{
+
+                            //var isrecord1 = db.QrEmployeeMasters.Where(x => x.qrEmpLoginId == obj.qrEmpLoginId && x.isActive == true).FirstOrDefault();
+                            //var isrecord2 = db.UserMasters.Where(x => x.userLoginId == obj.qrEmpLoginId && x.isActive == true).FirstOrDefault();
+                            //if (isrecord1 == null && isrecord2 == null)
+                            //{
+
+                            model.qrEmpId = obj.qrEmpId;
+                            model.qrEmpName = obj.qrEmpName;
+                            // model.qrEmpLoginId = obj.qrEmpLoginId;
+                            model.qrEmpPassword = obj.qrEmpPassword;
+                            model.qrEmpMobileNumber = obj.qrEmpMobileNumber;
+                            model.qrEmpAddress = obj.qrEmpAddress;
+                            model.type = "Employee";
+                            model.typeId = 1;
+                            model.imoNo = obj.imoNo;
+                            model.bloodGroup = "0";
+                            model.isActive = obj.isActive;
+
+                            await db.SaveChangesAsync();
+                            result.status = "success";
+                            result.message = "Employee Details Updated successfully";
+                            result.messageMar = "कर्मचारी तपशील यशस्वीरित्या अद्यतनित केले";
+                            //}
+                            //else
+                            //{
+                            //    result.status = "Error";
+                            //    result.message = "This LoginId Is Already Exist !";
+                            //    result.messageMar = "हे लॉगिनआयडी आधीच अस्तित्वात आहे !";
+                            //    return result;
+                            //}
+                            //}
+                            //else
+                            //{
+                            //    result.status = "Error";
+                            //    result.message = "Name Already Exist";
+                            //    result.messageMar = "नाव आधीपासून अस्तित्वात आहे..";
+                            //    return result;
+                            //}
+
+                        }
+                        else
+                        {
+                            result.message = "This Employee Not Available.";
+                            result.messageMar = "कर्मचारी उपलब्ध नाही.";
+                            result.status = "error";
+                            return result;
+
+                        }
+
+                    }
+                    else
+                    {
+                        var isrecord = await db.QrEmployeeMasters.Where(x => x.qrEmpName == obj.qrEmpName && x.isActive == true).FirstOrDefaultAsync();
+                        if (isrecord == null)
+                        {
+                            var isrecord1 = await db.QrEmployeeMasters.Where(x => x.qrEmpLoginId == obj.qrEmpLoginId && x.isActive == true).FirstOrDefaultAsync();
+                            var isrecord2 = await db.UserMasters.Where(x => x.userLoginId == obj.qrEmpLoginId && x.isActive == true).FirstOrDefaultAsync();
+                            if (isrecord1 == null && isrecord2 == null)
+                            {
+
+
+                                objdata.qrEmpName = obj.qrEmpName;
+                                objdata.qrEmpLoginId = obj.qrEmpLoginId;
+                                objdata.qrEmpPassword = obj.qrEmpPassword;
+                                objdata.qrEmpMobileNumber = obj.qrEmpMobileNumber;
+                                objdata.qrEmpAddress = obj.qrEmpAddress;
+                                objdata.type = "Employee";
+                                objdata.typeId = 1;
+                                //objdata.imoNo = obj.imoNo;
+                                objdata.imoNo = null;
+                                objdata.bloodGroup = "0";
+                                objdata.isActive = obj.isActive;
+
+                                db.QrEmployeeMasters.Add(objdata);
+                                await db.SaveChangesAsync();
+                                result.status = "success";
+                                result.message = "Employee Details Added successfully";
+                                result.messageMar = "कर्मचारी तपशील यशस्वीरित्या जोडले";
+                                return result;
+                            }
+                            else
+                            {
+                                result.status = "Error";
+                                result.message = "This LoginId Is Already Exist !";
+                                result.messageMar = "हे लॉगिनआयडी आधीच अस्तित्वात आहे !";
+                                return result;
+                            }
+
+
+                        }
+                        else
+                        {
+                            result.status = "Error";
+                            result.message = "Name Already Exist";
+                            result.messageMar = "नाव आधीपासून अस्तित्वात आहे..";
+                            return result;
+                        }
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString(), ex);
+                    result.message = "Something is wrong,Try Again.. ";
+                    result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
+                    result.status = "error";
+                    return result;
+                }
+
+
+            }
+
+            return result;
+        }
+
+
+        public async Task<CollectionSyncResult> SaveAddUserRoleAsync(UserRoleDetails obj)
+        {
+            CollectionSyncResult result = new CollectionSyncResult();
+            EmployeeMaster objdata = new EmployeeMaster();
+
+            try
+            {
+                using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
+                {
+                    if (obj.EmpId != 0)
+                    {
+                        var model = await dbMain.EmployeeMasters.Where(c => c.EmpId == obj.EmpId).FirstOrDefaultAsync();
+                        if (model != null)
+                        {
+                            model.EmpId = obj.EmpId;
+                            model.EmpName = obj.EmpName;
+                            model.LoginId = obj.LoginId;
+                            model.Password = obj.Password;
+                            model.EmpMobileNumber = obj.EmpMobileNumber;
+                            model.EmpAddress = obj.EmpAddress;
+                            model.type = obj.type;
+                            model.isActive = obj.isActive;
+                            model.isActiveULB = obj.isActiveULB;
+                            model.lastModifyDateEntry = DateTime.Now;
+
+
+                            await dbMain.SaveChangesAsync();
+                            result.status = "success";
+                            result.message = "User Role Details Updated successfully";
+                            result.messageMar = "वापरकर्ता भूमिका तपशील यशस्वीरित्या अद्यतनित केले";
+                        }
+                        else
+                        {
+                            result.message = "This User Role Not Available.";
+                            result.messageMar = "वापरकर्ता भूमिका उपलब्ध नाही.";
+                            result.status = "error";
+                            return result;
+
+                        }
+
+                    }
+                    else
+                    {
+                        objdata.EmpName = obj.EmpName;
+                        objdata.LoginId = obj.LoginId;
+                        objdata.Password = obj.Password;
+                        objdata.EmpMobileNumber = obj.EmpMobileNumber;
+                        objdata.EmpAddress = obj.EmpAddress;
+                        objdata.type = obj.type;
+                        objdata.isActive = obj.isActive;
+                        objdata.isActiveULB = obj.isActiveULB;
+                        objdata.lastModifyDateEntry = DateTime.Now;
+
+                        dbMain.EmployeeMasters.Add(objdata);
+                        await dbMain.SaveChangesAsync();
+                        result.status = "success";
+                        result.message = "User Role Added successfully";
+                        result.messageMar = "वापरकर्ता भूमिका तपशील यशस्वीरित्या जोडले";
+                        return result;
+                    }
+
+                }
+                    
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                result.message = "Something is wrong,Try Again.. ";
+                result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
+                result.status = "error";
+                return result;
+            }
+
+
+            return result;
+        }
+
+
+        public async Task<CollectionQRStatusResult> UpdateQRstatusAsync(HSHouseDetailsGrid obj, int AppId)
+        {
+            CollectionQRStatusResult result = new CollectionQRStatusResult();
+            HouseMaster objdata = new HouseMaster();
+            using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+            {
+                try
+                {
+                    if (obj.ReferanceId != null)
+                    {
+                        var model = await db.HouseMasters.Where(c => c.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
+                        if (model != null)
+                        {
+
+                            model.QRStatus = obj.QRStatus;
+                            model.QRStatusDate = DateTime.Now;
+                            await db.SaveChangesAsync();
+                            result.ReferanceId = obj.ReferanceId;
+                            result.status = "success";
+                            result.message = "Record Updated successfully";
+                            result.messageMar = "रेकॉर्ड यशस्वीरित्या अद्यतनित केले";
+                            return result;
+                        }
+                        else
+                        {
+                            var dump = await db.DumpYardDetails.Where(c => c.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
+                            if (dump != null)
+                            {
+
+                                dump.QRStatus = obj.QRStatus;
+                                dump.QRStatusDate = DateTime.Now;
+                                await db.SaveChangesAsync();
+                                result.ReferanceId = obj.ReferanceId;
+                                result.status = "success";
+                                result.message = "Record Updated successfully";
+                                result.messageMar = "रेकॉर्ड यशस्वीरित्या अद्यतनित केले";
+                                return result;
+                            }
+                            else
+                            {
+                                var street = await db.StreetSweepingDetails.Where(c => c.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
+                                if (street != null)
+                                {
+
+                                    street.QRStatus = obj.QRStatus;
+                                    street.QRStatusDate = DateTime.Now;
+                                    await db.SaveChangesAsync();
+                                    result.ReferanceId = obj.ReferanceId;
+                                    result.status = "success";
+                                    result.message = "Record Updated successfully";
+                                    result.messageMar = "रेकॉर्ड यशस्वीरित्या अद्यतनित केले";
+                                    return result;
+                                }
+                                else
+                                {
+                                    var liquid = await db.LiquidWasteDetails.Where(c => c.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
+                                    if (liquid != null)
+                                    {
+
+                                        liquid.QRStatus = obj.QRStatus;
+                                        liquid.QRStatusDate = DateTime.Now;
+                                        await db.SaveChangesAsync();
+                                        result.ReferanceId = obj.ReferanceId;
+                                        result.status = "success";
+                                        result.message = "Record Updated successfully";
+                                        result.messageMar = "रेकॉर्ड यशस्वीरित्या अद्यतनित केले";
+                                        return result;
+                                    }
+                                    else
+                                    {
+                                        result.ReferanceId = obj.ReferanceId;
+                                        result.message = "This Record Not Available.";
+                                        result.messageMar = "रेकॉर्ड उपलब्ध नाही.";
+                                        result.status = "error";
+                                        return result;
+
+                                    }
+                                }
+                            }
+                        }
+
+
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString(), ex);
+                    result.ReferanceId = obj.ReferanceId;
+                    result.message = "Something is wrong,Try Again.. ";
+                    result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
+                    result.status = "error";
+                    return result;
+                }
+
+
+            }
+
+            return result;
+        }
+
+        public async Task<Result> SaveSupervisorAttendenceAsync(BigVQREmployeeAttendenceVM obj, int type)
+        {
+            Result result = new Result();
+
+            using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
+            {
+                if (type == 0)
+                {
+
+                    HSUR_Daily_Attendance data = dbMain.HSUR_Daily_Attendances.Where(c => c.userId == obj.qrEmpId && c.ip_address == null && c.login_device == null && (c.endTime == null || c.endTime == "")).FirstOrDefault();
+                    if (data != null)
+                    {
+                        data.endTime = obj.startTime;
+                        data.daEndDate = obj.startDate;
+                        data.endLat = obj.startLat;
+                        data.endLong = obj.startLong;
+                        data.OutbatteryStatus = obj.batteryStatus;
+                        await dbMain.SaveChangesAsync();
+                    }
+                    try
+                    {
+                        HSUR_Daily_Attendance objdata = new HSUR_Daily_Attendance();
+
+                        var isActive = dbMain.EmployeeMasters.Where(c => c.EmpId == obj.qrEmpId && c.isActive == true && c.type == "SA").FirstOrDefault();
+                        if (isActive != null)
+                        {
+
+                            objdata.userId = obj.qrEmpId;
+                            objdata.daDate = obj.startDate;
+                            objdata.endLat = "";
+                            objdata.startLat = obj.startLat;
+                            objdata.startLong = obj.startLong;
+                            objdata.startTime = obj.startTime;
+                            objdata.endTime = "";
+                            objdata.EmployeeType = obj.EmployeeType;
+                            objdata.batteryStatus = obj.batteryStatus;
+                            dbMain.HSUR_Daily_Attendances.Add(objdata);
+                            UR_Location loc = new UR_Location();
+                            loc.empId = obj.qrEmpId;
+                            loc.datetime = DateTime.Now;
+                            loc.lat = obj.startLat;
+                            loc._long = obj.startLong;
+                            loc.batteryStatus = obj.batteryStatus;
+                            loc.type = 1;
+                            loc.address = Address(obj.endLat + "," + obj.endLong);
+                            if (loc.address != "")
+                            { loc.area = area(loc.address); }
+                            else
+                            {
+                                loc.area = "";
+                            }
+                            dbMain.UR_Locations.Add(loc);
+                            await dbMain.SaveChangesAsync();
+                            result.status = "success";
+                            result.message = "Shift started Successfully";
+                            result.messageMar = "शिफ्ट सुरू";
+                            result.isAttendenceOn = true;
+                            result.isAttendenceOff = false;
+                            return result;
+                        }
+                        else
+                        {
+                            result.status = "Error";
+                            result.message = "Contact To Administrator";
+                            result.messageMar = "प्रशासकाशी संपर्क साधा";
+                            return result;
+                        }
+                    }
+
+                    catch(Exception ex)
+                    {
+                        _logger.LogError(ex.ToString(), ex);
+                        result.status = "error";
+                        result.message = "Something is wrong,Try Again.. ";
+                        result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
+                        return result;
+                    }
+
+
+                }
+                else
+                {
+
+                    try
+                    {
+                        HSUR_Daily_Attendance objdata = await dbMain.HSUR_Daily_Attendances.Where(c => EF.Functions.DateDiffDay(c.daDate, obj.endDate) == 0 && c.userId == obj.qrEmpId && c.ip_address == null && c.login_device == null && (c.endTime == "" || c.endTime == null)).FirstOrDefaultAsync();
+                        if (objdata != null)
+                        {
+
+                            objdata.userId = obj.qrEmpId;
+                            objdata.daEndDate = obj.endDate;
+                            objdata.endLat = obj.endLat;
+                            objdata.endLong = obj.endLong;
+                            objdata.endTime = obj.endTime;
+                            objdata.EmployeeType = obj.EmployeeType;
+                            objdata.OutbatteryStatus = obj.batteryStatus;
+                            //objdata.endAddress = Address(objdata.endLat + "," + objdata.endLong);
+
+                            ///////////////////////////////////////////////////////////////////
+
+                            UR_Location loc = new UR_Location();
+                            loc.empId = obj.qrEmpId;
+                            loc.datetime = DateTime.Now;
+                            loc.lat = obj.endLat;
+                            loc._long = obj.endLong;
+                            loc.batteryStatus = obj.batteryStatus;
+                            loc.type = 1;
+                            loc.address = Address(obj.endLat + "," + obj.endLong);
+                            if (loc.address != "")
+                            { loc.area = area(loc.address); }
+                            else
+                            {
+                                loc.area = "";
+                            }
+                            dbMain.UR_Locations.Add(loc);
+
+                            ///////////////////////////////////////////////////////////////////
+
+                            await dbMain.SaveChangesAsync();
+                            result.status = "success";
+                            result.message = "Shift ended successfully";
+                            result.messageMar = "शिफ्ट संपले";
+                            result.isAttendenceOn = false;
+                            result.isAttendenceOff = true;
+
+                            return result;
+                        }
+
+
+                        else
+                        {
+                            HSUR_Daily_Attendance objdata2 = await dbMain.HSUR_Daily_Attendances.Where(c => c.userId == obj.qrEmpId && c.ip_address == null && c.login_device == null && (c.endTime == "" || c.endTime == null)).OrderByDescending(c => c.daID).FirstOrDefaultAsync();
+                            objdata2.userId = obj.qrEmpId;
+                            objdata2.daEndDate = obj.endDate;
+                            objdata2.endLat = obj.endLat;
+                            objdata2.endLong = obj.endLong;
+                            objdata2.endTime = obj.endTime;
+                            objdata2.EmployeeType = obj.EmployeeType;
+                            objdata2.OutbatteryStatus = obj.batteryStatus;
+
+                            //       objdata.endAddress = Address(objdata.endLat + "," + objdata.endLong);
+
+                            ///////////////////////////////////////////////////////////////////
+
+                            UR_Location loc = new UR_Location();
+                            loc.empId = obj.qrEmpId;
+                            loc.datetime = DateTime.Now;
+                            loc.lat = obj.endLat;
+                            loc._long = obj.endLong;
+                            loc.batteryStatus = obj.batteryStatus;
+                            loc.type = 1;
+                            loc.address = Address(obj.endLat + "," + obj.endLong);
+                            if (loc.address != "")
+                            { loc.area = area(loc.address); }
+                            else
+                            {
+                                loc.area = "";
+                            }
+                            dbMain.UR_Locations.Add(loc);
+
+                            ///////////////////////////////////////////////////////////////////
+
+                            await dbMain.SaveChangesAsync();
+                            result.status = "success";
+                            result.message = "Shift ended successfully";
+                            result.messageMar = "शिफ्ट संपले";
+                            result.isAttendenceOn = false;
+                            result.isAttendenceOff = true;
+                            return result;
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        _logger.LogError(ex.ToString(), ex);
+                        result.status = "error";
+                        result.message = "Something is wrong,Try Again.. ";
+                        result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
+                        return result;
+                    }
+                }
+            }
+
+
+        }
+
+        public async Task<Result> CheckSupervisorAttendenceAsync(BigVQREmployeeAttendenceVM obj)
+        {
+            Result result = new Result();
+            try
+            {
+                using(DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
+                {
+                    HSUR_Daily_Attendance objdata = new HSUR_Daily_Attendance();
+                    var isActive = await dbMain.EmployeeMasters.Where(c => c.EmpId == obj.qrEmpId && c.isActive == true && c.type == "SA").FirstOrDefaultAsync();
+                    var AttenIn = await dbMain.HSUR_Daily_Attendances.Where(c => EF.Functions.DateDiffDay(c.daDate, obj.startDate) == 0 && c.userId == obj.qrEmpId && c.ip_address == null && c.login_device == null && (c.endTime == null || c.endTime == "")).FirstOrDefaultAsync();
+                    if (isActive != null)
+                    {
+                        if (AttenIn != null)
+                        {
+                            result.status = "Success";
+                            result.message = "Shift On";
+                            result.messageMar = "शिफ्ट सुरू";
+                            result.isAttendenceOn = true;
+                            result.isAttendenceOff = false;
+                            return result;
+                        }
+                        else
+                        {
+                            result.status = "Success";
+                            result.message = "Shift Off";
+                            result.messageMar = "शिफ्ट बंद";
+                            result.isAttendenceOn = false;
+                            result.isAttendenceOff = true;
+                            return result;
+                        }
+                    }
+                    else
+                    {
+                        result.status = "Error";
+                        result.message = "Contact To Administrator";
+                        result.messageMar = "प्रशासकाशी संपर्क साधा";
+                        return result;
+                    }
+
+                }
+                
+            }
+
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                result.status = "error";
+                result.message = "Something is wrong,Try Again.. ";
+                result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
+                return result;
+            }
+        }
+
+
+        public async Task<List<HouseDetailsVM>> GetHouseListAsync(int appId, string EmpType)
+        {
+            List<HouseDetailsVM> obj = new List<HouseDetailsVM>();
+            obj = await GetHouseForNormalAsync(appId, EmpType);
+            return obj;
+
+        }
+
+
+        public async Task<List<HouseDetailsVM>> GetHouseForNormalAsync(int AppId, string EmpType)
+        {
+            List<HouseDetailsVM> obj = new List<HouseDetailsVM>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                {
+                    var house = await db.HouseMasters.Where(x => x.ReferanceId.Contains(EmpType) && x.houseLat != null && x.houseLong != null).Select(x => new { x.ReferanceId, x.houseNumber }).ToListAsync();
+                    if (house != null && house.Count > 0)
+                    {
+                        foreach (var x in house)
+                        {
+                            string HouseN = "";
+                            if (x.houseNumber == null || x.houseNumber == "")
+                            {
+                                HouseN = x.ReferanceId;
+                            }
+                            else { HouseN = x.houseNumber; }
+                            obj.Add(new HouseDetailsVM()
+                            {
+                                houseid = x.ReferanceId,
+                                houseNumber = HouseN,
+
+                            });
+                        }
+                    }
+                    
+
+                    var dump = await db.DumpYardDetails.Where(x => x.ReferanceId.Contains(EmpType) && x.dyLat != null && x.dyLong != null).Select(x => new { x.ReferanceId }).ToListAsync();
+                    if (dump != null && dump.Count > 0)
+                    {
+                        foreach (var x in dump)
+                        {
+
+                            obj.Add(new HouseDetailsVM()
+                            {
+                                houseid = x.ReferanceId,
+                                houseNumber = x.ReferanceId,
+
+                            });
+                        }
+
+                    }
+                    
+
+                    var LW = db.LiquidWasteDetails.Where(x => x.ReferanceId.Contains(EmpType) && x.LWLat != null && x.LWLong != null).Select(x => new { x.ReferanceId }).ToList();
+                    if(LW != null && LW.Count > 0)
+                    {
+                        foreach (var x in LW)
+                        {
+                            obj.Add(new HouseDetailsVM()
+                            {
+                                houseid = x.ReferanceId,
+                                houseNumber = x.ReferanceId,
+
+                            });
+                        }
+                    }
+                    
+                    var SSD = db.StreetSweepingDetails.Where(x => x.ReferanceId.Contains(EmpType) && x.SSLat != null && x.SSLong != null).Select(x => new { x.ReferanceId }).ToList();
+                    if(SSD != null && SSD.Count > 0)
+                    {
+                        foreach (var x in SSD)
+                        {
+
+                            obj.Add(new HouseDetailsVM()
+                            {
+                                houseid = x.ReferanceId,
+                                houseNumber = x.ReferanceId,
+
+                            });
+                        }
+                    }
+
+                }
+                return obj;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+            }
+        }
+
+
+        public async Task<List<HSHouseDetailsGrid>> GetHDSLListAsync(int appId, string EmpType, string ReferanceId)
+        {
+            List<HSHouseDetailsGrid> objDetail = new List<HSHouseDetailsGrid>();
+            if (EmpType == "H")
+            {
+                objDetail = await GetHouseDetailsByIdAsync(appId, ReferanceId);
+            }
+            if (EmpType == "L")
+            {
+                objDetail = await GetLiquidDetailsByIdAsync(appId, ReferanceId);
+            }
+            if (EmpType == "S")
+            {
+                objDetail = await GetStreetDetailsByIdAsync(appId, ReferanceId);
+            }
+
+            if (EmpType == "D")
+            {
+                objDetail = await GetDumpYardDetailsByIdAsync(appId, ReferanceId);
+            }
+
+
+            return objDetail;
+
+        }
+
+
+        public async Task<List<HSHouseDetailsGrid>> GetHouseDetailsByIdAsync(int appId, string ReferanceId)
+        {
+            List<HSHouseDetailsGrid> obj = new List<HSHouseDetailsGrid>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(appId))
+                {
+                    var data = await db.HouseMasters.Where(x => x.ReferanceId == ReferanceId).ToListAsync();
+                    if (data != null && data.Count > 0)
+                    {
+                        foreach (var x in data)
+                        {
+                            var name = await db.QrEmployeeMasters.Where(c => c.qrEmpId == x.userId).Select(c => new { c.qrEmpName }).FirstOrDefaultAsync();
+                            if (name != null)
+                            {
+                                string QRCodeImage = "";
+                                var BQI = await db.HouseMasters.Where(c => c.ReferanceId == ReferanceId).Select(c => new { c.BinaryQrCodeImage }).FirstOrDefaultAsync();
+                                if (BQI.BinaryQrCodeImage != null)
+                                {
+                                    QRCodeImage = Convert.ToBase64String(x.BinaryQrCodeImage);
+                                }
+                                if (string.IsNullOrEmpty(QRCodeImage))
+                                {
+                                    QRCodeImage = "/Images/default_not_upload.png";
+                                }
+                                else
+                                {
+                                    QRCodeImage = "data:image/jpeg;base64," + QRCodeImage;
+                                }
+                                obj.Add(new HSHouseDetailsGrid()
+                                {
+                                    houseId = x.houseId,
+                                    Name = name.qrEmpName,
+                                    Lat = x.houseLat,
+                                    Long = x.houseLong,
+                                    QRCodeImage = QRCodeImage,
+                                    ReferanceId = x.ReferanceId,
+                                    modifiedDate = x.modified.HasValue ? Convert.ToDateTime(x.modified).ToString("dd/MM/yyyy hh:mm tt") : "",
+                                    QRStatus = x.QRStatus,
+
+
+                                });
+                            }
+                            else
+                            {
+                                obj.Add(new HSHouseDetailsGrid()
+                                {
+                                    houseId = x.houseId,
+                                    Name = "",
+                                    Lat = x.houseLat,
+                                    Long = x.houseLong,
+                                    QRCodeImage = "/Images/default_not_upload.png",
+                                    ReferanceId = x.ReferanceId,
+                                    modifiedDate = x.modified.HasValue ? Convert.ToDateTime(x.modified).ToString("dd/MM/yyyy hh:mm tt") : "",
+                                    QRStatus = x.QRStatus,
+                                });
+                            }
+
+                        }
+                        
+                    }
+                    return obj;
+                }
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+
+            }
+        }
+        public async Task<List<HSHouseDetailsGrid>> GetLiquidDetailsByIdAsync(int appId, string ReferanceId)
+        {
+            List<HSHouseDetailsGrid> obj = new List<HSHouseDetailsGrid>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(appId))
+                {
+
+                    var data = await db.LiquidWasteDetails.Where(x => x.ReferanceId == ReferanceId).ToListAsync();
+                    if (data != null && data.Count > 0)
+                    {
+                        foreach (var x in data)
+                        {
+                            var name = await db.QrEmployeeMasters.Where(c => c.qrEmpId == x.userId).Select(c => new { c.qrEmpName }).FirstOrDefaultAsync();
+                            if (name != null)
+                            {
+                                string QRCodeImage = "";
+                                var BQI = await db.LiquidWasteDetails.Where(c => c.ReferanceId == ReferanceId).Select(c => new { c.BinaryQrCodeImage }).FirstOrDefaultAsync();
+                                if (BQI.BinaryQrCodeImage != null)
+                                {
+                                    QRCodeImage = Convert.ToBase64String(x.BinaryQrCodeImage);
+                                }
+                                if (string.IsNullOrEmpty(QRCodeImage))
+                                {
+                                    QRCodeImage = "/Images/default_not_upload.png";
+                                }
+                                else
+                                {
+                                    QRCodeImage = "data:image/jpeg;base64," + QRCodeImage;
+                                }
+                                obj.Add(new HSHouseDetailsGrid()
+                                {
+                                    houseId = x.LWId,
+                                    Name = name.qrEmpName,
+                                    Lat = x.LWLat,
+                                    Long = x.LWLong,
+                                    QRCodeImage = QRCodeImage,
+                                    ReferanceId = x.ReferanceId,
+                                    modifiedDate = x.lastModifiedDate.HasValue ? Convert.ToDateTime(x.lastModifiedDate).ToString("dd/MM/yyyy hh:mm tt") : "",
+                                    QRStatus = x.QRStatus,
+                                });
+                            }
+                            else
+                            {
+                                obj.Add(new HSHouseDetailsGrid()
+                                {
+                                    houseId = x.LWId,
+                                    Name = "",
+                                    Lat = x.LWLat,
+                                    Long = x.LWLong,
+                                    QRCodeImage = "/Images/default_not_upload.png",
+                                    ReferanceId = x.ReferanceId,
+                                    modifiedDate = x.lastModifiedDate.HasValue ? Convert.ToDateTime(x.lastModifiedDate).ToString("dd/MM/yyyy hh:mm tt") : "",
+                                    QRStatus = x.QRStatus,
+                                });
+                            }
+                        }
+                        
+
+                    }
+                    return obj;
+                }
+
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+            }
+        }
+
+
+        public async Task<List<HSHouseDetailsGrid>> GetStreetDetailsByIdAsync(int appId, string ReferanceId)
+        {
+            List<HSHouseDetailsGrid> obj = new List<HSHouseDetailsGrid>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(appId))
+                {
+
+                    var data = await db.StreetSweepingDetails.Where(x => x.ReferanceId == ReferanceId).ToListAsync();
+
+                    if (data != null && data.Count > 0)
+                    {
+                        foreach (var x in data)
+                        {
+                            var name = await db.QrEmployeeMasters.Where(c => c.qrEmpId == x.userId).Select(c => new { c.qrEmpName }).FirstOrDefaultAsync();
+                            if (name != null)
+                            {
+                                string QRCodeImage = "";
+                                var BQI = await db.StreetSweepingDetails.Where(c => c.ReferanceId == ReferanceId).Select(c => new { c.BinaryQrCodeImage }).FirstOrDefaultAsync();
+                                if (BQI.BinaryQrCodeImage != null)
+                                {
+                                    QRCodeImage = Convert.ToBase64String(x.BinaryQrCodeImage);
+                                }
+                                if (string.IsNullOrEmpty(QRCodeImage))
+                                {
+                                    QRCodeImage = "/Images/default_not_upload.png";
+                                }
+                                else
+                                {
+                                    QRCodeImage = "data:image/jpeg;base64," + QRCodeImage;
+                                }
+                                obj.Add(new HSHouseDetailsGrid()
+                                {
+                                    houseId = x.SSId,
+                                    Name = name.qrEmpName,
+                                    Lat = x.SSLat,
+                                    Long = x.SSLong,
+                                    QRCodeImage = QRCodeImage,
+                                    ReferanceId = x.ReferanceId,
+                                    modifiedDate = x.lastModifiedDate.HasValue ? Convert.ToDateTime(x.lastModifiedDate).ToString("dd/MM/yyyy hh:mm tt") : "",
+                                    QRStatus = x.QRStatus,
+                                });
+                            }
+                            else
+                            {
+                                obj.Add(new HSHouseDetailsGrid()
+                                {
+                                    houseId = x.SSId,
+                                    Name = "",
+                                    Lat = x.SSLat,
+                                    Long = x.SSLong,
+                                    QRCodeImage = "/Images/default_not_upload.png",
+                                    ReferanceId = x.ReferanceId,
+                                    modifiedDate = x.lastModifiedDate.HasValue ? Convert.ToDateTime(x.lastModifiedDate).ToString("dd/MM/yyyy hh:mm tt") : "",
+                                    QRStatus = x.QRStatus,
+                                });
+                            }
+                        }
+                    }
+                    
+                    return obj;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+            }
+        }
+
+
+        public async Task<List<HSHouseDetailsGrid>> GetDumpYardDetailsByIdAsync(int appId, string ReferanceId)
+        {
+            List<HSHouseDetailsGrid> obj = new List<HSHouseDetailsGrid>();
+
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(appId))
+                {
+                    var data = await db.DumpYardDetails.Where(x => x.ReferanceId == ReferanceId).ToListAsync();
+                    if (data != null && data.Count > 0)
+                    {
+                        foreach (var x in data)
+                        {
+                            var name = await db.QrEmployeeMasters.Where(c => c.qrEmpId == x.userId).Select(c => new { c.qrEmpName }).FirstOrDefaultAsync();
+                            if (name != null)
+                            {
+                                string QRCodeImage = "";
+                                var BQI = await db.DumpYardDetails.Where(c => c.ReferanceId == ReferanceId).Select(c => new { c.BinaryQrCodeImage }).FirstOrDefaultAsync();
+                                if (BQI.BinaryQrCodeImage != null)
+                                {
+                                    QRCodeImage = Convert.ToBase64String(x.BinaryQrCodeImage);
+                                }
+                                if (string.IsNullOrEmpty(QRCodeImage))
+                                {
+                                    QRCodeImage = "/Images/default_not_upload.png";
+                                }
+                                else
+                                {
+                                    QRCodeImage = "data:image/jpeg;base64," + QRCodeImage;
+                                }
+                                obj.Add(new HSHouseDetailsGrid()
+                                {
+                                    houseId = x.dyId,
+                                    Name = name.qrEmpName,
+                                    Lat = x.dyLat,
+                                    Long = x.dyLong,
+                                    QRCodeImage = QRCodeImage,
+                                    ReferanceId = x.ReferanceId,
+                                    modifiedDate = x.lastModifiedDate.HasValue ? Convert.ToDateTime(x.lastModifiedDate).ToString("dd/MM/yyyy hh:mm tt") : "",
+                                    QRStatus = x.QRStatus,
+
+                                });
+                            }
+                            else
+                            {
+                                obj.Add(new HSHouseDetailsGrid()
+                                {
+                                    houseId = x.dyId,
+                                    Name = "",
+                                    Lat = x.dyLat,
+                                    Long = x.dyLong,
+                                    QRCodeImage = "/Images/default_not_upload.png",
+                                    ReferanceId = x.ReferanceId,
+                                    modifiedDate = x.lastModifiedDate.HasValue ? Convert.ToDateTime(x.lastModifiedDate).ToString("dd/MM/yyyy hh:mm tt") : "",
+                                    QRStatus = x.QRStatus,
+                                });
+                            }
+                        }
+
+                    }
+                    return obj;
+                }
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+
+            }
+        }
+
+        public async Task<IEnumerable<UREmployeeAttendence>> UserRoleAttendanceAsync(int userid, DateTime FromDate, DateTime Todate, bool type)
+        {
+            List<UREmployeeAttendence> obj = new List<UREmployeeAttendence>();
+            try
+            {
+                using(DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
+                {
+                    if (type == true)
+                    {
+                        if (userid == 0)
+                        {
+                            var data = await dbMain.HSUR_Daily_Attendances.Where(c => c.startLat != null && c.daDate >= FromDate && c.daDate <= Todate).ToListAsync();
+                            if(data != null && data.Count > 0)
+                            {
+                                foreach (var x in data)
+                                {
+                                    obj.Add(new UREmployeeAttendence()
+                                    {
+                                        qrEmpDaId = x.daID,
+                                        qrEmpId = x.userId,
+                                        startLat = x.startLat,
+                                        startLong = x.startLong,
+                                        endLat = x.endLat,
+                                        endLong = x.endLong,
+                                        startTime = x.startTime,
+                                        endTime = x.endTime,
+                                        startDate = x.daDate == null ? null : Convert.ToDateTime(x.daDate).ToString("dd/MM/yyyy"),
+                                        endDate = x.daEndDate == null ? null : Convert.ToDateTime(x.daEndDate).ToString("dd/MM/yyyy"),
+                                        batteryStatus = x.batteryStatus,
+                                        OutbatteryStatus = x.batteryStatus,
+                                        EmployeeType = x.EmployeeType,
+                                        IpAddress = x.ip_address,
+                                        LoginDevice = x.login_device,
+                                        HostName = x.HostName,
+                                        EmployeeName = await dbMain.EmployeeMasters.Where(c => c.EmpId == x.userId).Select(s => s.EmpName).FirstOrDefaultAsync(),
+                                    });
+                                }
+                            }
+                            
+                        }
+                        else
+                        {
+                            var data = await dbMain.HSUR_Daily_Attendances.Where(c => c.startLat != null && c.daDate >= FromDate && c.daDate <= Todate && c.userId == userid).ToListAsync();
+                            if(data != null && data.Count > 0)
+                            {
+                                foreach (var x in data)
+                                {
+                                    obj.Add(new UREmployeeAttendence()
+                                    {
+                                        qrEmpDaId = x.daID,
+                                        qrEmpId = x.userId,
+                                        startLat = x.startLat,
+                                        startLong = x.startLong,
+                                        endLat = x.endLat,
+                                        endLong = x.endLong,
+                                        startTime = x.startTime,
+                                        endTime = x.endTime,
+                                        startDate = x.daDate == null ? null : Convert.ToDateTime(x.daDate).ToString("dd/MM/yyyy"),
+                                        endDate = x.daEndDate == null ? null : Convert.ToDateTime(x.daEndDate).ToString("dd/MM/yyyy"),
+                                        batteryStatus = x.batteryStatus,
+                                        OutbatteryStatus = x.batteryStatus,
+                                        EmployeeType = x.EmployeeType,
+                                        IpAddress = x.ip_address,
+                                        LoginDevice = x.login_device,
+                                        HostName = x.HostName,
+                                        EmployeeName = await dbMain.EmployeeMasters.Where(c => c.EmpId == x.userId).Select(s => s.EmpName).FirstOrDefaultAsync(),
+                                    });
+                                }
+
+                            }
+                            
+                        }
+
+                    }
+                    else
+                    {
+                        if (userid == 0)
+                        {
+                            var data = await dbMain.HSUR_Daily_Attendances.Where(c => c.startLat == null && c.daDate >= FromDate && c.daDate <= Todate).ToListAsync();
+                            if (data != null && data.Count > 0)
+                            {
+                                foreach (var x in data)
+                                {
+                                    obj.Add(new UREmployeeAttendence()
+                                    {
+                                        qrEmpDaId = x.daID,
+                                        qrEmpId = x.userId,
+                                        startLat = x.startLat,
+                                        startLong = x.startLong,
+                                        endLat = x.endLat,
+                                        endLong = x.endLong,
+                                        startTime = x.startTime,
+                                        endTime = x.endTime,
+                                        startDate = x.daDate == null ? null : Convert.ToDateTime(x.daDate).ToString("dd/MM/yyyy"),
+                                        endDate = x.daEndDate == null ? null : Convert.ToDateTime(x.daEndDate).ToString("dd/MM/yyyy"),
+                                        batteryStatus = x.batteryStatus,
+                                        OutbatteryStatus = x.batteryStatus,
+                                        EmployeeType = x.EmployeeType,
+                                        IpAddress = x.ip_address,
+                                        LoginDevice = x.login_device,
+                                        HostName = x.HostName,
+                                        EmployeeName = await dbMain.EmployeeMasters.Where(c => c.EmpId == x.userId).Select(s => s.EmpName).FirstOrDefaultAsync(),
+                                    });
+                                }
+                            }
+                                
+                        }
+                        else
+                        {
+                            var data = await dbMain.HSUR_Daily_Attendances.Where(c => c.startLat == null && c.daDate >= FromDate && c.daDate <= Todate && c.userId == userid).ToListAsync();
+                            if (data!= null && data.Count>0)
+                            {
+                                foreach (var x in data)
+                                {
+                                    obj.Add(new UREmployeeAttendence()
+                                    {
+                                        qrEmpDaId = x.daID,
+                                        qrEmpId = x.userId,
+                                        startLat = x.startLat,
+                                        startLong = x.startLong,
+                                        endLat = x.endLat,
+                                        endLong = x.endLong,
+                                        startTime = x.startTime,
+                                        endTime = x.endTime,
+                                        startDate = x.daDate == null ? null : Convert.ToDateTime(x.daDate).ToString("dd/MM/yyyy"),
+                                        endDate = x.daEndDate == null ? null : Convert.ToDateTime(x.daEndDate).ToString("dd/MM/yyyy"),
+                                        batteryStatus = x.batteryStatus,
+                                        OutbatteryStatus = x.batteryStatus,
+                                        EmployeeType = x.EmployeeType,
+                                        IpAddress = x.ip_address,
+                                        LoginDevice = x.login_device,
+                                        HostName = x.HostName,
+                                        EmployeeName = await dbMain.EmployeeMasters.Where(c => c.EmpId == x.userId).Select(s => s.EmpName).FirstOrDefaultAsync(),
+                                    });
+                                }
+                            }
+                            
+                        }
+
+                    }
+                }
+                
+
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+            }
+            if (obj != null && obj.Count > 0)
+                return obj.OrderByDescending(c => c.qrEmpDaId).ToList();
+            else
+                return obj;
+        }
+
 
         public string checkNull(string str)
         {
