@@ -37,7 +37,8 @@ namespace ICTSBMCOREAPI
             services.AddDbContext<DevSwachhBharatNagpurEntities>(ServiceLifetime.Transient);
             services.AddDbContext<DevICTSBMChildEntities>(ServiceLifetime.Transient);
             services.AddDbContext<DevICTSBMMainEntities>(ServiceLifetime.Transient);
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(options =>
+                options.JsonSerializerOptions.PropertyNamingPolicy = null); 
             services.AddSwaggerGen(s =>
             {
                 s.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo

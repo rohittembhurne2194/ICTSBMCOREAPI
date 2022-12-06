@@ -52,9 +52,9 @@ namespace ICTSBMCOREAPI.Controllers
         public async Task<Result> SaveQrHPDCollections([FromHeader] int AppId, [FromHeader] string referanceId, [FromHeader] int gcType, [FromBody]BigVQRHPDVM obj)
         {
             
-            string referanceid = (referanceId == "" ? "" : referanceId);
+            string referanceid = (string.IsNullOrEmpty(referanceId) ? "" : referanceId);
             
-            string houseid1 = obj.ReferanceId;
+            string houseid1 = (string.IsNullOrEmpty(obj.ReferanceId) ? "" : obj.ReferanceId);
             string[] houseList = houseid1.Split(',');
 
             if (houseList.Length > 1)
