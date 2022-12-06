@@ -74,5 +74,6 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         Task<List<SyncResult>> SaveUserLocationNSLAsync(List<SBUserLocation> obj, int AppId, string batteryStatus, int typeId, string EmpType);
         Task<CollectionSyncResult> SaveUserLocationOfflineSyncAsync(SBGarbageCollectionView obj, int AppId, int typeId);
         Task<Result> SendSMSToHOuseAsync(int area, int AppId);
+       // Task<List<DumpTripStatusResult>> SaveHouseMapTrail(Trial obj);
     }
 }

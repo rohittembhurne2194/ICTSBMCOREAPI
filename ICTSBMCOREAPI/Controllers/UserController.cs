@@ -4,9 +4,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ICTSBMCOREAPI.Controllers
@@ -223,6 +228,77 @@ namespace ICTSBMCOREAPI.Controllers
 
             objDetail = await objRep.GetUserMobileIdentificationAsync(AppId, userId, isSync, batteryStatus, imeinos);
             return objDetail;
+        }
+
+
+        [HttpPost]
+        [Route("Save/HouseMapTrail")]
+        public async Task<List<DumpTripStatusResult>>HouseMapTrail([FromBody] List<Trial> obj,[FromHeader] string url, [FromHeader] string username, [FromHeader] string password)
+        {
+            Trial tn = new Trial();
+            List<DumpTripStatusResult> objDetail = new List<DumpTripStatusResult>();
+            foreach (var item in obj)
+            {
+                //tn.startTs = item.startTs;
+                //tn.endTs = item.endTs;
+                tn.createUser = item.createUser;
+                tn.geom = item.geom;
+                tn.createTs = item.createTs;
+                tn.houseId = item.houseId;
+                tn.updateTs = item.updateTs;
+                tn.updateUser = item.updateUser;
+
+                HttpClient client = new HttpClient();
+                var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                var stringContent = new StringContent(json);
+                stringContent.Headers.ContentType.MediaType = "application/json";
+                stringContent.Headers.Add("url",url);
+                stringContent.Headers.Add("username", username);
+                stringContent.Headers.Add("password", password);
+
+
+                //HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "http://114.143.244.130:9091/house");
+                //request.Content = new StringContent("{\"url\":\"jdbc:postgresql://192.168.100.51:5434/sbmgis\",\"username\":\"sbmgis\",\"password\":\"sbmgis\"}", Encoding.UTF8,"application/json");//CONTENT-TYPE header
+                //request.Content.Headers.Add("url", url);
+                //request.Content.Headers.Add("username", username);
+                //request.Content.Headers.Add("password", password);
+                //await client.SendAsync(request)
+                //        .ContinueWith(async responseTask =>
+                //        {
+                //            Console.WriteLine("Response: {0}", responseTask.Result);
+                //            var Content = await responseTask.Result.Content.ReadAsStringAsync();
+                //        });
+                
+                var response = await client.PostAsync("http://114.143.244.130:9091/house", stringContent);
+
+                
+
+
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                objDetail.Add(new DumpTripStatusResult()
+                {
+                    code = responseString.ToString(),
+                    status = responseString.ToString(),
+                    message = responseString.ToString(),
+                    errorMessages = responseString.ToString(),
+                    timestamp = responseString.ToString(),
+                    data = responseString.ToString()
+                });
+            }
+            return objDetail;
+
+            //foreach (var item in obj)
+            //{
+            //    tn.startTs = item.startTs;
+            //    tn.endTs = item.endTs;
+            //    tn.createUser = item.createUser;
+            //    tn.geom = item.geom;
+            //    tn = await objRep.SaveHouseMapTrail(tn);
+
+            //}
+            //return objDetail;
+
         }
     }
     
