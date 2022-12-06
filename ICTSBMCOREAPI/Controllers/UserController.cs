@@ -255,35 +255,17 @@ namespace ICTSBMCOREAPI.Controllers
                 stringContent.Headers.Add("url",url);
                 stringContent.Headers.Add("username", username);
                 stringContent.Headers.Add("password", password);
-
-
-                //HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "http://114.143.244.130:9091/house");
-                //request.Content = new StringContent("{\"url\":\"jdbc:postgresql://192.168.100.51:5434/sbmgis\",\"username\":\"sbmgis\",\"password\":\"sbmgis\"}", Encoding.UTF8,"application/json");//CONTENT-TYPE header
-                //request.Content.Headers.Add("url", url);
-                //request.Content.Headers.Add("username", username);
-                //request.Content.Headers.Add("password", password);
-                //await client.SendAsync(request)
-                //        .ContinueWith(async responseTask =>
-                //        {
-                //            Console.WriteLine("Response: {0}", responseTask.Result);
-                //            var Content = await responseTask.Result.Content.ReadAsStringAsync();
-                //        });
-                
                 var response = await client.PostAsync("http://114.143.244.130:9091/house", stringContent);
-
-                
-
-
                 var responseString = await response.Content.ReadAsStringAsync();
-
+                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
                 objDetail.Add(new DumpTripStatusResult()
                 {
-                    code = responseString.ToString(),
-                    status = responseString.ToString(),
-                    message = responseString.ToString(),
-                    errorMessages = responseString.ToString(),
-                    timestamp = responseString.ToString(),
-                    data = responseString.ToString()
+                    code = dynamicobject.code.ToString(),
+                    status = dynamicobject.status.ToString(),
+                    message = dynamicobject.message.ToString(),
+                    errorMessages = dynamicobject.errorMessages.ToString(),
+                    timestamp = dynamicobject.timestamp.ToString(),
+                    data = dynamicobject.data.ToString()
                 });
             }
             return objDetail;
