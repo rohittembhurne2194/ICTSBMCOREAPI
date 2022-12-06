@@ -239,8 +239,8 @@ namespace ICTSBMCOREAPI.Controllers
             List<DumpTripStatusResult> objDetail = new List<DumpTripStatusResult>();
             foreach (var item in obj)
             {
-                //tn.startTs = item.startTs;
-                //tn.endTs = item.endTs;
+                tn.startTs = item.startTs;
+                tn.endTs = item.endTs;
                 tn.createUser = item.createUser;
                 tn.geom = item.geom;
                 tn.createTs = item.createTs;

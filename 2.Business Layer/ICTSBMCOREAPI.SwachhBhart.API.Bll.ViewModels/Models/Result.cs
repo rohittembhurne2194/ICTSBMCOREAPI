@@ -16,5 +16,8 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string emptype { get; set; }
 
         public string applink { get; set; }
+
+        public int houseid { get; set; }
+        public bool IsExixts { get; set; }
     }
 }

@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace ICTSBMCOREAPI.Controllers
@@ -31,16 +33,16 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpPost]
         [Route("Save/QrEmployeeAttendenceIn")]
-        public async Task<Result> SaveQrEmployeeAttendence([FromHeader] int AppId, [FromBody]BigVQREmployeeAttendenceVM obj)
+        public async Task<Result> SaveQrEmployeeAttendence([FromHeader] int AppId, [FromBody] BigVQREmployeeAttendenceVM obj)
         {
-            
+
             Result objDetail = new Result();
             objDetail = await objRep.SaveQrEmployeeAttendenceAsync(obj, AppId, 0);
             return objDetail;
         }
         [HttpPost]
         [Route("Save/QrEmployeeAttendenceOut")]
-        public async Task<Result> SaveQrEmployeeAttendenceOut([FromHeader] int AppId, [FromBody]BigVQREmployeeAttendenceVM obj)
+        public async Task<Result> SaveQrEmployeeAttendenceOut([FromHeader] int AppId, [FromBody] BigVQREmployeeAttendenceVM obj)
         {
             Result objDetail = new Result();
             objDetail = await objRep.SaveQrEmployeeAttendenceAsync(obj, AppId, 1);
@@ -49,11 +51,11 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpPost]
         [Route("Save/QrHPDCollections")]
-        public async Task<Result> SaveQrHPDCollections([FromHeader] int AppId, [FromHeader] string referanceId, [FromHeader] int gcType, [FromBody]BigVQRHPDVM obj)
+        public async Task<Result> SaveQrHPDCollections([FromHeader] int AppId, [FromHeader] int gcType, [FromBody] BigVQRHPDVM obj, [FromHeader] string url, [FromHeader] string username, [FromHeader] string password)
         {
-            
-            string referanceid = (string.IsNullOrEmpty(referanceId) ? "" : referanceId);
-            
+
+           // string referanceid = (string.IsNullOrEmpty(referanceId) ? "" : referanceId);
+
             string houseid1 = (string.IsNullOrEmpty(obj.ReferanceId) ? "" : obj.ReferanceId);
             string[] houseList = houseid1.Split(',');
 
@@ -64,21 +66,70 @@ namespace ICTSBMCOREAPI.Controllers
 
             }
 
-            string[] referancList = referanceId.Split(',');
+            //string[] referancList = referanceId.Split(',');
 
-            if (referancList.Length > 1)
+            //if (referancList.Length > 1)
+            //{
+            //    referanceid = referancList[0];
+
+            //}
+            Result objDetail1 = new Result();
+            objDetail1 = await objRep.SaveQrHPDCollectionsAsync(obj, AppId, gcType);
+            if (objDetail1.status == "success")
             {
-                referanceid = referancList[0];
 
+                //TimeSpan timespan = new TimeSpan(00, 00, 00);
+                //DateTime time = DateTime.Now.Add(timespan);
+
+                Trial tn = new Trial();
+                List<DumpTripStatusResult> objDetail = new List<DumpTripStatusResult>();
+                //foreach (var item in obj)
+                //{
+                tn.startTs = obj.startTs;
+                tn.endTs = obj.endTs;
+                tn.geom = obj.geom;
+                
+                tn.houseId = Convert.ToInt32(objDetail1.houseid);
+                if (objDetail1.IsExixts == true)
+                {
+                    tn.updateTs = obj.createTs;
+                    tn.updateUser = obj.userId;
+                }
+                else
+                {
+                    tn.createUser = obj.userId;
+                    tn.createTs = obj.createTs;
+                }
+
+
+                HttpClient client = new HttpClient();
+                var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                var stringContent = new StringContent(json);
+                stringContent.Headers.ContentType.MediaType = "application/json";
+                stringContent.Headers.Add("url", url);
+                stringContent.Headers.Add("username", username);
+                stringContent.Headers.Add("password", password);
+                var response = await client.PostAsync("http://114.143.244.130:9091/house", stringContent);
+                var responseString = await response.Content.ReadAsStringAsync();
+                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                objDetail.Add(new DumpTripStatusResult()
+                {
+                    code = dynamicobject.code.ToString(),
+                    status = dynamicobject.status.ToString(),
+                    message = dynamicobject.message.ToString(),
+                    errorMessages = dynamicobject.errorMessages.ToString(),
+                    timestamp = dynamicobject.timestamp.ToString(),
+                    data = dynamicobject.data.ToString()
+                });
+                // }
+                //   return objDetail;
             }
-            Result objDetail = new Result();
-            objDetail = await objRep.SaveQrHPDCollectionsAsync(obj, AppId, referanceid, gcType);
-            return objDetail;
+            return objDetail1;
         }
 
         [HttpPost]
         [Route("Save/QrHPDCollectionsOffline")]
-        public async Task<List<CollectionSyncResult>> SaveQrHPDCollectionsOffline([FromHeader] int AppId,[FromBody]List<BigVQRHPDVM> obj)
+        public async Task<List<CollectionSyncResult>> SaveQrHPDCollectionsOffline([FromHeader] int AppId, [FromBody] List<BigVQRHPDVM> obj)
         {
 
             List<CollectionSyncResult> objDetail = new List<CollectionSyncResult>();
@@ -92,7 +143,7 @@ namespace ICTSBMCOREAPI.Controllers
         //api/BookATable/GetBookAtableList
         public async Task<List<SBWorkDetails>> GetWork([FromHeader] int AppId, [FromHeader] int userId, [FromHeader] int year, [FromHeader] int month)
         {
-            
+
             List<SBWorkDetails> objDetail = new List<SBWorkDetails>();
             objDetail = await objRep.GetQrWorkHistoryAsync(userId, year, month, AppId);
             return objDetail.OrderByDescending(c => c.date).ToList();
@@ -101,9 +152,9 @@ namespace ICTSBMCOREAPI.Controllers
         [HttpGet]
         [Route("Get/QrWorkHistoryDetails")]
         //api/BookATable/GetBookAtableList
-        public async Task<List<BigVQrworkhistorydetails>> GetQRWorkDetails([FromHeader] int AppId, [FromHeader] int userId,[FromHeader] string date)
+        public async Task<List<BigVQrworkhistorydetails>> GetQRWorkDetails([FromHeader] int AppId, [FromHeader] int userId, [FromHeader] string date)
         {
-           
+
             DateTime Date = Convert.ToDateTime(date);
 
             List<BigVQrworkhistorydetails> objDetail = new List<BigVQrworkhistorydetails>();
@@ -112,7 +163,7 @@ namespace ICTSBMCOREAPI.Controllers
         }
         [HttpGet]
         [Route("Get/ScanifyHouse")]
-        public async Task<BigVQRHPDVM2> GetScanifyHouseDetailsData([FromHeader] int AppId, [FromHeader] string ReferenceId,[FromHeader] int gcType)
+        public async Task<BigVQRHPDVM2> GetScanifyHouseDetailsData([FromHeader] int AppId, [FromHeader] string ReferenceId, [FromHeader] int gcType)
         {
 
             BigVQRHPDVM2 objDetail = new BigVQRHPDVM2();
@@ -126,7 +177,7 @@ namespace ICTSBMCOREAPI.Controllers
         [Route("Get/Vehicles")]
         public async Task<List<VehicleList>> VehicleList([FromHeader] int AppId, [FromHeader] int VehicleTypeId)
         {
-            
+
             List<VehicleList> objDetail = new List<VehicleList>();
             objDetail = await objRep.GetVehicleListAsync(AppId, VehicleTypeId);
             return objDetail;
