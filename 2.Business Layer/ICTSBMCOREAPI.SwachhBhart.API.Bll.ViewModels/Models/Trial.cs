@@ -6,6 +6,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
 {
     public class Trial
     {
+        public string trailId { get; set; }
         public int houseId { get; set; }
         public string startTs { get; set; }
         public string endTs { get; set; }

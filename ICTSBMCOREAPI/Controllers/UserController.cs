@@ -64,7 +64,7 @@ namespace ICTSBMCOREAPI.Controllers
         [Route("Get/User")]
         public async Task<SBUserView> GetUser([FromHeader] int AppId, [FromHeader] int userId, [FromHeader] int typeId)
         {
-            
+
             SBUserView objDetail = new SBUserView();
             objDetail = await objRep.GetUserAsync(AppId, userId, typeId);
             return objDetail;
@@ -83,7 +83,7 @@ namespace ICTSBMCOREAPI.Controllers
         [Route("Get/IsAttendence")]
         public async Task<Result> CheckAttendence([FromHeader] int AppId, [FromHeader] int userId, [FromHeader] int typeId)
         {
-            
+
             Result objDetail = new Result();
             objDetail = await objRep.CheckAttendenceAsync(userId, AppId, typeId);
             return objDetail;
@@ -91,7 +91,7 @@ namespace ICTSBMCOREAPI.Controllers
         }
         [HttpPost]
         [Route("Save/AttendenceOffline")]
-        public async Task<List<SyncResult1>> SaveUserAttendenceOffline([FromHeader] int AppId, [FromHeader] string date, [FromHeader] string EmpType, [FromBody]List<SBUserAttendence> obj)
+        public async Task<List<SyncResult1>> SaveUserAttendenceOffline([FromHeader] int AppId, [FromHeader] string date, [FromHeader] string EmpType, [FromBody] List<SBUserAttendence> obj)
         {
             List<SyncResult1> objDetail = new List<SyncResult1>();
             objDetail = await objRep.SaveUserAttendenceOfflineAsync(obj, AppId, date, EmpType);
@@ -102,7 +102,7 @@ namespace ICTSBMCOREAPI.Controllers
         //api/BookATable/GetBookAtableList
         public async Task<List<SBWorkDetails>> GetWork([FromHeader] int AppId, [FromHeader] int userId, [FromHeader] int year, [FromHeader] int month, [FromHeader] string EmpType)
         {
-            
+
             List<SBWorkDetails> objDetail = new List<SBWorkDetails>();
             objDetail = await objRep.GetUserWorkAsync(userId, year, month, AppId, EmpType);
             return objDetail.OrderByDescending(c => c.date).ToList();
@@ -113,8 +113,8 @@ namespace ICTSBMCOREAPI.Controllers
         //api/BookATable/GetBookAtableList
         public async Task<List<SBWorkDetailsHistory>> GetWorkDetails([FromHeader] int AppId, [FromHeader] int userId, [FromHeader] int languageId, [FromHeader] DateTime fdate)
         {
-            
-           
+
+
             List<SBWorkDetailsHistory> objDetail = new List<SBWorkDetailsHistory>();
             objDetail = await objRep.GetUserWorkDetailsAsync(fdate, AppId, userId, languageId);
             return objDetail;
@@ -124,7 +124,7 @@ namespace ICTSBMCOREAPI.Controllers
         public async Task<List<CMSBZoneVM>> GetZone(int AppId, string SearchString)
         {
             List<CMSBZoneVM> objDetail = new List<CMSBZoneVM>();
-           
+
             objDetail = await objRep.GetZoneAsync(AppId, SearchString);
             return objDetail;
         }
@@ -177,7 +177,7 @@ namespace ICTSBMCOREAPI.Controllers
         //api/BookATable/GetBookAtableList
         public async Task<CollectionAppAreaLatLong> GetAppAreaLatLong([FromHeader] int AppId)
         {
-            
+
             CollectionAppAreaLatLong objDetail = new CollectionAppAreaLatLong();
             objDetail = await objRep.GetAppAreaLatLongAsync(AppId);
             return objDetail;
@@ -232,30 +232,73 @@ namespace ICTSBMCOREAPI.Controllers
 
 
         [HttpPost]
-        [Route("Save/HouseMapTrail")]
-        public async Task<List<DumpTripStatusResult>>HouseMapTrail([FromBody] List<Trial> obj,[FromHeader] string url, [FromHeader] string username, [FromHeader] string password)
+        [Route("Save/GarbageMapTrail")]
+        public async Task<List<DumpTripStatusResult>> GarbageMapTrail([FromBody] List<Trial> obj, [FromHeader] string url, [FromHeader] string username, [FromHeader] string password)
         {
+            HttpClient client = new HttpClient();
             Trial tn = new Trial();
             List<DumpTripStatusResult> objDetail = new List<DumpTripStatusResult>();
             foreach (var item in obj)
             {
+                tn.trailId = item.trailId;
                 tn.startTs = item.startTs;
                 tn.endTs = item.endTs;
                 tn.createUser = item.createUser;
                 tn.geom = item.geom;
                 tn.createTs = item.createTs;
-                tn.houseId = item.houseId;
                 tn.updateTs = item.updateTs;
                 tn.updateUser = item.updateUser;
 
-                HttpClient client = new HttpClient();
+
                 var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
                 var stringContent = new StringContent(json);
                 stringContent.Headers.ContentType.MediaType = "application/json";
-                stringContent.Headers.Add("url",url);
+                stringContent.Headers.Add("url", url);
                 stringContent.Headers.Add("username", username);
                 stringContent.Headers.Add("password", password);
-                var response = await client.PostAsync("http://114.143.244.130:9091/house", stringContent);
+                var response = await client.PostAsync("http://114.143.244.130:9091/garbage-trail", stringContent);
+                var responseString = await response.Content.ReadAsStringAsync();
+                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                objDetail.Add(new DumpTripStatusResult()
+                {
+                    code = dynamicobject.code.ToString(),
+                    status = dynamicobject.status.ToString(),
+                    message = dynamicobject.message.ToString(),
+                    errorMessages = dynamicobject.errorMessages.ToString(),
+                    timestamp = dynamicobject.timestamp.ToString(),
+                    data = dynamicobject.data.ToString()
+                });
+            }
+            return objDetail;
+
+        }
+
+        [HttpPost]
+        [Route("Save/HouseMapTrail")]
+        public async Task<List<DumpTripStatusResult>> HouseMapTrail([FromBody] List<Trial> obj, [FromHeader] string url, [FromHeader] string username, [FromHeader] string password)
+        {
+            HttpClient client = new HttpClient();
+            Trial tn = new Trial();
+            List<DumpTripStatusResult> objDetail = new List<DumpTripStatusResult>();
+            foreach (var item in obj)
+            {
+                tn.trailId = item.trailId;
+                tn.startTs = item.startTs;
+                tn.endTs = item.endTs;
+                tn.createUser = item.createUser;
+                tn.geom = item.geom;
+                tn.createTs = item.createTs;
+                tn.updateTs = item.updateTs;
+                tn.updateUser = item.updateUser;
+
+                var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                var stringContent = new StringContent(json);
+                stringContent.Headers.ContentType.MediaType = "application/json";
+                stringContent.Headers.Add("url", url);
+                stringContent.Headers.Add("username", username);
+                stringContent.Headers.Add("password", password);
+
+                var response = await client.PostAsync("http://114.143.244.130:9091/house-trail", stringContent);
                 var responseString = await response.Content.ReadAsStringAsync();
                 var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
                 objDetail.Add(new DumpTripStatusResult()
@@ -272,6 +315,6 @@ namespace ICTSBMCOREAPI.Controllers
 
         }
     }
-    
+
 }
 
