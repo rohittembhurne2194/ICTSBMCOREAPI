@@ -65,7 +65,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     var token = new JwtSecurityToken(
                         issuer: _configuration["JWT:ValidIssuer"],
                         audience: _configuration["JWT:ValidAudience"],
-                        expires: DateTime.Now.AddMinutes(60),
+                        expires: DateTime.Now.AddHours(12),
                         claims: authClaims,
                         signingCredentials: new SigningCredentials(authSigninkey, SecurityAlgorithms.HmacSha256Signature));
                     return new JwtSecurityTokenHandler().WriteToken(token);
@@ -5671,7 +5671,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
         }
 
-        public async Task<Result> SaveQrHPDCollectionsAsync(BigVQRHPDVM obj, int AppId, string referanceid, int gcType)
+        public async Task<Result> SaveQrHPDCollectionsAsync(BigVQRHPDVM obj, int AppId, int gcType)
         {
             Result result = new Result();
             
@@ -5729,7 +5729,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                             if (gcType == 5)
                             {
-                                var dump = await db.StreetSweepingDetails.Where(x => x.ReferanceId == referanceid).FirstOrDefaultAsync();
+                                var dump = await db.StreetSweepingDetails.Where(x => x.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
                                 if (dump != null)
                                 {
                                     if ((string.IsNullOrEmpty(obj.name)) == false)
@@ -5783,7 +5783,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     }
                                     //////////////////////////////////////////////////////////////////
                                     obj.date = DateTime.Now;
-                                    obj.ReferanceId = referanceid;
+                                    obj.ReferanceId = obj.ReferanceId;
 
                                     db.Qr_Locations.Add(await FillLocationDetailsAsync(obj, AppId, false));
                                     //////////////////////////////////////////////////////////////////
@@ -5803,7 +5803,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             }
                             if (gcType == 4)
                             {
-                                var dump = await db.LiquidWasteDetails.Where(x => x.ReferanceId == referanceid).FirstOrDefaultAsync();
+                                var dump = await db.LiquidWasteDetails.Where(x => x.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
                                 if (dump != null)
                                 {
                                     if ((string.IsNullOrEmpty(obj.name)) == false)
@@ -5857,7 +5857,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     }
                                     //////////////////////////////////////////////////////////////////
                                     obj.date = DateTime.Now;
-                                    obj.ReferanceId = referanceid;
+                                    obj.ReferanceId = obj.ReferanceId;
 
                                     db.Qr_Locations.Add(await FillLocationDetailsAsync(obj, AppId, false));
                                     //////////////////////////////////////////////////////////////////
@@ -5877,7 +5877,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             }
                             if (gcType == 3)
                             {
-                                var dump = await db.DumpYardDetails.Where(x => x.ReferanceId == referanceid).FirstOrDefaultAsync();
+                                var dump = await db.DumpYardDetails.Where(x => x.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
                                 if (dump != null)
                                 {
                                     if ((string.IsNullOrEmpty(obj.name)) == false)
@@ -5931,7 +5931,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     }
                                     //////////////////////////////////////////////////////////////////
                                     obj.date = DateTime.Now;
-                                    obj.ReferanceId = referanceid;
+                                    obj.ReferanceId = obj.ReferanceId;
                                     db.Qr_Locations.Add(await FillLocationDetailsAsync(obj, AppId, false));
                                     //////////////////////////////////////////////////////////////////
 
@@ -5950,7 +5950,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             }
                             else if (gcType == 2)
                             {
-                                var gp = await db.GarbagePointDetails.Where(x => x.ReferanceId == referanceid).FirstOrDefaultAsync();
+                                var gp = await db.GarbagePointDetails.Where(x => x.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
 
                                 if (gp != null)
                                 {
@@ -6015,7 +6015,16 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             }
                             else if (gcType == 1)
                             {
-                                var house = await db.HouseMasters.Where(x => x.ReferanceId == referanceid).FirstOrDefaultAsync();
+                                var house = await db.HouseMasters.Where(x => x.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
+                                result.houseid = house.houseId;
+                                if (house.houseLat != null)
+                                {
+                                    result.IsExixts = true;
+                                }
+                                else
+                                {
+                                    result.IsExixts = false;
+                                }
                                 if (house != null)
                                 {
                                     if ((string.IsNullOrEmpty(obj.houseNumber.ToString())) == false)
@@ -6092,6 +6101,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     result.status = "success";
                                     result.message = "Uploaded successfully";
                                     result.messageMar = "सबमिट यशस्वी";
+                                   
                                 }
                                 else
                                 {

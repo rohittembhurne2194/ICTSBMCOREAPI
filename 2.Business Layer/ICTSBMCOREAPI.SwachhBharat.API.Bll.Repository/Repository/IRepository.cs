@@ -77,7 +77,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         Task<CollectionSyncResult> SaveLiquidCollectionSyncAsync(SBGarbageCollectionView obj, int AppId, int type);
         Task<CollectionSyncResult> SavePointCollectionSyncAsync(SBGarbageCollectionView obj, int AppId, int type);
         Task<Result> SaveQrEmployeeAttendenceAsync(BigVQREmployeeAttendenceVM obj, int AppId, int type);
-        Task<Result> SaveQrHPDCollectionsAsync(BigVQRHPDVM obj, int AppId, string referanceid, int gcType);
+        Task<Result> SaveQrHPDCollectionsAsync(BigVQRHPDVM obj, int AppId, int gcType);
         Task<List<CollectionSyncResult>> SaveQrHPDCollectionsOfflineAsync(List<BigVQRHPDVM> obj, int AppId);
         Task<CollectionSyncResult> SaveStreetCollectionSyncAsync(SBGarbageCollectionView obj, int AppId, int type);
         Task<Result> SaveSupervisorAttendenceAsync(BigVQREmployeeAttendenceVM obj, int type);
