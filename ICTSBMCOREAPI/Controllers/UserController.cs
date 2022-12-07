@@ -270,17 +270,6 @@ namespace ICTSBMCOREAPI.Controllers
             }
             return objDetail;
 
-            //foreach (var item in obj)
-            //{
-            //    tn.startTs = item.startTs;
-            //    tn.endTs = item.endTs;
-            //    tn.createUser = item.createUser;
-            //    tn.geom = item.geom;
-            //    tn = await objRep.SaveHouseMapTrail(tn);
-
-            //}
-            //return objDetail;
-
         }
     }
     
