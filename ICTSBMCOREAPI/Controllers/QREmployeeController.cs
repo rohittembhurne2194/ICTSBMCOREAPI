@@ -51,7 +51,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpPost]
         [Route("Save/QrHPDCollections")]
-        public async Task<Result> SaveQrHPDCollections([FromHeader] int AppId, [FromHeader] int gcType, [FromBody] BigVQRHPDVM obj, [FromHeader] string url, [FromHeader] string username, [FromHeader] string password)
+        public async Task<Result> SaveQrHPDCollections([FromHeader] int AppId, [FromHeader] int gcType, [FromBody] BigVQRHPDVM obj)
         {
 
            // string referanceid = (string.IsNullOrEmpty(referanceId) ? "" : referanceId);
@@ -77,50 +77,96 @@ namespace ICTSBMCOREAPI.Controllers
             objDetail1 = await objRep.SaveQrHPDCollectionsAsync(obj, AppId, gcType);
             if (objDetail1.status == "success")
             {
+                var message = "";
 
+                using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
                 //TimeSpan timespan = new TimeSpan(00, 00, 00);
                 //DateTime time = DateTime.Now.Add(timespan);
 
                 Trial tn = new Trial();
                 List<DumpTripStatusResult> objDetail = new List<DumpTripStatusResult>();
-                //foreach (var item in obj)
-                //{
-                tn.startTs = obj.startTs;
-                tn.endTs = obj.endTs;
-                tn.geom = obj.geom;
+
+                try
+                {
+                    var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                    if (GIS_CON != null)
+                    {
+                        var gis_url = GIS_CON.DataSource;
+                        var gis_DBName = GIS_CON.InitialCatalog;
+                        var gis_username = GIS_CON.UserId;
+                        var gis_password = GIS_CON.Password;
+
+                        //foreach (var item in obj)
+                        //{
+                        tn.startTs = obj.startTs;
+                        tn.endTs = obj.endTs;
+                        tn.geom = obj.geom;
+
+                        tn.houseId = Convert.ToInt32(objDetail1.houseid);
+                        if (objDetail1.IsExixts == true)
+                        {
+                            tn.updateTs = obj.createTs;
+                            tn.updateUser = obj.userId;
+                        }
+                        else
+                        {
+                            tn.createUser = obj.userId;
+                            tn.createTs = obj.createTs;
+                        }
+
+
+                        HttpClient client = new HttpClient();
+                        var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                        var stringContent = new StringContent(json);
+                        stringContent.Headers.ContentType.MediaType = "application/json";
+                        stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                        stringContent.Headers.Add("username", gis_username);
+                        stringContent.Headers.Add("password", gis_password);
+                        var response = await client.PostAsync("http://114.143.244.130:9091/house", stringContent);
+                        var responseString = await response.Content.ReadAsStringAsync();
+                        var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                        objDetail.Add(new DumpTripStatusResult()
+                        {
+                            code = dynamicobject.code.ToString(),
+                            status = dynamicobject.status.ToString(),
+                            message = dynamicobject.message.ToString(),
+                            errorMessages = dynamicobject.errorMessages.ToString(),
+                            timestamp = dynamicobject.timestamp.ToString(),
+                            data = dynamicobject.data.ToString()
+                        });
+                        objDetail1.gismessage = dynamicobject.message.ToString();
+                        objDetail1.giserrorMessages = dynamicobject.errorMessages.ToString();
+                    }
+                    else
+                    {
+
+                        objDetail.Add(new DumpTripStatusResult()
+                        {
+                            code = "",
+                            status = "",
+                            message = "",
+                            errorMessages = "GIS Connection Are Not Available",
+                            timestamp = "",
+                            data = ""
+                        });
+                         objDetail1.gismessage= "GIS Connection Are Not Available";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    objDetail.Add(new DumpTripStatusResult()
+                    {
+                        code = "",
+                        status = "",
+                        message = "",
+                        errorMessages = ex.Message.ToString(),
+                        timestamp = "",
+                        data = ""
+                    });
+                     objDetail1.giserrorMessages = ex.Message.ToString();
+                }
                 
-                tn.houseId = Convert.ToInt32(objDetail1.houseid);
-                if (objDetail1.IsExixts == true)
-                {
-                    tn.updateTs = obj.createTs;
-                    tn.updateUser = obj.userId;
-                }
-                else
-                {
-                    tn.createUser = obj.userId;
-                    tn.createTs = obj.createTs;
-                }
-
-
-                HttpClient client = new HttpClient();
-                var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
-                var stringContent = new StringContent(json);
-                stringContent.Headers.ContentType.MediaType = "application/json";
-                stringContent.Headers.Add("url", url);
-                stringContent.Headers.Add("username", username);
-                stringContent.Headers.Add("password", password);
-                var response = await client.PostAsync("http://114.143.244.130:9091/house", stringContent);
-                var responseString = await response.Content.ReadAsStringAsync();
-                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                objDetail.Add(new DumpTripStatusResult()
-                {
-                    code = dynamicobject.code.ToString(),
-                    status = dynamicobject.status.ToString(),
-                    message = dynamicobject.message.ToString(),
-                    errorMessages = dynamicobject.errorMessages.ToString(),
-                    timestamp = dynamicobject.timestamp.ToString(),
-                    data = dynamicobject.data.ToString()
-                });
                 // }
                 //   return objDetail;
             }

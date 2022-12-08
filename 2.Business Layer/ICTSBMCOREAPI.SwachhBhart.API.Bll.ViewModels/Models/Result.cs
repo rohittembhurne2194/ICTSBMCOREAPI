@@ -8,8 +8,9 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
     {
         public string status { get; set; }
         public string message { get; set; }
+        public string gismessage { get; set; }
         public string messageMar { get; set; }
-
+        public string giserrorMessages { get; set; }
         public bool isAttendenceOn { get; set; }
         public bool isAttendenceOff { get; set; }
 

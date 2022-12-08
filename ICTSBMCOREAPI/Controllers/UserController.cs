@@ -289,16 +289,16 @@ namespace ICTSBMCOREAPI.Controllers
                     else
                     {
 
-                    objDetail.Add(new DumpTripStatusResult()
-                    {
-                        code = "",
-                        status = "",
-                        message = "",
-                        errorMessages = "GIS Connection Are Not Available",
-                        timestamp ="",
-                        data = ""
-                    });
-                    return objDetail;
+                        objDetail.Add(new DumpTripStatusResult()
+                        {
+                            code = "",
+                            status = "",
+                            message = "",
+                            errorMessages = "GIS Connection Are Not Available",
+                            timestamp ="",
+                            data = ""
+                        });
+                        return objDetail;
                     }
               }
             
@@ -323,44 +323,76 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpPost]
         [Route("Save/HouseMapTrail")]
-        public async Task<List<DumpTripStatusResult>> HouseMapTrail([FromBody] List<Trial> obj, [FromHeader] string url, [FromHeader] string username, [FromHeader] string password)
+        public async Task<List<DumpTripStatusResult>> HouseMapTrail([FromBody] List<Trial> obj, [FromHeader] int AppId)
         {
-            HttpClient client = new HttpClient();
-            Trial tn = new Trial();
+            var message = "";
+
+            using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
             List<DumpTripStatusResult> objDetail = new List<DumpTripStatusResult>();
-            foreach (var item in obj)
+            try
             {
-                tn.trailId = item.trailId;
-                tn.startTs = item.startTs;
-                tn.endTs = item.endTs;
-                tn.createUser = item.createUser;
-                tn.geom = item.geom;
-                tn.createTs = item.createTs;
-                tn.updateTs = item.updateTs;
-                tn.updateUser = item.updateUser;
+                var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
 
-                var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
-                var stringContent = new StringContent(json);
-                stringContent.Headers.ContentType.MediaType = "application/json";
-                stringContent.Headers.Add("url", url);
-                stringContent.Headers.Add("username", username);
-                stringContent.Headers.Add("password", password);
+                if (GIS_CON != null)
+                {
+                    var gis_url = GIS_CON.DataSource;
+                    var gis_DBName = GIS_CON.InitialCatalog;
+                    var gis_username = GIS_CON.UserId;
+                    var gis_password = GIS_CON.Password;
 
-                var response = await client.PostAsync("http://114.143.244.130:9091/house-trail", stringContent);
-                var responseString = await response.Content.ReadAsStringAsync();
-                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+
+                    HttpClient client = new HttpClient();
+                    Trial tn = new Trial();
+                   
+                    foreach (var item in obj)
+                    {
+                        tn.trailId = item.trailId;
+                        tn.startTs = item.startTs;
+                        tn.endTs = item.endTs;
+                        tn.createUser = item.createUser;
+                        tn.geom = item.geom;
+                        tn.createTs = item.createTs;
+                        tn.updateTs = item.updateTs;
+                        tn.updateUser = item.updateUser;
+
+                        var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                        var stringContent = new StringContent(json);
+                        stringContent.Headers.ContentType.MediaType = "application/json";
+                        stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                        stringContent.Headers.Add("username", gis_username);
+                        stringContent.Headers.Add("password", gis_password);
+
+                        var response = await client.PostAsync("http://114.143.244.130:9091/house-trail", stringContent);
+                        var responseString = await response.Content.ReadAsStringAsync();
+                        var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                        objDetail.Add(new DumpTripStatusResult()
+                        {
+                            code = dynamicobject.code.ToString(),
+                            status = dynamicobject.status.ToString(),
+                            message = dynamicobject.message.ToString(),
+                            errorMessages = dynamicobject.errorMessages.ToString(),
+                            timestamp = dynamicobject.timestamp.ToString(),
+                            data = dynamicobject.data.ToString()
+                        });
+                    }
+                    return objDetail;
+                }
+            }
+            catch(Exception ex)
+            {
                 objDetail.Add(new DumpTripStatusResult()
                 {
-                    code = dynamicobject.code.ToString(),
-                    status = dynamicobject.status.ToString(),
-                    message = dynamicobject.message.ToString(),
-                    errorMessages = dynamicobject.errorMessages.ToString(),
-                    timestamp = dynamicobject.timestamp.ToString(),
-                    data = dynamicobject.data.ToString()
+                    code = "",
+                    status = "",
+                    message = "",
+                    errorMessages = ex.Message.ToString(),
+                    timestamp = "",
+                    data = ""
                 });
+                return objDetail;
             }
-            return objDetail;
 
+            return objDetail;
         }
     }
 
