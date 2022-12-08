@@ -32,6 +32,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.MainModels
         public virtual DbSet<CheckAppD> CheckAppDs { get; set; }
         public virtual DbSet<EmployeeMaster> EmployeeMasters { get; set; }
         public virtual DbSet<Feedback_playstore> Feedback_playstores { get; set; }
+        public virtual DbSet<GIS_AppConnection> GIS_AppConnections { get; set; }
         public virtual DbSet<GameDetail> GameDetails { get; set; }
         public virtual DbSet<GameMaster> GameMasters { get; set; }
         public virtual DbSet<GamePlayerDetail> GamePlayerDetails { get; set; }
@@ -55,7 +56,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.MainModels
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("data source=202.65.157.253;initial catalog=LIVEAdvanceDevSwachhBharatMain;persist security info=True;user id=appynitty;password=BigV$Telecom;MultipleActiveResultSets=True;App=EntityFramework", options => options.EnableRetryOnFailure(20));
+                optionsBuilder.UseSqlServer("data source=202.65.157.253;initial catalog=LIVEAdvanceDevSwachhBharatMain;persist security info=True;user id=appynitty;password=BigV$Telecom;MultipleActiveResultSets=True;App=EntityFramework");
             }
         }
 
@@ -462,6 +463,34 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.MainModels
                 entity.ToTable("Feedback_playstore");
             });
 
+            modelBuilder.Entity<GIS_AppConnection>(entity =>
+            {
+                entity.HasKey(e => e.AppConnectionId)
+                    .HasName("PK__GIS_AppC__906CF5B097372769");
+
+                entity.ToTable("GIS_AppConnection");
+
+                entity.Property(e => e.DataSource)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.InitialCatalog)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Password)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserId)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+            });
+
             modelBuilder.Entity<GameDetail>(entity =>
             {
                 entity.HasKey(e => e.GameDetailsID);
@@ -618,9 +647,23 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.MainModels
 
                 entity.Property(e => e.que1).HasMaxLength(50);
 
+                entity.Property(e => e.que10).HasMaxLength(50);
+
+                entity.Property(e => e.que11).HasMaxLength(50);
+
                 entity.Property(e => e.que2).HasMaxLength(50);
 
                 entity.Property(e => e.que3).HasMaxLength(50);
+
+                entity.Property(e => e.que5).HasMaxLength(50);
+
+                entity.Property(e => e.que6).HasMaxLength(50);
+
+                entity.Property(e => e.que7).HasMaxLength(50);
+
+                entity.Property(e => e.que8).HasMaxLength(50);
+
+                entity.Property(e => e.que9).HasMaxLength(50);
             });
 
             modelBuilder.Entity<Subscription>(entity =>
