@@ -377,6 +377,20 @@ namespace ICTSBMCOREAPI.Controllers
                     }
                     return objDetail;
                 }
+                else
+                {
+
+                    objDetail.Add(new DumpTripStatusResult()
+                    {
+                        code = "",
+                        status = "",
+                        message = "",
+                        errorMessages = "GIS Connection Are Not Available",
+                        timestamp = "",
+                        data = ""
+                    });
+                    return objDetail;
+                }
             }
             catch(Exception ex)
             {
@@ -392,6 +406,267 @@ namespace ICTSBMCOREAPI.Controllers
                 return objDetail;
             }
 
+            return objDetail;
+        }
+
+        [HttpGet]
+        [Route("GisHouseDetails/all")]
+        public async Task<List<HouseGisDetails>> HouseGisDetailsAll([FromHeader] int AppId)
+        {
+            var message = "";
+
+            using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
+            List<HouseGisDetails> objDetail = new List<HouseGisDetails>();
+
+            try
+            {
+                var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                if (GIS_CON != null)
+                {
+                    var gis_url = GIS_CON.DataSource;
+                    var gis_DBName = GIS_CON.InitialCatalog;
+                    var gis_username = GIS_CON.UserId;
+                    var gis_password = GIS_CON.Password;
+
+                    HttpClient client = new HttpClient();
+                    Trial tn = new Trial();
+
+                    var json = JsonConvert.SerializeObject(tn,Formatting.Indented);
+                    var stringContent = new StringContent(json);
+               
+                    //stringContent.Headers.ContentType.MediaType = "application/json";
+                    //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                    //stringContent.Headers.Add("username", gis_username);
+                    //stringContent.Headers.Add("password", gis_password);
+
+                    client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                    client.DefaultRequestHeaders.Add("username", gis_username);
+                    client.DefaultRequestHeaders.Add("password", gis_password);
+
+                    var url = "http://114.143.244.130:9091/house/all";
+
+                    var response = await client.GetAsync(url);
+
+
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+
+
+                    objDetail.Add(new HouseGisDetails()
+                    {
+                        code = dynamicobject.code.ToString(),
+                        status = dynamicobject.status.ToString(),
+                        message = dynamicobject.message.ToString(),
+                        errorMessages = dynamicobject.errorMessages.ToString(),
+                        timestamp = dynamicobject.timestamp.ToString(),
+                        data = dynamicobject.data.ToString()
+                    });
+
+                    return objDetail;
+                }
+                else
+                {
+
+                    objDetail.Add(new HouseGisDetails()
+                    {
+                        code = "",
+                        status = "",
+                        message = "",
+                        errorMessages = "GIS Connection Are Not Available",
+                        timestamp = "",
+                        data = ""
+                    });
+                    return objDetail;
+                }
+            }
+            catch (Exception ex)
+            {
+                objDetail.Add(new HouseGisDetails()
+                {
+                    code = "",
+                    status = "",
+                    message = "",
+                    errorMessages = ex.Message.ToString(),
+                    timestamp = "",
+                    data = ""
+                });
+                return objDetail;
+            }
+            return objDetail;
+        }
+
+        [HttpGet]
+        [Route("GisGarbageTrail/all")]
+        public async Task<List<TrailsDetails>> GarbageTrailgisAll([FromHeader] int AppId)
+        {
+            var message = "";
+
+            using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
+            List<TrailsDetails> objDetail = new List<TrailsDetails>();
+
+            try
+            {
+                var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                if (GIS_CON != null)
+                {
+                    var gis_url = GIS_CON.DataSource;
+                    var gis_DBName = GIS_CON.InitialCatalog;
+                    var gis_username = GIS_CON.UserId;
+                    var gis_password = GIS_CON.Password;
+
+                    HttpClient client = new HttpClient();
+                    Trial tn = new Trial();
+
+                    var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                    var stringContent = new StringContent(json);
+
+                    //stringContent.Headers.ContentType.MediaType = "application/json";
+                    //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                    //stringContent.Headers.Add("username", gis_username);
+                    //stringContent.Headers.Add("password", gis_password);
+
+                    client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                    client.DefaultRequestHeaders.Add("username", gis_username);
+                    client.DefaultRequestHeaders.Add("password", gis_password);
+
+                    var url = "http://114.143.244.130:9091/garbage-trail/all";
+
+                    var response = await client.GetAsync(url);
+
+
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+
+
+                    objDetail.Add(new TrailsDetails()
+                    {
+                        code = dynamicobject.code.ToString(),
+                        status = dynamicobject.status.ToString(),
+                        message = dynamicobject.message.ToString(),
+                        errorMessages = dynamicobject.errorMessages.ToString(),
+                        timestamp = dynamicobject.timestamp.ToString(),
+                        data = dynamicobject.data.ToString()
+                    });
+
+                    return objDetail;
+                }
+                else
+                {
+
+                    objDetail.Add(new TrailsDetails()
+                    {
+                        code = "",
+                        status = "",
+                        message = "",
+                        errorMessages = "GIS Connection Are Not Available",
+                        timestamp = "",
+                        data = ""
+                    });
+                    return objDetail;
+                }
+            }
+            catch (Exception ex)
+            {
+                objDetail.Add(new TrailsDetails()
+                {
+                    code = "",
+                    status = "",
+                    message = "",
+                    errorMessages = ex.Message.ToString(),
+                    timestamp = "",
+                    data = ""
+                });
+                return objDetail;
+            }
+            return objDetail;
+        }
+
+        [HttpGet]
+        [Route("GisHouseTrail/all")]
+        public async Task<List<TrailsDetails>> HouseTrailgisAll([FromHeader] int AppId)
+        {
+            var message = "";
+
+            using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
+            List<TrailsDetails> objDetail = new List<TrailsDetails>();
+
+            try
+            {
+                var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                if (GIS_CON != null)
+                {
+                    var gis_url = GIS_CON.DataSource;
+                    var gis_DBName = GIS_CON.InitialCatalog;
+                    var gis_username = GIS_CON.UserId;
+                    var gis_password = GIS_CON.Password;
+
+                    HttpClient client = new HttpClient();
+                    Trial tn = new Trial();
+
+                    var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                    var stringContent = new StringContent(json);
+
+                    //stringContent.Headers.ContentType.MediaType = "application/json";
+                    //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                    //stringContent.Headers.Add("username", gis_username);
+                    //stringContent.Headers.Add("password", gis_password);
+
+                    client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                    client.DefaultRequestHeaders.Add("username", gis_username);
+                    client.DefaultRequestHeaders.Add("password", gis_password);
+
+                    var url = "http://114.143.244.130:9091/house-trail/all";
+
+                    var response = await client.GetAsync(url);
+
+
+                    var responseString = await response.Content.ReadAsStringAsync();
+                    var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+
+
+                    objDetail.Add(new TrailsDetails()
+                    {
+                        code = dynamicobject.code.ToString(),
+                        status = dynamicobject.status.ToString(),
+                        message = dynamicobject.message.ToString(),
+                        errorMessages = dynamicobject.errorMessages.ToString(),
+                        timestamp = dynamicobject.timestamp.ToString(),
+                        data = dynamicobject.data.ToString()
+                    });
+
+                    return objDetail;
+                }
+                else
+                {
+
+                    objDetail.Add(new TrailsDetails()
+                    {
+                        code = "",
+                        status = "",
+                        message = "",
+                        errorMessages = "GIS Connection Are Not Available",
+                        timestamp = "",
+                        data = ""
+                    });
+                    return objDetail;
+                }
+            }
+            catch (Exception ex)
+            {
+                objDetail.Add(new TrailsDetails()
+                {
+                    code = "",
+                    status = "",
+                    message = "",
+                    errorMessages = ex.Message.ToString(),
+                    timestamp = "",
+                    data = ""
+                });
+                return objDetail;
+            }
             return objDetail;
         }
     }
