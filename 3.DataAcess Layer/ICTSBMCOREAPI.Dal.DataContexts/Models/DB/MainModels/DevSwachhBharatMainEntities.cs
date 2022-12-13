@@ -56,8 +56,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.MainModels
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("data source=202.65.157.253;initial catalog=LIVEAdvanceDevSwachhBharatMain;persist security info=True;user id=appynitty;password=BigV$Telecom;MultipleActiveResultSets=True;App=EntityFramework");
-
+                optionsBuilder.UseSqlServer("data source=124.153.94.110;initial catalog=LIVEAdvanceDevSwachhBharatMain;persist security info=True;user id=appynitty;password=BigV$Telecom;MultipleActiveResultSets=True;App=EntityFramework");
             }
         }
 
@@ -467,7 +466,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.MainModels
             modelBuilder.Entity<GIS_AppConnection>(entity =>
             {
                 entity.HasKey(e => e.AppConnectionId)
-                    .HasName("PK__GIS_AppC__906CF5B097372769");
+                    .HasName("PK__GIS_AppC__906CF5B0CF3F6C20");
 
                 entity.ToTable("GIS_AppConnection");
 
@@ -648,23 +647,9 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.MainModels
 
                 entity.Property(e => e.que1).HasMaxLength(50);
 
-                entity.Property(e => e.que10).HasMaxLength(50);
-
-                entity.Property(e => e.que11).HasMaxLength(50);
-
                 entity.Property(e => e.que2).HasMaxLength(50);
 
                 entity.Property(e => e.que3).HasMaxLength(50);
-
-                entity.Property(e => e.que5).HasMaxLength(50);
-
-                entity.Property(e => e.que6).HasMaxLength(50);
-
-                entity.Property(e => e.que7).HasMaxLength(50);
-
-                entity.Property(e => e.que8).HasMaxLength(50);
-
-                entity.Property(e => e.que9).HasMaxLength(50);
             });
 
             modelBuilder.Entity<Subscription>(entity =>

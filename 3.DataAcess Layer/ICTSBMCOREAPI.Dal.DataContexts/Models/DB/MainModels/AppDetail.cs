@@ -81,11 +81,6 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.MainModels
         public int? Today_DumpScanCount { get; set; }
         public int? Total_DumpCount { get; set; }
         public string AppLink { get; set; }
-        public int? Today_MixedCount { get; set; }
-        public int? Today_SegregatedCount { get; set; }
-        public int? Today_GarbageNRCount { get; set; }
-        public int? Total_EmployeeActive { get; set; }
-        public int? Today_EmployeeDutyOn { get; set; }
-        public int? Today_EmployeeDutyOff { get; set; }
+        public string AIReportsPath { get; set; }
     }
 }
