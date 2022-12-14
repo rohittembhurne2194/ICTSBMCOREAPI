@@ -5,13 +5,17 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -418,6 +422,28 @@ namespace ICTSBMCOREAPI.Controllers
             using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
             List<HouseGisDetails> objDetail = new List<HouseGisDetails>();
 
+            //var stream = authorization.Replace("Bearer ", string.Empty);
+            //var handler = new JwtSecurityTokenHandler();
+            //var jsonToken = handler.ReadToken(stream);
+            //var tokenS = jsonToken as JwtSecurityToken;
+
+            //var jti = tokenS.Claims.First(claim => claim.Type == "jti").Value;
+
+            ////Extract the payload of the JWT
+            //var claims = tokenS.Claims;
+            //var jwtPayload = "{";
+            //foreach (Claim c in claims)
+            //{
+            //    jwtPayload += '"' + c.Type + "\":\"" + c.Value + "\",";
+            //}
+            //jwtPayload += "}";
+            //txtJwtOut.Text += "\r\nPayload:\r\n" + JToken.Parse(jwtPayload).ToString(Formatting.Indented);
+        
+
+            //ValidateToken(authorization);
+
+
+
             try
             {
                 var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
@@ -495,6 +521,29 @@ namespace ICTSBMCOREAPI.Controllers
             }
             return objDetail;
         }
+
+        //private static bool ValidateToken(string authorization)
+        //{
+        //    var tokenHandler = new JwtSecurityTokenHandler();
+        //    var validationParameters = GetValidationParameters();
+
+        //    SecurityToken validatedToken;
+        //    IPrincipal principal = tokenHandler.ValidateToken(authorization, validationParameters, out validatedToken);
+        //    return true;
+        //}
+
+        //private static TokenValidationParameters GetValidationParameters()
+        //{
+        //    return new TokenValidationParameters()
+        //    {
+        //        ValidateLifetime = false, // Because there is no expiration in the generated token
+        //        ValidateAudience = false, // Because there is no audiance in the generated token
+        //        ValidateIssuer = false,   // Because there is no issuer in the generated token
+        //        ValidIssuer = "Sample",
+        //        ValidAudience = "Sample"
+        //        //IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)) // The same key as the one that generate the token
+        //    };
+        //}
 
         [HttpGet]
         [Route("GisGarbageTrail/all")]
