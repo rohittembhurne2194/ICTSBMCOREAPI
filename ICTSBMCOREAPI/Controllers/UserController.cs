@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ICTSBMCOREAPI.Controllers
 {
@@ -415,29 +417,31 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("GisHouseDetails/all")]
-        public async Task<List<HouseGisDetails>> HouseGisDetailsAll([FromHeader] int AppId)
+        public async Task<List<HouseGisDetails>> HouseGisDetailsAll([FromHeader] string authorization, [FromHeader] int AppId)
         {
+            var txtJwtOut = "";
+            //var jwtInput = txtJwtOut.Text;
             var message = "";
 
             using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
             List<HouseGisDetails> objDetail = new List<HouseGisDetails>();
 
-            //var stream = authorization.Replace("Bearer ", string.Empty);
-            //var handler = new JwtSecurityTokenHandler();
-            //var jsonToken = handler.ReadToken(stream);
-            //var tokenS = jsonToken as JwtSecurityToken;
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
 
-            //var jti = tokenS.Claims.First(claim => claim.Type == "jti").Value;
+            var jti = tokenS.Claims.First(claim => claim.Type == "jti").Value;
 
-            ////Extract the payload of the JWT
-            //var claims = tokenS.Claims;
-            //var jwtPayload = "{";
-            //foreach (Claim c in claims)
-            //{
-            //    jwtPayload += '"' + c.Type + "\":\"" + c.Value + "\",";
-            //}
-            //jwtPayload += "}";
-            //txtJwtOut.Text += "\r\nPayload:\r\n" + JToken.Parse(jwtPayload).ToString(Formatting.Indented);
+            //Extract the payload of the JWT
+            var claims = tokenS.Claims;
+            var jwtPayload = "{";
+            foreach (Claim c in claims)
+            {
+                jwtPayload += '"' + c.Type + "\":\"" + c.Value + "\",";
+            }
+            jwtPayload += "}";
+            txtJwtOut += "\r\nPayload:\r\n" + JToken.Parse(jwtPayload).ToString(Formatting.Indented);
         
 
             //ValidateToken(authorization);
