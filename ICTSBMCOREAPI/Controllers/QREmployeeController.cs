@@ -34,20 +34,56 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpPost]
         [Route("Save/QrEmployeeAttendenceIn")]
-        public async Task<Result> SaveQrEmployeeAttendence([FromHeader] int AppId, [FromBody] BigVQREmployeeAttendenceVM obj)
+        public async Task<ActionResult<Result>> SaveQrEmployeeAttendence([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] BigVQREmployeeAttendenceVM obj)
         {
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
 
-            Result objDetail = new Result();
-            objDetail = await objRep.SaveQrEmployeeAttendenceAsync(obj, AppId, 0);
-            return objDetail;
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                Result objDetail = new Result();
+                objDetail = await objRep.SaveQrEmployeeAttendenceAsync(obj, AppId, 0);
+                return objDetail;
+            }
+            else
+            {
+                return Unauthorized();
+            }
+            
         }
         [HttpPost]
         [Route("Save/QrEmployeeAttendenceOut")]
-        public async Task<Result> SaveQrEmployeeAttendenceOut([FromHeader] int AppId, [FromBody] BigVQREmployeeAttendenceVM obj)
+        public async Task<ActionResult<Result>> SaveQrEmployeeAttendenceOut([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] BigVQREmployeeAttendenceVM obj)
         {
-            Result objDetail = new Result();
-            objDetail = await objRep.SaveQrEmployeeAttendenceAsync(obj, AppId, 1);
-            return objDetail;
+            
+
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                Result objDetail = new Result();
+                objDetail = await objRep.SaveQrEmployeeAttendenceAsync(obj, AppId, 1);
+                return objDetail;
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         [HttpPost]
@@ -115,7 +151,7 @@ namespace ICTSBMCOREAPI.Controllers
                             tn.endTs = obj.endTs;
                             tn.geom = obj.geom;
 
-                            tn.houseId = Convert.ToInt32(objDetail1.houseid);
+                            tn.id = objDetail1.houseid.ToString();
                             if (objDetail1.IsExixts == true)
                             {
                                 tn.updateTs = obj.createTs;
@@ -195,58 +231,147 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpPost]
         [Route("Save/QrHPDCollectionsOffline")]
-        public async Task<List<CollectionSyncResult>> SaveQrHPDCollectionsOffline([FromHeader] int AppId, [FromBody] List<BigVQRHPDVM> obj)
+        public async Task<ActionResult<List<CollectionSyncResult>>> SaveQrHPDCollectionsOffline([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] List<BigVQRHPDVM> obj)
         {
 
-            List<CollectionSyncResult> objDetail = new List<CollectionSyncResult>();
-            objDetail = await objRep.SaveQrHPDCollectionsOfflineAsync(obj, AppId);
-            return objDetail;
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                List<CollectionSyncResult> objDetail = new List<CollectionSyncResult>();
+                objDetail = await objRep.SaveQrHPDCollectionsOfflineAsync(obj, AppId);
+                return objDetail;
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
 
         [HttpGet]
         [Route("Get/QrWorkHistory")]
         //api/BookATable/GetBookAtableList
-        public async Task<List<SBWorkDetails>> GetWork([FromHeader] int AppId, [FromHeader] int userId, [FromHeader] int year, [FromHeader] int month)
+        public async Task<ActionResult<List<SBWorkDetails>>> GetWork([FromHeader] string authorization, [FromHeader] int AppId, [FromHeader] int userId, [FromHeader] int year, [FromHeader] int month)
         {
 
-            List<SBWorkDetails> objDetail = new List<SBWorkDetails>();
-            objDetail = await objRep.GetQrWorkHistoryAsync(userId, year, month, AppId);
-            return objDetail.OrderByDescending(c => c.date).ToList();
+
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+
+                List<SBWorkDetails> objDetail = new List<SBWorkDetails>();
+                objDetail = await objRep.GetQrWorkHistoryAsync(userId, year, month, AppId);
+                return objDetail.OrderByDescending(c => c.date).ToList();
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         [HttpGet]
         [Route("Get/QrWorkHistoryDetails")]
         //api/BookATable/GetBookAtableList
-        public async Task<List<BigVQrworkhistorydetails>> GetQRWorkDetails([FromHeader] int AppId, [FromHeader] int userId, [FromHeader] string date)
+        public async Task<ActionResult<List<BigVQrworkhistorydetails>>> GetQRWorkDetails([FromHeader] string authorization, [FromHeader] int AppId, [FromHeader] int userId, [FromHeader] string date)
         {
 
-            DateTime Date = Convert.ToDateTime(date);
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
 
-            List<BigVQrworkhistorydetails> objDetail = new List<BigVQrworkhistorydetails>();
-            objDetail = await objRep.GetQrWorkHistoryDetailsAsync(Date, AppId, userId);
-            return objDetail;
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                DateTime Date = Convert.ToDateTime(date);
+
+                List<BigVQrworkhistorydetails> objDetail = new List<BigVQrworkhistorydetails>();
+                objDetail = await objRep.GetQrWorkHistoryDetailsAsync(Date, AppId, userId);
+                return objDetail;
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
         [HttpGet]
         [Route("Get/ScanifyHouse")]
-        public async Task<BigVQRHPDVM2> GetScanifyHouseDetailsData([FromHeader] int AppId, [FromHeader] string ReferenceId, [FromHeader] int gcType)
+        public async Task<ActionResult<BigVQRHPDVM2>> GetScanifyHouseDetailsData([FromHeader] string authorization, [FromHeader] int AppId, [FromHeader] string ReferenceId, [FromHeader] int gcType)
         {
 
-            BigVQRHPDVM2 objDetail = new BigVQRHPDVM2();
-            objDetail = await objRep.GetScanifyHouseDetailsDataAsync(AppId, ReferenceId, gcType);
-            return objDetail;
 
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                BigVQRHPDVM2 objDetail = new BigVQRHPDVM2();
+                objDetail = await objRep.GetScanifyHouseDetailsDataAsync(AppId, ReferenceId, gcType);
+                return objDetail;
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
 
         [HttpGet]
         [Route("Get/Vehicles")]
-        public async Task<List<VehicleList>> VehicleList([FromHeader] int AppId, [FromHeader] int VehicleTypeId)
+        public async Task<ActionResult<List<VehicleList>>> VehicleList([FromHeader] string authorization, [FromHeader] int AppId, [FromHeader] int VehicleTypeId)
         {
 
-            List<VehicleList> objDetail = new List<VehicleList>();
-            objDetail = await objRep.GetVehicleListAsync(AppId, VehicleTypeId);
-            return objDetail;
+           
+
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                List<VehicleList> objDetail = new List<VehicleList>();
+                objDetail = await objRep.GetVehicleListAsync(AppId, VehicleTypeId);
+                return objDetail;
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
     }
 }

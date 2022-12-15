@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -28,12 +29,12 @@ namespace ICTSBMCOREAPI.Controllers
 
         [Route("Login")]
         [HttpPost]
-        public async Task<SBUser> GetLogin([FromHeader] string EmpType, [FromBody] SBUser objlogin)
+        [AllowAnonymous]
+        public async Task<ActionResult<SBUser>> GetLogin([FromHeader] string EmpType, [FromBody] SBUser objlogin)
         {
             //IEnumerable<string> headerValue1 = Request.Headers.GetValues("appId");
             //var id = headerValue1.FirstOrDefault();
             //int AppId = int.Parse(id);
-
 
             EmpType = "A";
 
@@ -44,16 +45,33 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("AllUlb")]
-        public async Task<List<NameULB>> GetUlb([FromHeader] int userId, [FromHeader] string EmpType, [FromHeader] string status)
+        public async Task<ActionResult<List<NameULB>>> GetUlb([FromHeader] string authorization, [FromHeader] int userId, [FromHeader] string EmpType, [FromHeader] string status, [FromBody] SBUser objlogin)
         {
-            List<NameULB> objDetail = new List<NameULB>();
-            objDetail = await objRep.GetUlbAsync(userId, EmpType, status.ToLower());
-            return objDetail;
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var auth_userid = tokenS.Claims.First(claim => claim.Type == "userLoginId").Value;
+            var auth_password = tokenS.Claims.First(claim => claim.Type == "userPassword").Value;
+
+
+
+            if(auth_userid == objlogin.userLoginId && auth_password == objlogin.userPassword)
+            {
+                List<NameULB> objDetail = new List<NameULB>();
+                objDetail = await objRep.GetUlbAsync(userId, EmpType, status.ToLower());
+                return objDetail;
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         [HttpGet]
         [Route("SelectedUlb")]
-        public async Task<HSDashboard> GetSelectedUlbData([FromHeader] int userId, [FromHeader] string EmpType, [FromHeader] int appId)
+        public async Task<ActionResult<HSDashboard>> GetSelectedUlbData([FromHeader] string authorization, [FromHeader] int userId, [FromHeader] string EmpType, [FromHeader] int appId)
         {
             HSDashboard objDetail = new HSDashboard();
             objDetail = await objRep.GetSelectedUlbDataAsync(userId, EmpType, appId);
@@ -63,7 +81,7 @@ namespace ICTSBMCOREAPI.Controllers
         [HttpGet]
         [Route("QREmployeeList")]
         // Active Employee List For Filter
-        public async Task<List<HSEmployee>> GetQREmployeeList([FromHeader] int userId, [FromHeader] string EmpType, [FromHeader] int appId)
+        public async Task<ActionResult<List<HSEmployee>>> GetQREmployeeList([FromHeader] string authorization, [FromHeader] int userId, [FromHeader] string EmpType, [FromHeader] int appId)
         {
 
             List<HSEmployee> objDetail = new List<HSEmployee>();
@@ -74,7 +92,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("QREmployeeDetailsList")]
-        public async Task<List<HouseScanifyEmployeeDetails>> GetQREmployeeDetailsList([FromHeader] int userId, [FromHeader] string EmpType, [FromHeader] int appId, [FromHeader] int qrEmpId, [FromHeader] bool status)
+        public async Task<ActionResult<List<HouseScanifyEmployeeDetails>>> GetQREmployeeDetailsList([FromHeader] string authorization, [FromHeader] int userId, [FromHeader] string EmpType, [FromHeader] int appId, [FromHeader] int qrEmpId, [FromHeader] bool status)
         {
 
 
@@ -86,7 +104,7 @@ namespace ICTSBMCOREAPI.Controllers
         [HttpGet]
         [Route("HouseScanifyDetailsGridRow")]
         // Show Live Data On Dashboard
-        public async Task<List<HouseScanifyDetailsGridRow>> GetHouseScanifyDetails([FromHeader] int userId, [FromHeader] int appId, [FromHeader] DateTime FromDate, [FromHeader] DateTime Todate)
+        public async Task<ActionResult<List<HouseScanifyDetailsGridRow>>> GetHouseScanifyDetails([FromHeader] string authorization, [FromHeader] int userId, [FromHeader] int appId, [FromHeader] DateTime FromDate, [FromHeader] DateTime Todate)
         {
 
             IEnumerable<HouseScanifyDetailsGridRow> objDetail = new List<HouseScanifyDetailsGridRow>();
@@ -97,7 +115,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("AttendanceGridRow")]
-        public async Task<List<HSAttendanceGrid>> GetAttendanceDetails([FromHeader] int qrEmpId, [FromHeader] int appId, [FromHeader] DateTime FromDate, [FromHeader] DateTime Todate)
+        public async Task<ActionResult<List<HSAttendanceGrid>>> GetAttendanceDetails([FromHeader] string authorization, [FromHeader] int qrEmpId, [FromHeader] int appId, [FromHeader] DateTime FromDate, [FromHeader] DateTime Todate)
         {
 
             IEnumerable<HSAttendanceGrid> objDetail = new List<HSAttendanceGrid>();
@@ -107,7 +125,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("HouseDetails")]
-        public async Task<List<HSHouseDetailsGrid>> GetHouseDetails([FromHeader] int userId, [FromHeader] int appId, [FromHeader] DateTime FromDate, [FromHeader] DateTime Todate, [FromHeader] string ReferanceId)
+        public async Task<ActionResult<List<HSHouseDetailsGrid>>> GetHouseDetails([FromHeader] string authorization, [FromHeader] int userId, [FromHeader] int appId, [FromHeader] DateTime FromDate, [FromHeader] DateTime Todate, [FromHeader] string ReferanceId)
         {
 
 
@@ -119,7 +137,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("DumpYardDetails")]
-        public async Task<List<HSDumpYardDetailsGrid>> GetDumpYardDetails([FromHeader] int userId, [FromHeader] int appId, [FromHeader] DateTime FromDate, [FromHeader] DateTime Todate)
+        public async Task<ActionResult<List<HSDumpYardDetailsGrid>>> GetDumpYardDetails([FromHeader] string authorization, [FromHeader] int userId, [FromHeader] int appId, [FromHeader] DateTime FromDate, [FromHeader] DateTime Todate)
         {
 
             IEnumerable<HSDumpYardDetailsGrid> objDetail = new List<HSDumpYardDetailsGrid>();
@@ -130,7 +148,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("LiquidDetails")]
-        public async Task<List<HSLiquidDetailsGrid>> GetLiquidDetails([FromHeader] int userId, [FromHeader] int appId, [FromHeader] DateTime FromDate, [FromHeader] DateTime Todate)
+        public async Task<ActionResult<List<HSLiquidDetailsGrid>>> GetLiquidDetails([FromHeader] string authorization, [FromHeader] int userId, [FromHeader] int appId, [FromHeader] DateTime FromDate, [FromHeader] DateTime Todate)
         {
 
             IEnumerable<HSLiquidDetailsGrid> objDetail = new List<HSLiquidDetailsGrid>();
@@ -141,7 +159,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("StreetDetails")]
-        public async Task<List<HSStreetDetailsGrid>> GetStreetDetails([FromHeader] int userId, [FromHeader] int appId, [FromHeader] DateTime FromDate, [FromHeader] DateTime Todate)
+        public async Task<ActionResult<List<HSStreetDetailsGrid>>> GetStreetDetails([FromHeader] string authorization, [FromHeader] int userId, [FromHeader] int appId, [FromHeader] DateTime FromDate, [FromHeader] DateTime Todate)
         {
 
             IEnumerable<HSStreetDetailsGrid> objDetail = new List<HSStreetDetailsGrid>();
@@ -151,7 +169,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("UserRoleList")]
-        public async Task<List<UserRoleDetails>> UserRoleList([FromHeader] int userId, [FromHeader] string EmpType, [FromHeader] bool status, [FromHeader] int EmpId)
+        public async Task<ActionResult<List<UserRoleDetails>>> UserRoleList([FromHeader] string authorization, [FromHeader] int userId, [FromHeader] string EmpType, [FromHeader] bool status, [FromHeader] int EmpId)
         {
 
             IEnumerable<UserRoleDetails> objDetail = new List<UserRoleDetails>();
@@ -161,7 +179,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [Route("AddHouseScanifyEmployee")]
         [HttpPost]
-        public async Task<List<CollectionSyncResult>> AddEmployee([FromHeader]int appId,[FromBody] List<HouseScanifyEmployeeDetails> objRaw)
+        public async Task<ActionResult<List<CollectionSyncResult>>> AddEmployee([FromHeader] string authorization, [FromHeader]int appId,[FromBody] List<HouseScanifyEmployeeDetails> objRaw)
         {
 
             
@@ -238,7 +256,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [Route("AddHouseScanifyUserRole")]
         [HttpPost]
-        public async Task<List<CollectionSyncResult>> AddUserRole([FromHeader] int appId, [FromBody]List<UserRoleDetails> objRaw)
+        public async Task<ActionResult<List<CollectionSyncResult>>> AddUserRole([FromHeader] string authorization, [FromHeader] int appId, [FromBody]List<UserRoleDetails> objRaw)
         {
             
             UserRoleDetails gcDetail = new UserRoleDetails();
@@ -323,7 +341,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [Route("UpdateQRstatus")]
         [HttpPost]
-        public async Task<List<CollectionQRStatusResult>> UpdateQRstatus([FromHeader] int appId, [FromBody] List<HSHouseDetailsGrid> objRaw)
+        public async Task<ActionResult<List<CollectionQRStatusResult>>> UpdateQRstatus([FromHeader] string authorization, [FromHeader] int appId, [FromBody] List<HSHouseDetailsGrid> objRaw)
         {
 
             
@@ -397,7 +415,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpPost]
         [Route("SupervisorAttendenceIn")]
-        public async Task<Result> SaveQrEmployeeAttendence([FromBody]BigVQREmployeeAttendenceVM obj)
+        public async Task<ActionResult<Result>> SaveQrEmployeeAttendence([FromHeader] string authorization, [FromBody]BigVQREmployeeAttendenceVM obj)
         {
            
             Result objDetail = new Result();
@@ -408,7 +426,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpPost]
         [Route("SupervisorAttendenceOut")]
-        public async Task<Result> SaveQrEmployeeAttendenceOut([FromBody]BigVQREmployeeAttendenceVM obj)
+        public async Task<ActionResult<Result>> SaveQrEmployeeAttendenceOut([FromHeader] string authorization, [FromBody]BigVQREmployeeAttendenceVM obj)
         {
             
             Result objDetail = new Result();
@@ -417,7 +435,7 @@ namespace ICTSBMCOREAPI.Controllers
         }
         [HttpPost]
         [Route("SupervisorAttendenceCheck")]
-        public async Task<Result> CheckQrEmployeeAttendence([FromBody]BigVQREmployeeAttendenceVM obj)
+        public async Task<ActionResult<Result>> CheckQrEmployeeAttendence([FromHeader] string authorization, [FromBody]BigVQREmployeeAttendenceVM obj)
         {
             
             Result objDetail = new Result();
@@ -426,7 +444,7 @@ namespace ICTSBMCOREAPI.Controllers
         }
         [HttpGet]
         [Route("GetHouseList")]
-        public async Task<List<HouseDetailsVM>> GetHouseWise([FromHeader] int appId, [FromHeader] string ListType)
+        public async Task<ActionResult<List<HouseDetailsVM>>> GetHouseWise([FromHeader] string authorization, [FromHeader] int appId, [FromHeader] string ListType)
         {
             List<HouseDetailsVM> objDetail = new List<HouseDetailsVM>();
             
@@ -439,7 +457,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("GetAllHDSLDetails")]
-        public async Task<List<HSHouseDetailsGrid>> GetHouseListById([FromHeader] int appId,[FromHeader] string ReferanceId)
+        public async Task<ActionResult<List<HSHouseDetailsGrid>>> GetHouseListById([FromHeader] string authorization, [FromHeader] int appId,[FromHeader] string ReferanceId)
         {
             string EmpType = string.Empty;
             if (!string.IsNullOrEmpty(ReferanceId))
@@ -456,7 +474,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("GetUserRoleAttendance")]
-        public async Task<List<UREmployeeAttendence>> UserRoleAttendance([FromHeader] int userId,[FromHeader] DateTime FromDate, [FromHeader] DateTime Todate,[FromHeader] bool IsMobile)
+        public async Task<ActionResult<List<UREmployeeAttendence>>> UserRoleAttendance([FromHeader] string authorization, [FromHeader] int userId,[FromHeader] DateTime FromDate, [FromHeader] DateTime Todate,[FromHeader] bool IsMobile)
         {
 
             IEnumerable<UREmployeeAttendence> objDetail = new List<UREmployeeAttendence>();

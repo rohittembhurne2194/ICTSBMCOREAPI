@@ -23,5 +23,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string message { get; set; }
         public string messageMar { get; set; }
         public bool? gtFeatures { get; set; }
+
+        public string hsusertoken { get; set; }
     }
 }
