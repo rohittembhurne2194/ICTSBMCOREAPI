@@ -240,15 +240,29 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpPost]
         [Route("Save/GarbageMapTrail")]
-        public async Task<List<DumpTripStatusResult>> GarbageMapTrail([FromBody] List<Trial> obj, [FromHeader] int AppId)
+        public async Task<ActionResult<List<DumpTripStatusResult>>> GarbageMapTrail([FromHeader] string authorization, [FromBody] List<Trial> obj, [FromHeader] int AppId)
         {
             var message = "";
            
               using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
             List<DumpTripStatusResult> objDetail = new List<DumpTripStatusResult>();
-            try {
+
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if(Auth_AppId == AppId)
+            {
+                try
+                {
                     var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
-                  
+
                     if (GIS_CON != null)
                     {
                         var gis_url = GIS_CON.DataSource;
@@ -258,7 +272,7 @@ namespace ICTSBMCOREAPI.Controllers
 
                         HttpClient client = new HttpClient();
                         Trial tn = new Trial();
-                       
+
                         foreach (var item in obj)
                         {
                             tn.trailId = item.trailId;
@@ -301,126 +315,150 @@ namespace ICTSBMCOREAPI.Controllers
                             status = "",
                             message = "",
                             errorMessages = "GIS Connection Are Not Available",
-                            timestamp ="",
+                            timestamp = "",
                             data = ""
                         });
                         return objDetail;
                     }
-              }
-            
-            catch (Exception ex)
-            {
-                //_logger.LogError(ex.ToString(), ex);
-
-                objDetail.Add(new DumpTripStatusResult()
-                {
-                    code = "",
-                    status = "",
-                    message = "",
-                    errorMessages = ex.Message.ToString(),
-                    timestamp = "",
-                    data = ""
-                });
-                return objDetail;
-
-            }
-            return objDetail;
-        }
-
-        [HttpPost]
-        [Route("Save/HouseMapTrail")]
-        public async Task<List<DumpTripStatusResult>> HouseMapTrail([FromBody] List<Trial> obj, [FromHeader] int AppId)
-        {
-            var message = "";
-
-            using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
-            List<DumpTripStatusResult> objDetail = new List<DumpTripStatusResult>();
-            try
-            {
-                var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
-
-                if (GIS_CON != null)
-                {
-                    var gis_url = GIS_CON.DataSource;
-                    var gis_DBName = GIS_CON.InitialCatalog;
-                    var gis_username = GIS_CON.UserId;
-                    var gis_password = GIS_CON.Password;
-
-
-                    HttpClient client = new HttpClient();
-                    Trial tn = new Trial();
-                   
-                    foreach (var item in obj)
-                    {
-                        tn.trailId = item.trailId;
-                        tn.startTs = item.startTs;
-                        tn.endTs = item.endTs;
-                        tn.createUser = item.createUser;
-                        tn.geom = item.geom;
-                        tn.createTs = item.createTs;
-                        tn.updateTs = item.updateTs;
-                        tn.updateUser = item.updateUser;
-
-                        var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
-                        var stringContent = new StringContent(json);
-                        stringContent.Headers.ContentType.MediaType = "application/json";
-                        stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
-                        stringContent.Headers.Add("username", gis_username);
-                        stringContent.Headers.Add("password", gis_password);
-
-                        var response = await client.PostAsync("http://114.143.244.130:9091/house-trail", stringContent);
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                        objDetail.Add(new DumpTripStatusResult()
-                        {
-                            code = dynamicobject.code.ToString(),
-                            status = dynamicobject.status.ToString(),
-                            message = dynamicobject.message.ToString(),
-                            errorMessages = dynamicobject.errorMessages.ToString(),
-                            timestamp = dynamicobject.timestamp.ToString(),
-                            data = dynamicobject.data.ToString()
-                        });
-                    }
-                    return objDetail;
                 }
-                else
+
+                catch (Exception ex)
                 {
+                    //_logger.LogError(ex.ToString(), ex);
 
                     objDetail.Add(new DumpTripStatusResult()
                     {
                         code = "",
                         status = "",
                         message = "",
-                        errorMessages = "GIS Connection Are Not Available",
+                        errorMessages = ex.Message.ToString(),
+                        timestamp = "",
+                        data = ""
+                    });
+                    return objDetail;
+
+                }
+                return objDetail;
+            }
+            else
+            {
+                return Unauthorized();
+            }
+           
+        }
+
+        [HttpPost]
+        [Route("Save/HouseMapTrail")]
+        public async Task<ActionResult<List<DumpTripStatusResult>>> HouseMapTrail([FromHeader] string authorization, [FromBody] List<Trial> obj, [FromHeader] int AppId)
+        {
+            var message = "";
+
+            using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
+            List<DumpTripStatusResult> objDetail = new List<DumpTripStatusResult>();
+
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                try
+                {
+                    var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                    if (GIS_CON != null)
+                    {
+                        var gis_url = GIS_CON.DataSource;
+                        var gis_DBName = GIS_CON.InitialCatalog;
+                        var gis_username = GIS_CON.UserId;
+                        var gis_password = GIS_CON.Password;
+
+
+                        HttpClient client = new HttpClient();
+                        Trial tn = new Trial();
+
+                        foreach (var item in obj)
+                        {
+                            tn.trailId = item.trailId;
+                            tn.startTs = item.startTs;
+                            tn.endTs = item.endTs;
+                            tn.createUser = item.createUser;
+                            tn.geom = item.geom;
+                            tn.createTs = item.createTs;
+                            tn.updateTs = item.updateTs;
+                            tn.updateUser = item.updateUser;
+
+                            var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                            var stringContent = new StringContent(json);
+                            stringContent.Headers.ContentType.MediaType = "application/json";
+                            stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                            stringContent.Headers.Add("username", gis_username);
+                            stringContent.Headers.Add("password", gis_password);
+
+                            var response = await client.PostAsync("http://114.143.244.130:9091/house-trail", stringContent);
+                            var responseString = await response.Content.ReadAsStringAsync();
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                            objDetail.Add(new DumpTripStatusResult()
+                            {
+                                code = dynamicobject.code.ToString(),
+                                status = dynamicobject.status.ToString(),
+                                message = dynamicobject.message.ToString(),
+                                errorMessages = dynamicobject.errorMessages.ToString(),
+                                timestamp = dynamicobject.timestamp.ToString(),
+                                data = dynamicobject.data.ToString()
+                            });
+                        }
+                        return objDetail;
+                    }
+                    else
+                    {
+
+                        objDetail.Add(new DumpTripStatusResult()
+                        {
+                            code = "",
+                            status = "",
+                            message = "",
+                            errorMessages = "GIS Connection Are Not Available",
+                            timestamp = "",
+                            data = ""
+                        });
+                        return objDetail;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    objDetail.Add(new DumpTripStatusResult()
+                    {
+                        code = "",
+                        status = "",
+                        message = "",
+                        errorMessages = ex.Message.ToString(),
                         timestamp = "",
                         data = ""
                     });
                     return objDetail;
                 }
-            }
-            catch(Exception ex)
-            {
-                objDetail.Add(new DumpTripStatusResult()
-                {
-                    code = "",
-                    status = "",
-                    message = "",
-                    errorMessages = ex.Message.ToString(),
-                    timestamp = "",
-                    data = ""
-                });
+
                 return objDetail;
             }
-
-            return objDetail;
+            else
+            {
+                return Unauthorized();
+            }
+           
         }
 
         [HttpGet]
         [Route("GisHouseDetails/all")]
-        public async Task<List<HouseGisDetails>> HouseGisDetailsAll([FromHeader] string authorization, [FromHeader] int AppId)
+        public async Task<ActionResult<List<HouseGisDetails>>> HouseGisDetailsAll([FromHeader] string authorization, [FromHeader] int AppId)
         {
-            var txtJwtOut = "";
-            //var jwtInput = txtJwtOut.Text;
+            
             var message = "";
 
             using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
@@ -431,296 +469,322 @@ namespace ICTSBMCOREAPI.Controllers
             var jsonToken = handler.ReadToken(stream);
             var tokenS = jsonToken as JwtSecurityToken;
 
-            var jti = tokenS.Claims.First(claim => claim.Type == "jti").Value;
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
 
             //Extract the payload of the JWT
-            var claims = tokenS.Claims;
-            var jwtPayload = "{";
-            foreach (Claim c in claims)
+            //var claims = tokenS.Claims;
+
+            //var jwtPayload = "{";
+            //foreach (Claim c in claims)
+            //{
+            //    jwtPayload += '"' + c.Type + "\":\"" + c.Value + "\",";
+            //}
+            //jwtPayload += "}";
+            //txtJwtOut += "\r\nPayload:\r\n" + JToken.Parse(jwtPayload).ToString(Formatting.Indented);
+
+
+
+            if (Auth_AppId == AppId)
             {
-                jwtPayload += '"' + c.Type + "\":\"" + c.Value + "\",";
-            }
-            jwtPayload += "}";
-            txtJwtOut += "\r\nPayload:\r\n" + JToken.Parse(jwtPayload).ToString(Formatting.Indented);
-        
-
-            //ValidateToken(authorization);
-
-
-
-            try
-            {
-                var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
-
-                if (GIS_CON != null)
+                try
                 {
-                    var gis_url = GIS_CON.DataSource;
-                    var gis_DBName = GIS_CON.InitialCatalog;
-                    var gis_username = GIS_CON.UserId;
-                    var gis_password = GIS_CON.Password;
+                    var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
 
-                    HttpClient client = new HttpClient();
-                    Trial tn = new Trial();
-
-                    var json = JsonConvert.SerializeObject(tn,Formatting.Indented);
-                    var stringContent = new StringContent(json);
-               
-                    //stringContent.Headers.ContentType.MediaType = "application/json";
-                    //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
-                    //stringContent.Headers.Add("username", gis_username);
-                    //stringContent.Headers.Add("password", gis_password);
-
-                    client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
-                    client.DefaultRequestHeaders.Add("username", gis_username);
-                    client.DefaultRequestHeaders.Add("password", gis_password);
-
-                    var url = "http://114.143.244.130:9091/house/all";
-
-                    var response = await client.GetAsync(url);
-
-
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-
-
-                    objDetail.Add(new HouseGisDetails()
+                    if (GIS_CON != null)
                     {
-                        code = dynamicobject.code.ToString(),
-                        status = dynamicobject.status.ToString(),
-                        message = dynamicobject.message.ToString(),
-                        errorMessages = dynamicobject.errorMessages.ToString(),
-                        timestamp = dynamicobject.timestamp.ToString(),
-                        data = dynamicobject.data.ToString()
-                    });
+                        var gis_url = GIS_CON.DataSource;
+                        var gis_DBName = GIS_CON.InitialCatalog;
+                        var gis_username = GIS_CON.UserId;
+                        var gis_password = GIS_CON.Password;
 
-                    return objDetail;
+                        HttpClient client = new HttpClient();
+                        Trial tn = new Trial();
+
+                        var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                        var stringContent = new StringContent(json);
+
+                        //stringContent.Headers.ContentType.MediaType = "application/json";
+                        //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                        //stringContent.Headers.Add("username", gis_username);
+                        //stringContent.Headers.Add("password", gis_password);
+
+                        client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                        client.DefaultRequestHeaders.Add("username", gis_username);
+                        client.DefaultRequestHeaders.Add("password", gis_password);
+
+                        var url = "http://114.143.244.130:9091/house/all";
+
+                        var response = await client.GetAsync(url);
+
+
+                        var responseString = await response.Content.ReadAsStringAsync();
+                        var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+
+
+                        objDetail.Add(new HouseGisDetails()
+                        {
+                            code = dynamicobject.code.ToString(),
+                            status = dynamicobject.status.ToString(),
+                            message = dynamicobject.message.ToString(),
+                            errorMessages = dynamicobject.errorMessages.ToString(),
+                            timestamp = dynamicobject.timestamp.ToString(),
+                            data = dynamicobject.data.ToString()
+                        });
+
+                        return objDetail;
+                    }
+                    else
+                    {
+
+                        objDetail.Add(new HouseGisDetails()
+                        {
+                            code = "",
+                            status = "",
+                            message = "",
+                            errorMessages = "GIS Connection Are Not Available",
+                            timestamp = "",
+                            data = ""
+                        });
+                        return objDetail;
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-
                     objDetail.Add(new HouseGisDetails()
                     {
                         code = "",
                         status = "",
                         message = "",
-                        errorMessages = "GIS Connection Are Not Available",
+                        errorMessages = ex.Message.ToString(),
                         timestamp = "",
                         data = ""
                     });
                     return objDetail;
                 }
-            }
-            catch (Exception ex)
-            {
-                objDetail.Add(new HouseGisDetails()
-                {
-                    code = "",
-                    status = "",
-                    message = "",
-                    errorMessages = ex.Message.ToString(),
-                    timestamp = "",
-                    data = ""
-                });
                 return objDetail;
             }
-            return objDetail;
+            else
+            {
+                return Unauthorized();
+            }
+           
+            
         }
 
-        //private static bool ValidateToken(string authorization)
-        //{
-        //    var tokenHandler = new JwtSecurityTokenHandler();
-        //    var validationParameters = GetValidationParameters();
 
-        //    SecurityToken validatedToken;
-        //    IPrincipal principal = tokenHandler.ValidateToken(authorization, validationParameters, out validatedToken);
-        //    return true;
-        //}
-
-        //private static TokenValidationParameters GetValidationParameters()
-        //{
-        //    return new TokenValidationParameters()
-        //    {
-        //        ValidateLifetime = false, // Because there is no expiration in the generated token
-        //        ValidateAudience = false, // Because there is no audiance in the generated token
-        //        ValidateIssuer = false,   // Because there is no issuer in the generated token
-        //        ValidIssuer = "Sample",
-        //        ValidAudience = "Sample"
-        //        //IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)) // The same key as the one that generate the token
-        //    };
-        //}
 
         [HttpGet]
         [Route("GisGarbageTrail/all")]
-        public async Task<List<TrailsDetails>> GarbageTrailgisAll([FromHeader] int AppId)
+        public async Task<ActionResult<List<TrailsDetails>>> GarbageTrailgisAll([FromHeader] string authorization, [FromHeader] int AppId)
         {
             var message = "";
 
             using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
             List<TrailsDetails> objDetail = new List<TrailsDetails>();
 
-            try
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
             {
-                var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
-
-                if (GIS_CON != null)
+                try
                 {
-                    var gis_url = GIS_CON.DataSource;
-                    var gis_DBName = GIS_CON.InitialCatalog;
-                    var gis_username = GIS_CON.UserId;
-                    var gis_password = GIS_CON.Password;
+                    var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
 
-                    HttpClient client = new HttpClient();
-                    Trial tn = new Trial();
-
-                    var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
-                    var stringContent = new StringContent(json);
-
-                    //stringContent.Headers.ContentType.MediaType = "application/json";
-                    //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
-                    //stringContent.Headers.Add("username", gis_username);
-                    //stringContent.Headers.Add("password", gis_password);
-
-                    client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
-                    client.DefaultRequestHeaders.Add("username", gis_username);
-                    client.DefaultRequestHeaders.Add("password", gis_password);
-
-                    var url = "http://114.143.244.130:9091/garbage-trail/all";
-
-                    var response = await client.GetAsync(url);
-
-
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-
-
-                    objDetail.Add(new TrailsDetails()
+                    if (GIS_CON != null)
                     {
-                        code = dynamicobject.code.ToString(),
-                        status = dynamicobject.status.ToString(),
-                        message = dynamicobject.message.ToString(),
-                        errorMessages = dynamicobject.errorMessages.ToString(),
-                        timestamp = dynamicobject.timestamp.ToString(),
-                        data = dynamicobject.data.ToString()
-                    });
+                        var gis_url = GIS_CON.DataSource;
+                        var gis_DBName = GIS_CON.InitialCatalog;
+                        var gis_username = GIS_CON.UserId;
+                        var gis_password = GIS_CON.Password;
 
-                    return objDetail;
+                        HttpClient client = new HttpClient();
+                        Trial tn = new Trial();
+
+                        var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                        var stringContent = new StringContent(json);
+
+                        //stringContent.Headers.ContentType.MediaType = "application/json";
+                        //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                        //stringContent.Headers.Add("username", gis_username);
+                        //stringContent.Headers.Add("password", gis_password);
+
+                        client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                        client.DefaultRequestHeaders.Add("username", gis_username);
+                        client.DefaultRequestHeaders.Add("password", gis_password);
+
+                        var url = "http://114.143.244.130:9091/garbage-trail/all";
+
+                        var response = await client.GetAsync(url);
+
+
+                        var responseString = await response.Content.ReadAsStringAsync();
+                        var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+
+
+                        objDetail.Add(new TrailsDetails()
+                        {
+                            code = dynamicobject.code.ToString(),
+                            status = dynamicobject.status.ToString(),
+                            message = dynamicobject.message.ToString(),
+                            errorMessages = dynamicobject.errorMessages.ToString(),
+                            timestamp = dynamicobject.timestamp.ToString(),
+                            data = dynamicobject.data.ToString()
+                        });
+
+                        return objDetail;
+                    }
+                    else
+                    {
+
+                        objDetail.Add(new TrailsDetails()
+                        {
+                            code = "",
+                            status = "",
+                            message = "",
+                            errorMessages = "GIS Connection Are Not Available",
+                            timestamp = "",
+                            data = ""
+                        });
+                        return objDetail;
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-
                     objDetail.Add(new TrailsDetails()
                     {
                         code = "",
                         status = "",
                         message = "",
-                        errorMessages = "GIS Connection Are Not Available",
+                        errorMessages = ex.Message.ToString(),
                         timestamp = "",
                         data = ""
                     });
                     return objDetail;
                 }
-            }
-            catch (Exception ex)
-            {
-                objDetail.Add(new TrailsDetails()
-                {
-                    code = "",
-                    status = "",
-                    message = "",
-                    errorMessages = ex.Message.ToString(),
-                    timestamp = "",
-                    data = ""
-                });
                 return objDetail;
             }
-            return objDetail;
+            else
+            {
+                return Unauthorized();
+            }
+          
         }
 
         [HttpGet]
         [Route("GisHouseTrail/all")]
-        public async Task<List<TrailsDetails>> HouseTrailgisAll([FromHeader] int AppId)
+        public async Task<ActionResult<List<TrailsDetails>>> HouseTrailgisAll([FromHeader] string authorization, [FromHeader] int AppId)
         {
             var message = "";
 
             using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
             List<TrailsDetails> objDetail = new List<TrailsDetails>();
 
-            try
+
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if(Auth_AppId == AppId)
             {
-                var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
-
-                if (GIS_CON != null)
+                try
                 {
-                    var gis_url = GIS_CON.DataSource;
-                    var gis_DBName = GIS_CON.InitialCatalog;
-                    var gis_username = GIS_CON.UserId;
-                    var gis_password = GIS_CON.Password;
+                    var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
 
-                    HttpClient client = new HttpClient();
-                    Trial tn = new Trial();
-
-                    var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
-                    var stringContent = new StringContent(json);
-
-                    //stringContent.Headers.ContentType.MediaType = "application/json";
-                    //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
-                    //stringContent.Headers.Add("username", gis_username);
-                    //stringContent.Headers.Add("password", gis_password);
-
-                    client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
-                    client.DefaultRequestHeaders.Add("username", gis_username);
-                    client.DefaultRequestHeaders.Add("password", gis_password);
-
-                    var url = "http://114.143.244.130:9091/house-trail/all";
-
-                    var response = await client.GetAsync(url);
-
-
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-
-
-                    objDetail.Add(new TrailsDetails()
+                    if (GIS_CON != null)
                     {
-                        code = dynamicobject.code.ToString(),
-                        status = dynamicobject.status.ToString(),
-                        message = dynamicobject.message.ToString(),
-                        errorMessages = dynamicobject.errorMessages.ToString(),
-                        timestamp = dynamicobject.timestamp.ToString(),
-                        data = dynamicobject.data.ToString()
-                    });
+                        var gis_url = GIS_CON.DataSource;
+                        var gis_DBName = GIS_CON.InitialCatalog;
+                        var gis_username = GIS_CON.UserId;
+                        var gis_password = GIS_CON.Password;
 
-                    return objDetail;
+                        HttpClient client = new HttpClient();
+                        Trial tn = new Trial();
+
+                        var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                        var stringContent = new StringContent(json);
+
+                        //stringContent.Headers.ContentType.MediaType = "application/json";
+                        //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                        //stringContent.Headers.Add("username", gis_username);
+                        //stringContent.Headers.Add("password", gis_password);
+
+                        client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                        client.DefaultRequestHeaders.Add("username", gis_username);
+                        client.DefaultRequestHeaders.Add("password", gis_password);
+
+                        var url = "http://114.143.244.130:9091/house-trail/all";
+
+                        var response = await client.GetAsync(url);
+
+
+                        var responseString = await response.Content.ReadAsStringAsync();
+                        var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+
+
+                        objDetail.Add(new TrailsDetails()
+                        {
+                            code = dynamicobject.code.ToString(),
+                            status = dynamicobject.status.ToString(),
+                            message = dynamicobject.message.ToString(),
+                            errorMessages = dynamicobject.errorMessages.ToString(),
+                            timestamp = dynamicobject.timestamp.ToString(),
+                            data = dynamicobject.data.ToString()
+                        });
+
+                        return objDetail;
+                    }
+                    else
+                    {
+
+                        objDetail.Add(new TrailsDetails()
+                        {
+                            code = "",
+                            status = "",
+                            message = "",
+                            errorMessages = "GIS Connection Are Not Available",
+                            timestamp = "",
+                            data = ""
+                        });
+                        return objDetail;
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-
                     objDetail.Add(new TrailsDetails()
                     {
                         code = "",
                         status = "",
                         message = "",
-                        errorMessages = "GIS Connection Are Not Available",
+                        errorMessages = ex.Message.ToString(),
                         timestamp = "",
                         data = ""
                     });
                     return objDetail;
                 }
-            }
-            catch (Exception ex)
-            {
-                objDetail.Add(new TrailsDetails()
-                {
-                    code = "",
-                    status = "",
-                    message = "",
-                    errorMessages = ex.Message.ToString(),
-                    timestamp = "",
-                    data = ""
-                });
                 return objDetail;
             }
-            return objDetail;
+            else
+            {
+                return Unauthorized();
+            }
+           
         }
     }
 
