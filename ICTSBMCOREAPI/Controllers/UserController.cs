@@ -797,7 +797,7 @@ namespace ICTSBMCOREAPI.Controllers
         [HttpGet]
         [Route("GisHouseDetails/all")]
       
-        public async Task<ActionResult<List<HouseGisDetails>>> HouseGisDetailsAll(Type type, [FromHeader] string authorization, [FromHeader] int AppId)
+        public async Task<ActionResult<List<HouseGisDetails>>> HouseGisDetailsAll([FromHeader] string authorization, [FromHeader] int AppId)
         {
             
             //var message = "";
