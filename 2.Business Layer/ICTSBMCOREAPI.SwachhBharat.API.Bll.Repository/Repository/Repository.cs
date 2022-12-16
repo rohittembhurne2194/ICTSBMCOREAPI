@@ -65,7 +65,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     var token = new JwtSecurityToken(
                         issuer: _configuration["JWT:ValidIssuer"],
                         audience: _configuration["JWT:ValidAudience"],
-                        expires: DateTime.Now.AddHours(12),
+                        expires: DateTime.Now.AddYears(1),
                         claims: authClaims,
                         signingCredentials: new SigningCredentials(authSigninkey, SecurityAlgorithms.HmacSha256Signature));
                     return new JwtSecurityTokenHandler().WriteToken(token);
@@ -10649,6 +10649,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         user.imiNo = "";
                         user.message = "UserName or Passward not Match.";
                         user.messageMar = "वापरकर्ता नाव किंवा पासवर्ड जुळत नाही.";
+                        user.hsusertoken = "";
                     }
                     else if (obj != null && obj.LoginId == userName && obj.Password == password)
                     {
@@ -10662,6 +10663,22 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         user.type = "";
                         user.gtFeatures = true;
                         user.status = "success"; user.message = "Login Successfully"; user.messageMar = "लॉगिन यशस्वी";
+
+                        var authClaims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.Name,user.name),
+                             new Claim("userLoginId",user.userLoginId),
+                             new Claim("userPassword",user.userPassword),
+                            new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
+                        };
+                        var authSigninkey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]));
+                        var token = new JwtSecurityToken(
+                            issuer: _configuration["JWT:ValidIssuer"],
+                            audience: _configuration["JWT:ValidAudience"],
+                            expires: DateTime.Now.AddYears(1),
+                            claims: authClaims,
+                            signingCredentials: new SigningCredentials(authSigninkey, SecurityAlgorithms.HmacSha256Signature));
+                        user.hsusertoken = new JwtSecurityTokenHandler().WriteToken(token);
                     }
 
                     return user;
