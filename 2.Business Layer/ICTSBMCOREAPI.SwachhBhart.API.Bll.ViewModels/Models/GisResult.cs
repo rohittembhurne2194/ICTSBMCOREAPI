@@ -32,11 +32,5 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string[] coordinates { get; set; }
     }
 
-    public class coordinate
-    {
-        [JsonProperty("First")]
-        public string First { get; set; }
-        [JsonProperty("Last")]
-        public string Last { get; set; }
-    }
+
 }
