@@ -29,7 +29,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         [JsonProperty("type")]
         public string type { get; set; }
         [JsonProperty("coordinates")]
-        public dynamic coordinates { get; set; }
+        public string[] coordinates { get; set; }
     }
 
     public class coordinate
