@@ -795,10 +795,10 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("GisHouseDetails/all")]
-        public async Task<ActionResult<List<HouseGisDetails>>> HouseGisDetailsAll([FromHeader] string authorization, [FromHeader] int AppId)
+        public async Task<ActionResult<List<HouseGisDetails>>> HouseGisDetailsAll(Type type, [FromHeader] string authorization, [FromHeader] int AppId)
         {
             
-            var message = "";
+            //var message = "";
 
             using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
             List<HouseGisDetails> objDetail = new List<HouseGisDetails>();
@@ -859,21 +859,47 @@ namespace ICTSBMCOREAPI.Controllers
                         var response = await client.GetAsync(url);
 
 
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                        //var responseString = await response.Content.ReadAsStringAsync();
+                        //var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
 
-
-                        objDetail.Add(new HouseGisDetails()
+                        if (response.IsSuccessStatusCode)
                         {
-                            code = dynamicobject.code.ToString(),
-                            status = dynamicobject.status.ToString(),
-                            message = dynamicobject.message.ToString(),
-                            errorMessages = dynamicobject.errorMessages.ToString(),
-                            timestamp = dynamicobject.timestamp.ToString(),
-                            data = dynamicobject.data.ToString()
-                        });
+                            var responseString = await response.Content.ReadAsStringAsync();
+                            var jsonParsed = JObject.Parse(responseString);
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                            var jsonResult = jsonParsed["data"];
 
-                        return objDetail;
+                            
+                            List<GisResult> result = jsonResult.ToObject<List<GisResult>>();
+
+                            objDetail.Add(new HouseGisDetails()
+                            {
+                                code = dynamicobject.code.ToString(),
+                                status = dynamicobject.status.ToString(),
+                                message = dynamicobject.message.ToString(),
+                                errorMessages = dynamicobject.errorMessages.ToString(),
+                                timestamp = dynamicobject.timestamp.ToString(),
+                                data = result
+                            });
+
+                            return objDetail;
+
+                            //return result;
+
+                        }
+
+                        //objDetail.Add(new HouseGisDetails()
+                        //{
+                        //    code = dynamicobject.code.ToString(),
+                        //    status = dynamicobject.status.ToString(),
+                        //    message = dynamicobject.message.ToString(),
+                        //    errorMessages = dynamicobject.errorMessages.ToString(),
+                        //    timestamp = dynamicobject.timestamp.ToString(),
+                        //    data = dynamicobject.data.ToString(),
+                        //    json = JsonConvert.SerializeObject(dynamicobject.data, Formatting.Indented)
+                        //});
+
+                        //return objDetail;
                     }
                     else
                     {
