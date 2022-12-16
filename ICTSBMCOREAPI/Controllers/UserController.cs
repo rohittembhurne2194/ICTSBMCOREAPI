@@ -799,7 +799,7 @@ namespace ICTSBMCOREAPI.Controllers
         [HttpGet]
         [Route("GisHouseDetails/all")]
       
-        public async Task<ActionResult<List<HouseGisDetails>>> HouseGisDetailsAll(Type type, [FromHeader] string authorization, [FromHeader] int AppId)
+        public async Task<ActionResult<List<HouseGisDetails>>> HouseGisDetailsAll([FromHeader] string authorization, [FromHeader] int AppId)
         {
             
             //var message = "";
@@ -872,9 +872,9 @@ namespace ICTSBMCOREAPI.Controllers
                             var jsonParsed = JObject.Parse(responseString);
                             var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
                             var jsonResult = jsonParsed["data"];
-                            Response.Headers.Add("Access-Control-Allow-Origin", "*");
-                            Response.Headers.Add("Access-Control-Allow-Methods", "GET");
-                            Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
+                            //Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                            //Response.Headers.Add("Access-Control-Allow-Methods", "GET");
+                            //Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
 
                             List<GisResult> result = jsonResult.ToObject<List<GisResult>>();
 
