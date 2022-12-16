@@ -27,7 +27,6 @@ namespace ICTSBMCOREAPI.Controllers
     [Authorize]
     [Route("api")]
     [ApiController]
-   
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
@@ -795,7 +794,6 @@ namespace ICTSBMCOREAPI.Controllers
            
         }
 
-        [EnableCors("MyCorsPolicy")]
         [HttpGet]
         [Route("GisHouseDetails/all")]
       
@@ -872,9 +870,9 @@ namespace ICTSBMCOREAPI.Controllers
                             var jsonParsed = JObject.Parse(responseString);
                             var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
                             var jsonResult = jsonParsed["data"];
-                            Response.Headers.Add("Access-Control-Allow-Origin", "*");
-                            Response.Headers.Add("Access-Control-Allow-Methods", "GET");
-                            Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
+                            //Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                            //Response.Headers.Add("Access-Control-Allow-Methods", "GET");
+                            //Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
 
                             List<GisResult> result = jsonResult.ToObject<List<GisResult>>();
 
