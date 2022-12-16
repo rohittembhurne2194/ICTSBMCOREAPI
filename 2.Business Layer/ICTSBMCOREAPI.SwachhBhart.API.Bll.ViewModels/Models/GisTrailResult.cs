@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
 {
-    public class GisResult
+  public  class GisTrailResult
     {
         [JsonProperty("id")]
         public string id { get; set; }
@@ -20,16 +20,15 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         [JsonProperty("updateTs")]
         public string updateTs { get; set; }
         [JsonProperty("geom")]
-        public geom? geom { get; set; }
-       
+        public geomt? geom { get; set; }
     }
 
-    public class geom
+    public class geomt
     {
         [JsonProperty("type")]
         public string type { get; set; }
         [JsonProperty("coordinates")]
-        public string[] coordinates { get; set; }
+        public string[][] coordinates { get; set; }
     }
 
 }

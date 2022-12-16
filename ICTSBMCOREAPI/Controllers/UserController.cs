@@ -884,22 +884,11 @@ namespace ICTSBMCOREAPI.Controllers
 
                             return objDetail;
 
-                            //return result;
-
                         }
-
-                        //objDetail.Add(new HouseGisDetails()
-                        //{
-                        //    code = dynamicobject.code.ToString(),
-                        //    status = dynamicobject.status.ToString(),
-                        //    message = dynamicobject.message.ToString(),
-                        //    errorMessages = dynamicobject.errorMessages.ToString(),
-                        //    timestamp = dynamicobject.timestamp.ToString(),
-                        //    data = dynamicobject.data.ToString(),
-                        //    json = JsonConvert.SerializeObject(dynamicobject.data, Formatting.Indented)
-                        //});
-
-                        //return objDetail;
+                        else
+                        {
+                            return null;
+                        }
                     }
                     else
                     {
@@ -993,21 +982,38 @@ namespace ICTSBMCOREAPI.Controllers
                         var response = await client.GetAsync(url);
 
 
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                        //var responseString = await response.Content.ReadAsStringAsync();
+                        //var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
 
-
-                        objDetail.Add(new TrailsDetails()
+                        if (response.IsSuccessStatusCode)
                         {
-                            code = dynamicobject.code.ToString(),
-                            status = dynamicobject.status.ToString(),
-                            message = dynamicobject.message.ToString(),
-                            errorMessages = dynamicobject.errorMessages.ToString(),
-                            timestamp = dynamicobject.timestamp.ToString(),
-                            data = dynamicobject.data.ToString()
-                        });
+                            var responseString = await response.Content.ReadAsStringAsync();
+                            var jsonParsed = JObject.Parse(responseString);
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                            var jsonResult = jsonParsed["data"];
 
-                        return objDetail;
+
+                            List<GisTrailResult> result = jsonResult.ToObject<List<GisTrailResult>>();
+
+                            objDetail.Add(new TrailsDetails()
+                            {
+                                code = dynamicobject.code.ToString(),
+                                status = dynamicobject.status.ToString(),
+                                message = dynamicobject.message.ToString(),
+                                errorMessages = dynamicobject.errorMessages.ToString(),
+                                timestamp = dynamicobject.timestamp.ToString(),
+                                data = result
+                            });
+
+                            return objDetail;
+
+                        }
+                        else
+                        {
+                            return null;
+                        }
+
+                      
                     }
                     else
                     {
@@ -1099,21 +1105,38 @@ namespace ICTSBMCOREAPI.Controllers
                         var response = await client.GetAsync(url);
 
 
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                        //var responseString = await response.Content.ReadAsStringAsync();
+                        //var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
 
-
-                        objDetail.Add(new TrailsDetails()
+                        if (response.IsSuccessStatusCode)
                         {
-                            code = dynamicobject.code.ToString(),
-                            status = dynamicobject.status.ToString(),
-                            message = dynamicobject.message.ToString(),
-                            errorMessages = dynamicobject.errorMessages.ToString(),
-                            timestamp = dynamicobject.timestamp.ToString(),
-                            data = dynamicobject.data.ToString()
-                        });
+                            var responseString = await response.Content.ReadAsStringAsync();
+                            var jsonParsed = JObject.Parse(responseString);
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                            var jsonResult = jsonParsed["data"];
 
-                        return objDetail;
+
+                            List<GisTrailResult> result = jsonResult.ToObject<List<GisTrailResult>>();
+
+                            objDetail.Add(new TrailsDetails()
+                            {
+                                code = dynamicobject.code.ToString(),
+                                status = dynamicobject.status.ToString(),
+                                message = dynamicobject.message.ToString(),
+                                errorMessages = dynamicobject.errorMessages.ToString(),
+                                timestamp = dynamicobject.timestamp.ToString(),
+                                data = result
+                            });
+
+                            return objDetail;
+
+                        }
+                        else
+                        {
+                            return null;
+                        }
+
+
                     }
                     else
                     {
