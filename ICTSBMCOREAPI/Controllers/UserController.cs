@@ -881,7 +881,6 @@ namespace ICTSBMCOREAPI.Controllers
                                 code = dynamicobject.code.ToString(),
                                 status = dynamicobject.status.ToString(),
                                 message = dynamicobject.message.ToString(),
-                                errorMessages = dynamicobject.errorMessages.ToString(),
                                 timestamp = dynamicobject.timestamp.ToString(),
                                 data = result
                             });
@@ -901,8 +900,8 @@ namespace ICTSBMCOREAPI.Controllers
                         {
                             code = "",
                             status = "",
-                            message = "",
-                            errorMessages = "GIS Connection Are Not Available",
+                            message = "GIS Connection Are Not Available",
+                           // errorMessages = "GIS Connection Are Not Available",
                             timestamp = "",
                             data = ""
                         });
@@ -915,8 +914,8 @@ namespace ICTSBMCOREAPI.Controllers
                     {
                         code = "",
                         status = "",
-                        message = "",
-                        errorMessages = ex.Message.ToString(),
+                        message = ex.Message.ToString(),
+                        //errorMessages = ex.Message.ToString(),
                         timestamp = "",
                         data = ""
                     });
@@ -1004,7 +1003,6 @@ namespace ICTSBMCOREAPI.Controllers
                                 code = dynamicobject.code.ToString(),
                                 status = dynamicobject.status.ToString(),
                                 message = dynamicobject.message.ToString(),
-                                errorMessages = dynamicobject.errorMessages.ToString(),
                                 timestamp = dynamicobject.timestamp.ToString(),
                                 data = result
                             });
@@ -1026,8 +1024,8 @@ namespace ICTSBMCOREAPI.Controllers
                         {
                             code = "",
                             status = "",
-                            message = "",
-                            errorMessages = "GIS Connection Are Not Available",
+                            message = "GIS Connection Are Not Available",
+                            //errorMessages = "GIS Connection Are Not Available",
                             timestamp = "",
                             data = ""
                         });
@@ -1040,8 +1038,8 @@ namespace ICTSBMCOREAPI.Controllers
                     {
                         code = "",
                         status = "",
-                        message = "",
-                        errorMessages = ex.Message.ToString(),
+                        message = ex.Message.ToString(),
+                        //errorMessages = ex.Message.ToString(),
                         timestamp = "",
                         data = ""
                     });
@@ -1127,7 +1125,6 @@ namespace ICTSBMCOREAPI.Controllers
                                 code = dynamicobject.code.ToString(),
                                 status = dynamicobject.status.ToString(),
                                 message = dynamicobject.message.ToString(),
-                                errorMessages = dynamicobject.errorMessages.ToString(),
                                 timestamp = dynamicobject.timestamp.ToString(),
                                 data = result
                             });
@@ -1149,8 +1146,8 @@ namespace ICTSBMCOREAPI.Controllers
                         {
                             code = "",
                             status = "",
-                            message = "",
-                            errorMessages = "GIS Connection Are Not Available",
+                            message = "GIS Connection Are Not Available",
+                            //errorMessages = "GIS Connection Are Not Available",
                             timestamp = "",
                             data = ""
                         });
@@ -1163,8 +1160,8 @@ namespace ICTSBMCOREAPI.Controllers
                     {
                         code = "",
                         status = "",
-                        message = "",
-                        errorMessages = ex.Message.ToString(),
+                        message = ex.Message.ToString(),
+                        //errorMessages = ex.Message.ToString(),
                         timestamp = "",
                         data = ""
                     });
