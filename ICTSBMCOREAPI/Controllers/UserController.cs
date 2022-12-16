@@ -2,6 +2,7 @@
 using ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository;
 using ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -26,6 +27,7 @@ namespace ICTSBMCOREAPI.Controllers
     [Authorize]
     [Route("api")]
     [ApiController]
+   
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
@@ -793,8 +795,10 @@ namespace ICTSBMCOREAPI.Controllers
            
         }
 
+        [EnableCors("MyCorsPolicy")]
         [HttpGet]
         [Route("GisHouseDetails/all")]
+      
         public async Task<ActionResult<List<HouseGisDetails>>> HouseGisDetailsAll(Type type, [FromHeader] string authorization, [FromHeader] int AppId)
         {
             
@@ -868,8 +872,10 @@ namespace ICTSBMCOREAPI.Controllers
                             var jsonParsed = JObject.Parse(responseString);
                             var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
                             var jsonResult = jsonParsed["data"];
+                            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                            Response.Headers.Add("Access-Control-Allow-Methods", "GET");
+                            Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
 
-                            
                             List<GisResult> result = jsonResult.ToObject<List<GisResult>>();
 
                             objDetail.Add(new HouseGisDetails()
