@@ -969,6 +969,8 @@ namespace ICTSBMCOREAPI.Controllers
 
                         var responseString = await response.Content.ReadAsStringAsync();
                         var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                        // dynamicobject=JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented });
+
 
 
                         objDetail.Add(new TrailsDetails()
@@ -978,8 +980,10 @@ namespace ICTSBMCOREAPI.Controllers
                             message = dynamicobject.message.ToString(),
                             errorMessages = dynamicobject.errorMessages.ToString(),
                             timestamp = dynamicobject.timestamp.ToString(),
-                            data = dynamicobject.data.ToString()
-                        });
+                            //data = dynamicobject.data.ToString(),
+                            data = JsonConvert.DeserializeObject<List<NewData>>(dynamicobject.data.ToString()),
+
+                        }) ;
 
                         return objDetail;
                     }
