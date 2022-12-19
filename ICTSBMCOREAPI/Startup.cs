@@ -92,21 +92,13 @@ namespace ICTSBMCOREAPI
                 };
             });
 
-            services.AddCors(options =>
-            {
-                options.AddPolicy("MyCorsPolicy", builder => builder
-                    .AllowAnyOrigin().WithOrigins("https://124.153.94.110:1010", "http://localhost:36926")
-                    .AllowAnyMethod()
-                    .AllowAnyHeader());
-                    //.SetIsOriginAllowed(host => true));
-                    //.WithHeaders("Content-Type"));
-            });
+          
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
-           
+            
 
             if (env.IsDevelopment())
             {
@@ -128,7 +120,7 @@ namespace ICTSBMCOREAPI
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers().RequireCors("MyCorsPolicy");
+                endpoints.MapControllers();
             });
         }
     }

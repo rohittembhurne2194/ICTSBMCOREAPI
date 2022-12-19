@@ -27,7 +27,6 @@ namespace ICTSBMCOREAPI.Controllers
     [Authorize]
     [Route("api")]
     [ApiController]
-   
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
@@ -795,11 +794,10 @@ namespace ICTSBMCOREAPI.Controllers
            
         }
 
-        [EnableCors("MyCorsPolicy")]
         [HttpGet]
         [Route("GisHouseDetails/all")]
       
-        public async Task<ActionResult<List<HouseGisDetails>>> HouseGisDetailsAll(Type type, [FromHeader] string authorization, [FromHeader] int AppId)
+        public async Task<ActionResult<List<HouseGisDetails>>> HouseGisDetailsAll([FromHeader] string authorization, [FromHeader] int AppId)
         {
             
             //var message = "";
@@ -872,9 +870,9 @@ namespace ICTSBMCOREAPI.Controllers
                             var jsonParsed = JObject.Parse(responseString);
                             var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
                             var jsonResult = jsonParsed["data"];
-                            Response.Headers.Add("Access-Control-Allow-Origin", Request.Headers);
-                            Response.Headers.Add("Access-Control-Allow-Methods", "GET");
-                            Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
+                            //Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                            //Response.Headers.Add("Access-Control-Allow-Methods", "GET");
+                            //Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
 
                             List<GisResult> result = jsonResult.ToObject<List<GisResult>>();
 
@@ -883,7 +881,6 @@ namespace ICTSBMCOREAPI.Controllers
                                 code = dynamicobject.code.ToString(),
                                 status = dynamicobject.status.ToString(),
                                 message = dynamicobject.message.ToString(),
-                                errorMessages = dynamicobject.errorMessages.ToString(),
                                 timestamp = dynamicobject.timestamp.ToString(),
                                 data = result
                             });
@@ -903,8 +900,8 @@ namespace ICTSBMCOREAPI.Controllers
                         {
                             code = "",
                             status = "",
-                            message = "",
-                            errorMessages = "GIS Connection Are Not Available",
+                            message = "GIS Connection Are Not Available",
+                           // errorMessages = "GIS Connection Are Not Available",
                             timestamp = "",
                             data = ""
                         });
@@ -917,8 +914,8 @@ namespace ICTSBMCOREAPI.Controllers
                     {
                         code = "",
                         status = "",
-                        message = "",
-                        errorMessages = ex.Message.ToString(),
+                        message = ex.Message.ToString(),
+                        //errorMessages = ex.Message.ToString(),
                         timestamp = "",
                         data = ""
                     });
@@ -1006,7 +1003,6 @@ namespace ICTSBMCOREAPI.Controllers
                                 code = dynamicobject.code.ToString(),
                                 status = dynamicobject.status.ToString(),
                                 message = dynamicobject.message.ToString(),
-                                errorMessages = dynamicobject.errorMessages.ToString(),
                                 timestamp = dynamicobject.timestamp.ToString(),
                                 data = result
                             });
@@ -1028,8 +1024,8 @@ namespace ICTSBMCOREAPI.Controllers
                         {
                             code = "",
                             status = "",
-                            message = "",
-                            errorMessages = "GIS Connection Are Not Available",
+                            message = "GIS Connection Are Not Available",
+                            //errorMessages = "GIS Connection Are Not Available",
                             timestamp = "",
                             data = ""
                         });
@@ -1042,8 +1038,8 @@ namespace ICTSBMCOREAPI.Controllers
                     {
                         code = "",
                         status = "",
-                        message = "",
-                        errorMessages = ex.Message.ToString(),
+                        message = ex.Message.ToString(),
+                        //errorMessages = ex.Message.ToString(),
                         timestamp = "",
                         data = ""
                     });
@@ -1129,7 +1125,6 @@ namespace ICTSBMCOREAPI.Controllers
                                 code = dynamicobject.code.ToString(),
                                 status = dynamicobject.status.ToString(),
                                 message = dynamicobject.message.ToString(),
-                                errorMessages = dynamicobject.errorMessages.ToString(),
                                 timestamp = dynamicobject.timestamp.ToString(),
                                 data = result
                             });
@@ -1151,8 +1146,8 @@ namespace ICTSBMCOREAPI.Controllers
                         {
                             code = "",
                             status = "",
-                            message = "",
-                            errorMessages = "GIS Connection Are Not Available",
+                            message = "GIS Connection Are Not Available",
+                            //errorMessages = "GIS Connection Are Not Available",
                             timestamp = "",
                             data = ""
                         });
@@ -1165,8 +1160,8 @@ namespace ICTSBMCOREAPI.Controllers
                     {
                         code = "",
                         status = "",
-                        message = "",
-                        errorMessages = ex.Message.ToString(),
+                        message = ex.Message.ToString(),
+                        //errorMessages = ex.Message.ToString(),
                         timestamp = "",
                         data = ""
                     });
