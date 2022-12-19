@@ -95,8 +95,7 @@ namespace ICTSBMCOREAPI
             services.AddCors(options =>
             {
                 options.AddPolicy("MyCorsPolicy", builder => builder
-                    .AllowAnyOrigin()
-                    //.WithOrigins("https://124.153.94.110:1010", "http://localhost:36926")
+                    .AllowAnyOrigin().WithOrigins("https://124.153.94.110:1010", "http://localhost:36926")
                     .AllowAnyMethod()
                     .AllowAnyHeader());
                     //.SetIsOriginAllowed(host => true));
@@ -107,7 +106,7 @@ namespace ICTSBMCOREAPI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
-            app.UseCors("MyCorsPolicy");
+           
 
             if (env.IsDevelopment())
             {
@@ -123,6 +122,7 @@ namespace ICTSBMCOREAPI
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseCors("MyCorsPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
 

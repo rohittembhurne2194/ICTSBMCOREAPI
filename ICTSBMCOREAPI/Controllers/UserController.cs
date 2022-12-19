@@ -872,7 +872,7 @@ namespace ICTSBMCOREAPI.Controllers
                             var jsonParsed = JObject.Parse(responseString);
                             var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
                             var jsonResult = jsonParsed["data"];
-                            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                            Response.Headers.Add("Access-Control-Allow-Origin", Request.Headers);
                             Response.Headers.Add("Access-Control-Allow-Methods", "GET");
                             Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
 
