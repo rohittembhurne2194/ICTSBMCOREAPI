@@ -114,6 +114,7 @@ namespace ICTSBMCOREAPI
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseCors("MyCorsPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
 
