@@ -2,6 +2,7 @@
 using ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository;
 using ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -795,10 +796,11 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("GisHouseDetails/all")]
+      
         public async Task<ActionResult<List<HouseGisDetails>>> HouseGisDetailsAll([FromHeader] string authorization, [FromHeader] int AppId)
         {
             
-            var message = "";
+            //var message = "";
 
             using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
             List<HouseGisDetails> objDetail = new List<HouseGisDetails>();
@@ -859,21 +861,37 @@ namespace ICTSBMCOREAPI.Controllers
                         var response = await client.GetAsync(url);
 
 
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                        //var responseString = await response.Content.ReadAsStringAsync();
+                        //var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
 
-
-                        objDetail.Add(new HouseGisDetails()
+                        if (response.IsSuccessStatusCode)
                         {
-                            code = dynamicobject.code.ToString(),
-                            status = dynamicobject.status.ToString(),
-                            message = dynamicobject.message.ToString(),
-                            errorMessages = dynamicobject.errorMessages.ToString(),
-                            timestamp = dynamicobject.timestamp.ToString(),
-                            data = dynamicobject.data.ToString()
-                        });
+                            var responseString = await response.Content.ReadAsStringAsync();
+                            var jsonParsed = JObject.Parse(responseString);
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                            var jsonResult = jsonParsed["data"];
+                            //Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                            //Response.Headers.Add("Access-Control-Allow-Methods", "GET");
+                            //Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
 
-                        return objDetail;
+                            List<GisResult> result = jsonResult.ToObject<List<GisResult>>();
+
+                            objDetail.Add(new HouseGisDetails()
+                            {
+                                code = dynamicobject.code.ToString(),
+                                status = dynamicobject.status.ToString(),
+                                message = dynamicobject.message.ToString(),
+                                timestamp = dynamicobject.timestamp.ToString(),
+                                data = result
+                            });
+
+                            return objDetail;
+
+                        }
+                        else
+                        {
+                            return null;
+                        }
                     }
                     else
                     {
@@ -882,8 +900,8 @@ namespace ICTSBMCOREAPI.Controllers
                         {
                             code = "",
                             status = "",
-                            message = "",
-                            errorMessages = "GIS Connection Are Not Available",
+                            message = "GIS Connection Are Not Available",
+                           // errorMessages = "GIS Connection Are Not Available",
                             timestamp = "",
                             data = ""
                         });
@@ -896,8 +914,8 @@ namespace ICTSBMCOREAPI.Controllers
                     {
                         code = "",
                         status = "",
-                        message = "",
-                        errorMessages = ex.Message.ToString(),
+                        message = ex.Message.ToString(),
+                        //errorMessages = ex.Message.ToString(),
                         timestamp = "",
                         data = ""
                     });
@@ -967,25 +985,37 @@ namespace ICTSBMCOREAPI.Controllers
                         var response = await client.GetAsync(url);
 
 
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                        // dynamicobject=JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented });
+                        //var responseString = await response.Content.ReadAsStringAsync();
+                        //var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
 
-
-
-                        objDetail.Add(new TrailsDetails()
+                        if (response.IsSuccessStatusCode)
                         {
-                            code = dynamicobject.code.ToString(),
-                            status = dynamicobject.status.ToString(),
-                            message = dynamicobject.message.ToString(),
-                            errorMessages = dynamicobject.errorMessages.ToString(),
-                            timestamp = dynamicobject.timestamp.ToString(),
-                            //data = dynamicobject.data.ToString(),
-                            data = JsonConvert.DeserializeObject<List<NewData>>(dynamicobject.data.ToString()),
+                            var responseString = await response.Content.ReadAsStringAsync();
+                            var jsonParsed = JObject.Parse(responseString);
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                            var jsonResult = jsonParsed["data"];
 
-                        }) ;
 
-                        return objDetail;
+                            List<GisTrailResult> result = jsonResult.ToObject<List<GisTrailResult>>();
+
+                            objDetail.Add(new TrailsDetails()
+                            {
+                                code = dynamicobject.code.ToString(),
+                                status = dynamicobject.status.ToString(),
+                                message = dynamicobject.message.ToString(),
+                                timestamp = dynamicobject.timestamp.ToString(),
+                                data = result
+                            });
+
+                            return objDetail;
+
+                        }
+                        else
+                        {
+                            return null;
+                        }
+
+                      
                     }
                     else
                     {
@@ -994,8 +1024,8 @@ namespace ICTSBMCOREAPI.Controllers
                         {
                             code = "",
                             status = "",
-                            message = "",
-                            errorMessages = "GIS Connection Are Not Available",
+                            message = "GIS Connection Are Not Available",
+                            //errorMessages = "GIS Connection Are Not Available",
                             timestamp = "",
                             data = ""
                         });
@@ -1008,8 +1038,8 @@ namespace ICTSBMCOREAPI.Controllers
                     {
                         code = "",
                         status = "",
-                        message = "",
-                        errorMessages = ex.Message.ToString(),
+                        message = ex.Message.ToString(),
+                        //errorMessages = ex.Message.ToString(),
                         timestamp = "",
                         data = ""
                     });
@@ -1077,21 +1107,37 @@ namespace ICTSBMCOREAPI.Controllers
                         var response = await client.GetAsync(url);
 
 
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                        //var responseString = await response.Content.ReadAsStringAsync();
+                        //var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
 
-
-                        objDetail.Add(new TrailsDetails()
+                        if (response.IsSuccessStatusCode)
                         {
-                            code = dynamicobject.code.ToString(),
-                            status = dynamicobject.status.ToString(),
-                            message = dynamicobject.message.ToString(),
-                            errorMessages = dynamicobject.errorMessages.ToString(),
-                            timestamp = dynamicobject.timestamp.ToString(),
-                            data = dynamicobject.data.ToString()
-                        });
+                            var responseString = await response.Content.ReadAsStringAsync();
+                            var jsonParsed = JObject.Parse(responseString);
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                            var jsonResult = jsonParsed["data"];
 
-                        return objDetail;
+
+                            List<GisTrailResult> result = jsonResult.ToObject<List<GisTrailResult>>();
+
+                            objDetail.Add(new TrailsDetails()
+                            {
+                                code = dynamicobject.code.ToString(),
+                                status = dynamicobject.status.ToString(),
+                                message = dynamicobject.message.ToString(),
+                                timestamp = dynamicobject.timestamp.ToString(),
+                                data = result
+                            });
+
+                            return objDetail;
+
+                        }
+                        else
+                        {
+                            return null;
+                        }
+
+
                     }
                     else
                     {
@@ -1100,8 +1146,8 @@ namespace ICTSBMCOREAPI.Controllers
                         {
                             code = "",
                             status = "",
-                            message = "",
-                            errorMessages = "GIS Connection Are Not Available",
+                            message = "GIS Connection Are Not Available",
+                            //errorMessages = "GIS Connection Are Not Available",
                             timestamp = "",
                             data = ""
                         });
@@ -1114,8 +1160,8 @@ namespace ICTSBMCOREAPI.Controllers
                     {
                         code = "",
                         status = "",
-                        message = "",
-                        errorMessages = ex.Message.ToString(),
+                        message = ex.Message.ToString(),
+                        //errorMessages = ex.Message.ToString(),
                         timestamp = "",
                         data = ""
                     });
