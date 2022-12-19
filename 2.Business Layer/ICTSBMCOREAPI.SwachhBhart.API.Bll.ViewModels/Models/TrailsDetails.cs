@@ -14,7 +14,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string timestamp { get; set; }
         public dynamic data { get; set; }
 
-        public  List<NewData> newdata { get; set; }
+       // public  List<NewData> newdata { get; set; }
 
     }
 
