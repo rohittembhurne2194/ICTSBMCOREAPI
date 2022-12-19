@@ -796,7 +796,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("GisHouseDetails/all")]
-      
+        [EnableCors("MyCorsPolicy")]
         public async Task<ActionResult<HouseGisDetails>> HouseGisDetailsAll([FromHeader] string authorization, [FromHeader] int AppId)
         {
             
@@ -950,6 +950,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("GisHouseDetails/search")]
+        [EnableCors("MyCorsPolicy")]
         public async Task<ActionResult<HouseGisDetails>> HouseGisDetailsSearch([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] List<GisSearch> obj)
         {
             using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
@@ -1069,6 +1070,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("GisGarbageTrail/all")]
+        [EnableCors("MyCorsPolicy")]
         public async Task<ActionResult<TrailsDetails>> GarbageTrailgisAll([FromHeader] string authorization, [FromHeader] int AppId)
         {
             var message = "";
@@ -1190,6 +1192,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("GisGarbageTrail/search")]
+        [EnableCors("MyCorsPolicy")]
         public async Task<ActionResult<HouseGisDetails>> GarbageTrailgisSearch([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] List<GisSearch> obj)
         {
             using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
@@ -1309,6 +1312,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("GisHouseTrail/all")]
+        [EnableCors("MyCorsPolicy")]
         public async Task<ActionResult<TrailsDetails>> HouseTrailgisAll([FromHeader] string authorization, [FromHeader] int AppId)
         {
             var message = "";
@@ -1449,6 +1453,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("GisHouseTrail/search")]
+        [EnableCors("MyCorsPolicy")]
         public async Task<ActionResult<HouseGisDetails>> HouseTrailgisSearch([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] List<GisSearch> obj)
         {
             using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();

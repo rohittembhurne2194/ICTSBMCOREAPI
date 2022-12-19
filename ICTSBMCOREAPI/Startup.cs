@@ -92,7 +92,10 @@ namespace ICTSBMCOREAPI
                 };
             });
 
-          
+            services.AddCors(p => p.AddPolicy("MyCorsPolicy", build =>
+             {
+                 build.WithOrigins("*").AllowAnyHeader().AllowAnyMethod();
+             }));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
