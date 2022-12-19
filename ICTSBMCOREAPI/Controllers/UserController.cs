@@ -797,13 +797,13 @@ namespace ICTSBMCOREAPI.Controllers
         [HttpGet]
         [Route("GisHouseDetails/all")]
       
-        public async Task<ActionResult<List<HouseGisDetails>>> HouseGisDetailsAll([FromHeader] string authorization, [FromHeader] int AppId)
+        public async Task<ActionResult<HouseGisDetails>> HouseGisDetailsAll([FromHeader] string authorization, [FromHeader] int AppId)
         {
             
             //var message = "";
 
             using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
-            List<HouseGisDetails> objDetail = new List<HouseGisDetails>();
+            HouseGisDetails objDetail = new HouseGisDetails();
 
             var stream = authorization.Replace("Bearer ", string.Empty);
             var handler = new JwtSecurityTokenHandler();
@@ -876,15 +876,20 @@ namespace ICTSBMCOREAPI.Controllers
 
                             List<GisResult> result = jsonResult.ToObject<List<GisResult>>();
 
-                            objDetail.Add(new HouseGisDetails()
-                            {
-                                code = dynamicobject.code.ToString(),
-                                status = dynamicobject.status.ToString(),
-                                message = dynamicobject.message.ToString(),
-                                timestamp = dynamicobject.timestamp.ToString(),
-                                data = result
-                            });
+                            //objDetail.Add(new HouseGisDetails()
+                            //{
+                            //    code = dynamicobject.code.ToString(),
+                            //    status = dynamicobject.status.ToString(),
+                            //    message = dynamicobject.message.ToString(),
+                            //    timestamp = dynamicobject.timestamp.ToString(),
+                            //    data = result
+                            //});
 
+                            objDetail.code = dynamicobject.code.ToString();
+                            objDetail.status = dynamicobject.status.ToString();
+                            objDetail.message = dynamicobject.message.ToString();
+                            objDetail.timestamp = dynamicobject.timestamp.ToString();
+                            objDetail.data = result;
                             return objDetail;
 
                         }
@@ -896,32 +901,44 @@ namespace ICTSBMCOREAPI.Controllers
                     else
                     {
 
-                        objDetail.Add(new HouseGisDetails()
-                        {
-                            code = "",
-                            status = "",
-                            message = "GIS Connection Are Not Available",
-                           // errorMessages = "GIS Connection Are Not Available",
-                            timestamp = "",
-                            data = ""
-                        });
+                        //objDetail.Add(new HouseGisDetails()
+                        //{
+                        //    code = "",
+                        //    status = "",
+                        //    message = "GIS Connection Are Not Available",
+                        //   // errorMessages = "GIS Connection Are Not Available",
+                        //    timestamp = "",
+                        //    data = ""
+                        //});
+                        objDetail.code = "";
+                        objDetail.status = "";
+                        objDetail.message = "GIS Connection Are Not Available";
+                        objDetail.timestamp = DateTime.Now.ToString();
+                        objDetail.data = "";
                         return objDetail;
                     }
                 }
                 catch (Exception ex)
                 {
-                    objDetail.Add(new HouseGisDetails()
-                    {
-                        code = "",
-                        status = "",
-                        message = ex.Message.ToString(),
-                        //errorMessages = ex.Message.ToString(),
-                        timestamp = "",
-                        data = ""
-                    });
+                    //objDetail.Add(new HouseGisDetails()
+                    //{
+                    //    code = "",
+                    //    status = "",
+                    //    message = ex.Message.ToString(),
+                    //    //errorMessages = ex.Message.ToString(),
+                    //    timestamp = "",
+                    //    data = ""
+                    //});
+
+                    objDetail.code = "";
+                    objDetail.status = "";
+                    objDetail.message = ex.Message.ToString();
+                    objDetail.timestamp = DateTime.Now.ToString();
+                    objDetail.data = "";
+                  
                     return objDetail;
                 }
-                return objDetail;
+               //return objDetail;
             }
             else
             {
@@ -935,12 +952,12 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("GisGarbageTrail/all")]
-        public async Task<ActionResult<List<TrailsDetails>>> GarbageTrailgisAll([FromHeader] string authorization, [FromHeader] int AppId)
+        public async Task<ActionResult<TrailsDetails>> GarbageTrailgisAll([FromHeader] string authorization, [FromHeader] int AppId)
         {
             var message = "";
 
             using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
-            List<TrailsDetails> objDetail = new List<TrailsDetails>();
+            TrailsDetails objDetail = new TrailsDetails();
 
             var stream = authorization.Replace("Bearer ", string.Empty);
             var handler = new JwtSecurityTokenHandler();
@@ -998,14 +1015,11 @@ namespace ICTSBMCOREAPI.Controllers
 
                             List<GisTrailResult> result = jsonResult.ToObject<List<GisTrailResult>>();
 
-                            objDetail.Add(new TrailsDetails()
-                            {
-                                code = dynamicobject.code.ToString(),
-                                status = dynamicobject.status.ToString(),
-                                message = dynamicobject.message.ToString(),
-                                timestamp = dynamicobject.timestamp.ToString(),
-                                data = result
-                            });
+                            objDetail.code = dynamicobject.code.ToString();
+                            objDetail.status = dynamicobject.status.ToString();
+                            objDetail.message = dynamicobject.message.ToString();
+                            objDetail.timestamp = dynamicobject.timestamp.ToString();
+                            objDetail.data = result;
 
                             return objDetail;
 
@@ -1020,32 +1034,35 @@ namespace ICTSBMCOREAPI.Controllers
                     else
                     {
 
-                        objDetail.Add(new TrailsDetails()
-                        {
-                            code = "",
-                            status = "",
-                            message = "GIS Connection Are Not Available",
-                            //errorMessages = "GIS Connection Are Not Available",
-                            timestamp = "",
-                            data = ""
-                        });
+                        objDetail.code = "";
+                        objDetail.status = "";
+                        objDetail.message = "GIS Connection Are Not Available";
+                        objDetail.timestamp = DateTime.Now.ToString();
+                        objDetail.data = "";
+
                         return objDetail;
                     }
                 }
                 catch (Exception ex)
                 {
-                    objDetail.Add(new TrailsDetails()
-                    {
-                        code = "",
-                        status = "",
-                        message = ex.Message.ToString(),
-                        //errorMessages = ex.Message.ToString(),
-                        timestamp = "",
-                        data = ""
-                    });
+                    //objDetail.Add(new TrailsDetails()
+                    //{
+                    //    code = "",
+                    //    status = "",
+                    //    message = ex.Message.ToString(),
+                    //    //errorMessages = ex.Message.ToString(),
+                    //    timestamp = "",
+                    //    data = ""
+                    //});
+
+                    objDetail.code = "";
+                    objDetail.status = "";
+                    objDetail.message = ex.Message.ToString();
+                    objDetail.timestamp = DateTime.Now.ToString();
+                    objDetail.data = "";
                     return objDetail;
                 }
-                return objDetail;
+               
             }
             else
             {
@@ -1056,12 +1073,12 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("GisHouseTrail/all")]
-        public async Task<ActionResult<List<TrailsDetails>>> HouseTrailgisAll([FromHeader] string authorization, [FromHeader] int AppId)
+        public async Task<ActionResult<TrailsDetails>> HouseTrailgisAll([FromHeader] string authorization, [FromHeader] int AppId)
         {
             var message = "";
 
             using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
-            List<TrailsDetails> objDetail = new List<TrailsDetails>();
+            TrailsDetails objDetail = new TrailsDetails();
 
 
             var stream = authorization.Replace("Bearer ", string.Empty);
@@ -1120,14 +1137,20 @@ namespace ICTSBMCOREAPI.Controllers
 
                             List<GisTrailResult> result = jsonResult.ToObject<List<GisTrailResult>>();
 
-                            objDetail.Add(new TrailsDetails()
-                            {
-                                code = dynamicobject.code.ToString(),
-                                status = dynamicobject.status.ToString(),
-                                message = dynamicobject.message.ToString(),
-                                timestamp = dynamicobject.timestamp.ToString(),
-                                data = result
-                            });
+                            //objDetail.Add(new TrailsDetails()
+                            //{
+                            //    code = dynamicobject.code.ToString(),
+                            //    status = dynamicobject.status.ToString(),
+                            //    message = dynamicobject.message.ToString(),
+                            //    timestamp = dynamicobject.timestamp.ToString(),
+                            //    data = result
+                            //});
+
+                            objDetail.code = dynamicobject.code.ToString();
+                            objDetail.status = dynamicobject.status.ToString();
+                            objDetail.message = dynamicobject.message.ToString();
+                            objDetail.timestamp = dynamicobject.timestamp.ToString();
+                            objDetail.data = result;
 
                             return objDetail;
 
@@ -1142,32 +1165,44 @@ namespace ICTSBMCOREAPI.Controllers
                     else
                     {
 
-                        objDetail.Add(new TrailsDetails()
-                        {
-                            code = "",
-                            status = "",
-                            message = "GIS Connection Are Not Available",
-                            //errorMessages = "GIS Connection Are Not Available",
-                            timestamp = "",
-                            data = ""
-                        });
+                        //objDetail.Add(new TrailsDetails()
+                        //{
+                        //    code = "",
+                        //    status = "",
+                        //    message = "GIS Connection Are Not Available",
+                        //    //errorMessages = "GIS Connection Are Not Available",
+                        //    timestamp = "",
+                        //    data = ""
+                        //});
+
+                        objDetail.code = "";
+                        objDetail.status = "";
+                        objDetail.message = "GIS Connection Are Not Available";
+                        objDetail.timestamp = DateTime.Now.ToString();
+                        objDetail.data = "";
                         return objDetail;
                     }
                 }
                 catch (Exception ex)
                 {
-                    objDetail.Add(new TrailsDetails()
-                    {
-                        code = "",
-                        status = "",
-                        message = ex.Message.ToString(),
-                        //errorMessages = ex.Message.ToString(),
-                        timestamp = "",
-                        data = ""
-                    });
+                    //objDetail.Add(new TrailsDetails()
+                    //{
+                    //    code = "",
+                    //    status = "",
+                    //    message = ex.Message.ToString(),
+                    //    //errorMessages = ex.Message.ToString(),
+                    //    timestamp = "",
+                    //    data = ""
+                    //});
+
+                    objDetail.code = "";
+                    objDetail.status = "";
+                    objDetail.message = ex.Message.ToString();
+                    objDetail.timestamp = DateTime.Now.ToString();
+                    objDetail.data = "";
                     return objDetail;
                 }
-                return objDetail;
+                //return objDetail;
             }
             else
             {
