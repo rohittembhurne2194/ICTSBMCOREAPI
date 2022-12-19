@@ -948,7 +948,124 @@ namespace ICTSBMCOREAPI.Controllers
             
         }
 
+        [HttpGet]
+        [Route("GisHouseDetails/search")]
+        public async Task<ActionResult<HouseGisDetails>> HouseGisDetailsSearch([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] List<GisSearch> obj)
+        {
+            using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
+            HouseGisDetails objDetail = new HouseGisDetails();
 
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                try
+                {
+                    var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                    if (GIS_CON != null)
+                    {
+                        var gis_url = GIS_CON.DataSource;
+                        var gis_DBName = GIS_CON.InitialCatalog;
+                        var gis_username = GIS_CON.UserId;
+                        var gis_password = GIS_CON.Password;
+
+                        HttpClient client = new HttpClient();
+                        GisSearch tn = new GisSearch();
+
+                        foreach (var item in obj)
+                        {
+                            tn.id = item.id;
+                            tn.startTs = item.startTs;
+                            tn.endTs = item.endTs;
+                            tn.createUser = item.createUser;
+
+                            //var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                            //var stringContent = new StringContent(json);
+
+
+                            //client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                            //client.DefaultRequestHeaders.Add("username", gis_username);
+                            //client.DefaultRequestHeaders.Add("password", gis_password);
+
+
+                            //var response = await client.PostAsync("http://114.143.244.130:9091/house/search", stringContent);
+
+
+                            var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                            var stringContent = new StringContent(json);
+                            stringContent.Headers.ContentType.MediaType = "application/json";
+                            stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                            stringContent.Headers.Add("username", gis_username);
+                            stringContent.Headers.Add("password", gis_password);
+
+                            var response = await client.PostAsync("http://114.143.244.130:9091/house/search", stringContent);
+
+                            if (response.IsSuccessStatusCode)
+                            {
+                                var responseString = await response.Content.ReadAsStringAsync();
+                                var jsonParsed = JObject.Parse(responseString);
+                                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                                var jsonResult = jsonParsed["data"];
+
+                                List<GisResult> result = jsonResult.ToObject<List<GisResult>>();
+
+
+
+                                objDetail.code = dynamicobject.code.ToString();
+                                objDetail.status = dynamicobject.status.ToString();
+                                objDetail.message = dynamicobject.message.ToString();
+                                objDetail.timestamp = dynamicobject.timestamp.ToString();
+                                objDetail.data = result;
+                               
+
+                            }
+                            else
+                            {
+                                return null;
+                            }
+ 
+                        }
+
+                        return objDetail;
+                    }
+                    else
+                    {
+
+                        objDetail.code = "";
+                        objDetail.status = "";
+                        objDetail.message = "GIS Connection Are Not Available";
+                        objDetail.timestamp = DateTime.Now.ToString();
+                        objDetail.data = "";
+                        return objDetail;
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    objDetail.code = "";
+                    objDetail.status = "";
+                    objDetail.message = ex.Message.ToString();
+                    objDetail.timestamp = DateTime.Now.ToString();
+                    objDetail.data = "";
+
+                    return objDetail;
+                }
+               
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
 
         [HttpGet]
         [Route("GisGarbageTrail/all")]
@@ -1069,6 +1186,125 @@ namespace ICTSBMCOREAPI.Controllers
                 return Unauthorized();
             }
           
+        }
+
+        [HttpGet]
+        [Route("GisGarbageTrail/search")]
+        public async Task<ActionResult<HouseGisDetails>> GarbageTrailgisSearch([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] List<GisSearch> obj)
+        {
+            using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
+            HouseGisDetails objDetail = new HouseGisDetails();
+
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                try
+                {
+                    var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                    if (GIS_CON != null)
+                    {
+                        var gis_url = GIS_CON.DataSource;
+                        var gis_DBName = GIS_CON.InitialCatalog;
+                        var gis_username = GIS_CON.UserId;
+                        var gis_password = GIS_CON.Password;
+
+                        HttpClient client = new HttpClient();
+                        GisSearch tn = new GisSearch();
+
+                        foreach (var item in obj)
+                        {
+                            tn.id = item.id;
+                            tn.startTs = item.startTs;
+                            tn.endTs = item.endTs;
+                            tn.createUser = item.createUser;
+
+                            //var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                            //var stringContent = new StringContent(json);
+
+
+                            //client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                            //client.DefaultRequestHeaders.Add("username", gis_username);
+                            //client.DefaultRequestHeaders.Add("password", gis_password);
+
+
+                            //var response = await client.PostAsync("http://114.143.244.130:9091/house/search", stringContent);
+
+
+                            var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                            var stringContent = new StringContent(json);
+                            stringContent.Headers.ContentType.MediaType = "application/json";
+                            stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                            stringContent.Headers.Add("username", gis_username);
+                            stringContent.Headers.Add("password", gis_password);
+
+                            var response = await client.PostAsync("http://114.143.244.130:9091/garbage-trail/search", stringContent);
+
+                            if (response.IsSuccessStatusCode)
+                            {
+                                var responseString = await response.Content.ReadAsStringAsync();
+                                var jsonParsed = JObject.Parse(responseString);
+                                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                                var jsonResult = jsonParsed["data"];
+
+                                List<GisTrailResult> result = jsonResult.ToObject<List<GisTrailResult>>();
+
+
+
+                                objDetail.code = dynamicobject.code.ToString();
+                                objDetail.status = dynamicobject.status.ToString();
+                                objDetail.message = dynamicobject.message.ToString();
+                                objDetail.timestamp = dynamicobject.timestamp.ToString();
+                                objDetail.data = result;
+
+
+                            }
+                            else
+                            {
+                                return null;
+                            }
+
+                        }
+
+                        return objDetail;
+                    }
+                    else
+                    {
+
+                        objDetail.code = "";
+                        objDetail.status = "";
+                        objDetail.message = "GIS Connection Are Not Available";
+                        objDetail.timestamp = DateTime.Now.ToString();
+                        objDetail.data = "";
+                        return objDetail;
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    objDetail.code = "";
+                    objDetail.status = "";
+                    objDetail.message = ex.Message.ToString();
+                    objDetail.timestamp = DateTime.Now.ToString();
+                    objDetail.data = "";
+
+                    return objDetail;
+                }
+
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         [HttpGet]
@@ -1210,6 +1446,126 @@ namespace ICTSBMCOREAPI.Controllers
             }
            
         }
+
+        [HttpGet]
+        [Route("GisHouseTrail/search")]
+        public async Task<ActionResult<HouseGisDetails>> HouseTrailgisSearch([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] List<GisSearch> obj)
+        {
+            using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
+            HouseGisDetails objDetail = new HouseGisDetails();
+
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                try
+                {
+                    var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                    if (GIS_CON != null)
+                    {
+                        var gis_url = GIS_CON.DataSource;
+                        var gis_DBName = GIS_CON.InitialCatalog;
+                        var gis_username = GIS_CON.UserId;
+                        var gis_password = GIS_CON.Password;
+
+                        HttpClient client = new HttpClient();
+                        GisSearch tn = new GisSearch();
+
+                        foreach (var item in obj)
+                        {
+                            tn.id = item.id;
+                            tn.startTs = item.startTs;
+                            tn.endTs = item.endTs;
+                            tn.createUser = item.createUser;
+
+                            //var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                            //var stringContent = new StringContent(json);
+
+
+                            //client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                            //client.DefaultRequestHeaders.Add("username", gis_username);
+                            //client.DefaultRequestHeaders.Add("password", gis_password);
+
+
+                            //var response = await client.PostAsync("http://114.143.244.130:9091/house/search", stringContent);
+
+
+                            var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                            var stringContent = new StringContent(json);
+                            stringContent.Headers.ContentType.MediaType = "application/json";
+                            stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                            stringContent.Headers.Add("username", gis_username);
+                            stringContent.Headers.Add("password", gis_password);
+
+                            var response = await client.PostAsync("http://114.143.244.130:9091/house-trail/search", stringContent);
+
+                            if (response.IsSuccessStatusCode)
+                            {
+                                var responseString = await response.Content.ReadAsStringAsync();
+                                var jsonParsed = JObject.Parse(responseString);
+                                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                                var jsonResult = jsonParsed["data"];
+
+                                List<GisTrailResult> result = jsonResult.ToObject<List<GisTrailResult>>();
+
+
+
+                                objDetail.code = dynamicobject.code.ToString();
+                                objDetail.status = dynamicobject.status.ToString();
+                                objDetail.message = dynamicobject.message.ToString();
+                                objDetail.timestamp = dynamicobject.timestamp.ToString();
+                                objDetail.data = result;
+
+
+                            }
+                            else
+                            {
+                                return null;
+                            }
+
+                        }
+
+                        return objDetail;
+                    }
+                    else
+                    {
+
+                        objDetail.code = "";
+                        objDetail.status = "";
+                        objDetail.message = "GIS Connection Are Not Available";
+                        objDetail.timestamp = DateTime.Now.ToString();
+                        objDetail.data = "";
+                        return objDetail;
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    objDetail.code = "";
+                    objDetail.status = "";
+                    objDetail.message = ex.Message.ToString();
+                    objDetail.timestamp = DateTime.Now.ToString();
+                    objDetail.data = "";
+
+                    return objDetail;
+                }
+
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
     }
 
 }
