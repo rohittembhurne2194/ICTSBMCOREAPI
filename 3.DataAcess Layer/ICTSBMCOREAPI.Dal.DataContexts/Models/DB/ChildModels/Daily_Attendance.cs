@@ -26,7 +26,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
         public string OutbatteryStatus { get; set; }
         public string EmployeeType { get; set; }
         public int? dyid { get; set; }
-        public int? VQRID { get; set; }
+        public int? VQRId { get; set; }
         public byte[] BinaryQrCodeImage { get; set; }
     }
 }

@@ -51,7 +51,7 @@ namespace ICTSBMCOREAPI.Controllers
 
                 using (_DevICTSBMChildEntities = new DevICTSBMChildEntities(AppId))
                 {
-                    houseCount = _DevICTSBMChildEntities.HouseMasters.Count();
+                    houseCount = _DevICTSBMChildEntities.housemasters.Count();
                 }
                 //throw new Exception("exception occured........");
                 return houseCount;

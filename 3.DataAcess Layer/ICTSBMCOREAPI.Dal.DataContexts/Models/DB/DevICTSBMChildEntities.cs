@@ -62,6 +62,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB
         public DbSet<SP_LiquidDetailsApp_Result> SP_LiquidDetailsApp_Results { get; set; }
         public DbSet<SP_StreetDetailsApp_Result> SP_StreetDetailsApp_Results { get; set; }
 
+        public DbSet<calculateDistance_Result> calculateDistance_Results { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

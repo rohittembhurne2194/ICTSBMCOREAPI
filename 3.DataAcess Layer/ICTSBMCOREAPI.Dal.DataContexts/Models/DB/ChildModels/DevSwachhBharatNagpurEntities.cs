@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
@@ -9,12 +8,6 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 {
     public partial class DevSwachhBharatNagpurEntities : DbContext
     {
-        //private int AppId;
-        //public DevSwachhBharatNagpurEntities(int AppId)
-        //{
-        //    this.AppId = AppId;
-        //}
-
         public DevSwachhBharatNagpurEntities()
         {
         }
@@ -30,8 +23,14 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
         public virtual DbSet<AspNetUserLogin> AspNetUserLogins { get; set; }
         public virtual DbSet<AspNetUserRole> AspNetUserRoles { get; set; }
         public virtual DbSet<BinLatLong> BinLatLongs { get; set; }
+        public virtual DbSet<BuildingShp> BuildingShps { get; set; }
+        public virtual DbSet<Buildings_CSV> Buildings_CSVs { get; set; }
+        public virtual DbSet<ComplaintArise> ComplaintArises { get; set; }
+        public virtual DbSet<ComplaintMaster> ComplaintMasters { get; set; }
         public virtual DbSet<Daily_Attendance> Daily_Attendances { get; set; }
         public virtual DbSet<DeviceDetail> DeviceDetails { get; set; }
+        public virtual DbSet<DumpTripDetail> DumpTripDetails { get; set; }
+        public virtual DbSet<DumpTripDetailM> DumpTripDetailMs { get; set; }
         public virtual DbSet<DumpYardDetail> DumpYardDetails { get; set; }
         public virtual DbSet<EmpBeatMap> EmpBeatMaps { get; set; }
         public virtual DbSet<EmpShift> EmpShifts { get; set; }
@@ -45,10 +44,10 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
         public virtual DbSet<GramCleaningComplient> GramCleaningComplients { get; set; }
         public virtual DbSet<HouseBunch> HouseBunches { get; set; }
         public virtual DbSet<HouseList> HouseLists { get; set; }
-        public virtual DbSet<HouseMaster> HouseMasters { get; set; }
         public virtual DbSet<LanguageInfo> LanguageInfos { get; set; }
         public virtual DbSet<LiquidWasteDetail> LiquidWasteDetails { get; set; }
         public virtual DbSet<Location> Locations { get; set; }
+        public virtual DbSet<MasterQR> MasterQRs { get; set; }
         public virtual DbSet<MasterQRBunch> MasterQRBunches { get; set; }
         public virtual DbSet<MonthlyAttedance> MonthlyAttedances { get; set; }
         public virtual DbSet<QrEmployeeMaster> QrEmployeeMasters { get; set; }
@@ -61,12 +60,14 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
         public virtual DbSet<StreetSweepingBeat> StreetSweepingBeats { get; set; }
         public virtual DbSet<StreetSweepingDetail> StreetSweepingDetails { get; set; }
         public virtual DbSet<TeritoryMaster> TeritoryMasters { get; set; }
+        public virtual DbSet<TransDumpTD> TransDumpTDs { get; set; }
         public virtual DbSet<UserMaster> UserMasters { get; set; }
         public virtual DbSet<VW_HSGetDumpyardDetail> VW_HSGetDumpyardDetails { get; set; }
         public virtual DbSet<VW_HSGetHouseDetail> VW_HSGetHouseDetails { get; set; }
         public virtual DbSet<VW_HSGetLiquidDetail> VW_HSGetLiquidDetails { get; set; }
         public virtual DbSet<VW_HSGetStreetDetail> VW_HSGetStreetDetails { get; set; }
         public virtual DbSet<Vehical_QR_Master> Vehical_QR_Masters { get; set; }
+        public virtual DbSet<VehicleRegistration> VehicleRegistrations { get; set; }
         public virtual DbSet<VehicleType> VehicleTypes { get; set; }
         public virtual DbSet<Vw_BitCount> Vw_BitCounts { get; set; }
         public virtual DbSet<Vw_GetHouseNumber> Vw_GetHouseNumbers { get; set; }
@@ -80,30 +81,20 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
         public virtual DbSet<WardNumber> WardNumbers { get; set; }
         public virtual DbSet<ZoneMaster> ZoneMasters { get; set; }
         public virtual DbSet<__MigrationHistory> __MigrationHistories { get; set; }
+        public virtual DbSet<housemaster> housemasters { get; set; }
         public virtual DbSet<questionnaire> questionnaires { get; set; }
         public virtual DbSet<view_LLocation> view_LLocations { get; set; }
         public virtual DbSet<view_Location> view_Locations { get; set; }
         public virtual DbSet<view_SLocation> view_SLocations { get; set; }
 
-//        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-//        {
-//            if (!optionsBuilder.IsConfigured)
-//            {
-//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-//                //optionsBuilder.UseSqlServer("data source=202.65.157.253;initial catalog=LIVEAdvanceEtapalliGhantaGadi;persist security info=True;user id=appynitty;password=BigV$Telecom;MultipleActiveResultSets=True;App=EntityFramework");
-//                if (AppId > 0)
-//                {
-//                    optionsBuilder.UseSqlServer(SwachhBharatAppConnection.GetConnectionString(AppId));
-//                }
-//                else
-//                {
-//                    optionsBuilder.UseSqlServer("data source=202.65.157.253;initial catalog=LIVEAdvanceEtapalliGhantaGadi;persist security info=True;user id=appynitty;password=BigV$Telecom;MultipleActiveResultSets=True;App=EntityFramework");
-
-//                }
-
-//            }
-//        }
-
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseSqlServer("data source=124.153.94.110;initial catalog=LIVEAdvanceAppynittyGhantaGadi;persist security info=True;user id=appynitty;password=BigV$Telecom;MultipleActiveResultSets=True;App=EntityFramework");
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -203,6 +194,48 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
                 entity.Property(e => e.lat).HasMaxLength(500);
             });
 
+            modelBuilder.Entity<BuildingShp>(entity =>
+            {
+                entity.ToTable("BuildingShp");
+
+                entity.Property(e => e._long)
+                    .HasMaxLength(500)
+                    .HasColumnName("long");
+
+                entity.Property(e => e.lat).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<Buildings_CSV>(entity =>
+            {
+                entity.ToTable("Buildings_CSV");
+            });
+
+            modelBuilder.Entity<ComplaintArise>(entity =>
+            {
+                entity.HasKey(e => e.CAId);
+
+                entity.ToTable("ComplaintArise");
+
+                entity.Property(e => e.EmployeeType).HasMaxLength(50);
+
+                entity.Property(e => e.PauseDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ResumeDate).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<ComplaintMaster>(entity =>
+            {
+                entity.HasKey(e => e.Cid);
+
+                entity.ToTable("ComplaintMaster");
+
+                entity.Property(e => e.Cname).HasMaxLength(500);
+
+                entity.Property(e => e.CreationDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+            });
+
             modelBuilder.Entity<Daily_Attendance>(entity =>
             {
                 entity.HasKey(e => e.daID);
@@ -257,6 +290,54 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
                 entity.Property(e => e.ReferenceID).HasMaxLength(50);
             });
 
+            modelBuilder.Entity<DumpTripDetail>(entity =>
+            {
+                entity.HasKey(e => e.tripId)
+                    .HasName("PK__DumpTrip__303EBF85069CD96F");
+
+                entity.Property(e => e.dyId).HasMaxLength(100);
+
+                entity.Property(e => e.endDateTime).HasColumnType("datetime");
+
+                entity.Property(e => e.startDateTime).HasColumnType("datetime");
+
+                entity.Property(e => e.totalDryWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.totalGcWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.totalWetWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.transId).HasMaxLength(100);
+
+                entity.Property(e => e.vehicleNumber).HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<DumpTripDetailM>(entity =>
+            {
+                entity.HasKey(e => e.tripId)
+                    .HasName("PK__DumpTrip__303EBF851E24862A");
+
+                entity.ToTable("DumpTripDetailM");
+
+                entity.Property(e => e.bcTransId).HasMaxLength(500);
+
+                entity.Property(e => e.dyId).HasMaxLength(100);
+
+                entity.Property(e => e.endDateTime).HasColumnType("datetime");
+
+                entity.Property(e => e.startDateTime).HasColumnType("datetime");
+
+                entity.Property(e => e.totalDryWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.totalGcWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.totalWetWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.transId).HasMaxLength(100);
+
+                entity.Property(e => e.vehicleNumber).HasMaxLength(100);
+            });
+
             modelBuilder.Entity<DumpYardDetail>(entity =>
             {
                 entity.HasKey(e => e.dyId);
@@ -285,7 +366,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
             modelBuilder.Entity<EmpBeatMap>(entity =>
             {
                 entity.HasKey(e => e.ebmId)
-                    .HasName("PK__EmpBeatM__AF992DDA35B515D5");
+                    .HasName("PK__EmpBeatM__AF992DDAF73F6286");
 
                 entity.ToTable("EmpBeatMap");
 
@@ -297,7 +378,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
             modelBuilder.Entity<EmpShift>(entity =>
             {
                 entity.HasKey(e => e.shiftId)
-                    .HasName("PK__EmpShift__F2F06B02445EEC64");
+                    .HasName("PK__EmpShift__F2F06B02B6870FA7");
 
                 entity.ToTable("EmpShift");
 
@@ -487,47 +568,6 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<HouseMaster>(entity =>
-            {
-                entity.HasKey(e => e.houseId);
-
-                entity.ToTable("HouseMaster");
-
-                entity.Property(e => e.FCMID)
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.QRStatusDate).HasColumnType("datetime");
-
-                entity.Property(e => e.RFIDTagId).HasMaxLength(255);
-
-                entity.Property(e => e.ReferanceId).HasMaxLength(350);
-
-                entity.Property(e => e.WasteType)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.houseAddress).HasMaxLength(500);
-
-                entity.Property(e => e.houseLat).HasMaxLength(500);
-
-                entity.Property(e => e.houseLong).HasMaxLength(500);
-
-                entity.Property(e => e.houseNumber).HasMaxLength(500);
-
-                entity.Property(e => e.houseOwner)
-                    .HasMaxLength(200)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.houseOwnerMar).HasMaxLength(200);
-
-                entity.Property(e => e.houseOwnerMobile).HasMaxLength(200);
-
-                entity.Property(e => e.lastModifiedEntry).HasColumnType("datetime");
-
-                entity.Property(e => e.modified).HasColumnType("datetime");
-            });
-
             modelBuilder.Entity<LanguageInfo>(entity =>
             {
                 entity.ToTable("LanguageInfo");
@@ -543,11 +583,9 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 
             modelBuilder.Entity<LiquidWasteDetail>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => e.LWId);
 
                 entity.Property(e => e.DataEntryDate).HasColumnType("datetime");
-
-                entity.Property(e => e.LWId).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.LWLat).HasMaxLength(500);
 
@@ -599,6 +637,15 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
                 entity.Property(e => e.datetime).HasColumnType("datetime");
 
                 entity.Property(e => e.lat).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<MasterQR>(entity =>
+            {
+                entity.HasKey(e => e.MasterId);
+
+                entity.ToTable("MasterQR");
+
+                entity.Property(e => e.ReferanceId).HasMaxLength(350);
             });
 
             modelBuilder.Entity<MasterQRBunch>(entity =>
@@ -762,15 +809,11 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 
             modelBuilder.Entity<SauchalayAddress>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.ToTable("SauchalayAddress");
 
                 entity.Property(e => e.Address).HasMaxLength(500);
 
                 entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.ImageUrl).HasMaxLength(1000);
 
@@ -808,15 +851,13 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 
             modelBuilder.Entity<StreetSweepingDetail>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => e.SSId);
 
                 entity.Property(e => e.DataEntryDate).HasColumnType("datetime");
 
                 entity.Property(e => e.QRStatusDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ReferanceId).HasMaxLength(200);
-
-                entity.Property(e => e.SSId).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.SSLat).HasMaxLength(500);
 
@@ -836,6 +877,32 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
                 entity.Property(e => e.Area).HasMaxLength(250);
 
                 entity.Property(e => e.AreaMar).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<TransDumpTD>(entity =>
+            {
+                entity.HasKey(e => e.TransBcId)
+                    .HasName("PK__TransDum__46195E11E052C142");
+
+                entity.ToTable("TransDumpTD");
+
+                entity.Property(e => e.bcTransId).HasMaxLength(500);
+
+                entity.Property(e => e.dyId).HasMaxLength(100);
+
+                entity.Property(e => e.endDateTime).HasColumnType("datetime");
+
+                entity.Property(e => e.startDateTime).HasColumnType("datetime");
+
+                entity.Property(e => e.totalDryWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.totalGcWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.totalWetWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.transId).HasMaxLength(100);
+
+                entity.Property(e => e.vehicleNumber).HasMaxLength(100);
             });
 
             modelBuilder.Entity<UserMaster>(entity =>
@@ -901,8 +968,6 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
                 entity.HasNoKey();
 
                 entity.ToView("VW_HSGetHouseDetails");
-
-                entity.Property(e => e.BinaryQrCodeImage).IsRequired();
 
                 entity.Property(e => e.QRStatusDate).HasColumnType("datetime");
 
@@ -986,6 +1051,16 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
                 entity.Property(e => e.lastModifiedEntry).HasColumnType("datetime");
 
                 entity.Property(e => e.modified).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<VehicleRegistration>(entity =>
+            {
+                entity.HasKey(e => e.vehicleId)
+                    .HasName("PK__VehicleR__5B9D25F22229CD81");
+
+                entity.ToTable("VehicleRegistration");
+
+                entity.Property(e => e.vehicleNo).HasMaxLength(300);
             });
 
             modelBuilder.Entity<VehicleType>(entity =>
@@ -1120,6 +1195,49 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
                 entity.Property(e => e.ProductVersion)
                     .IsRequired()
                     .HasMaxLength(32);
+            });
+
+            modelBuilder.Entity<housemaster>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("housemaster");
+
+                entity.Property(e => e.FCMID)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.QRStatusDate).HasColumnType("datetime");
+
+                entity.Property(e => e.RFIDTagId).HasMaxLength(255);
+
+                entity.Property(e => e.ReferanceId).HasMaxLength(350);
+
+                entity.Property(e => e.WasteType)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.houseAddress).HasMaxLength(500);
+
+                entity.Property(e => e.houseId).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.houseLat).HasMaxLength(500);
+
+                entity.Property(e => e.houseLong).HasMaxLength(500);
+
+                entity.Property(e => e.houseNumber).HasMaxLength(500);
+
+                entity.Property(e => e.houseOwner)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.houseOwnerMar).HasMaxLength(200);
+
+                entity.Property(e => e.houseOwnerMobile).HasMaxLength(200);
+
+                entity.Property(e => e.lastModifiedEntry).HasColumnType("datetime");
+
+                entity.Property(e => e.modified).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<questionnaire>(entity =>
