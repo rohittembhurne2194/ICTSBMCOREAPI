@@ -10326,7 +10326,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         {
                             if (Status == "false")
                             {
-                                var data = await dbMain.AppDetails.Where(c => c.AppId.ToString().ToLower().Contains(author.ToLower())).ToListAsync();
+                                var data = await dbMain.AppDetails.Where(c => c.AppId.ToString().ToLower().Contains(author.Replace(" ","").ToLower())).ToListAsync();
                                 foreach (var x in data)
                                 {
                                     obj.Add(new NameULB()
@@ -10339,7 +10339,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             }
                             else if (Status == "true")
                             {
-                                var data = await dbMain.AppDetails.Where(c => c.AppId.ToString().ToLower().Contains(author.ToLower()) && c.FAQ != "0").ToListAsync();
+                                var data = await dbMain.AppDetails.Where(c => c.AppId.ToString().ToLower().Contains(author.Replace(" ", "").ToLower()) && c.FAQ != "0").ToListAsync();
                                 foreach (var x in data)
                                 {
                                     obj.Add(new NameULB()
