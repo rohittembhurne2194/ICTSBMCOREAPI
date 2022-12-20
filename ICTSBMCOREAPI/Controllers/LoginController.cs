@@ -53,7 +53,7 @@ namespace ICTSBMCOREAPI.Controllers
             return Ok(result);
         }
         [HttpPost("Login")]
-        public async Task<ActionResult<SBUser>> GetLogin([FromHeader] string authorization, [FromHeader] int AppId, [FromHeader] string EmpType, [FromBody]SBUser objlogin)
+        public async Task<ActionResult<SBUser>> GetLogin([FromHeader] string authorization, [FromHeader] int AppId, [FromBody]SBUser objlogin)
         {
             //Request.Headers.TryGetValue("appId", out var id);
             //int AppId = int.Parse(id);
@@ -71,7 +71,7 @@ namespace ICTSBMCOREAPI.Controllers
 
             if (Auth_AppId == AppId)
             {
-                SBUser objresponse = await objRep.CheckUserLoginAsync(objlogin.userLoginId, objlogin.userPassword, objlogin.imiNo, AppId, EmpType);
+                SBUser objresponse = await objRep.CheckUserLoginAsync(objlogin.userLoginId, objlogin.userPassword, objlogin.imiNo, AppId, objlogin.EmpType);
                 return objresponse;
             }
             else
