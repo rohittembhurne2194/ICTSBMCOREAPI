@@ -48,7 +48,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         Task<HSDashboard> GetSelectedUlbDataAsync(int userId, string EmpType, int appId);
         Task<IEnumerable<HSStreetDetailsGrid>> GetStreetDetailsAsync(int userId, DateTime FromDate, DateTime Todate, int appId);
         Task<List<HSHouseDetailsGrid>> GetStreetDetailsByIdAsync(int appId, string ReferanceId);
-        Task<List<NameULB>> GetUlbAsync(int userId, string EmpType, string Status);
+        Task<List<NameULB>> GetUlbAsync(int userId, string Status);
         Task<SBUserView> GetUserAsync(int AppId, int userId, int typeId);
         Task<SyncResult2> GetUserMobileIdentificationAsync(int appId, int userId, bool isSync, int batteryStatus, string imeinos);
         Task<List<SBWorkDetails>> GetUserWorkAsync(int userId, int year, int month, int appId, string EmpType);

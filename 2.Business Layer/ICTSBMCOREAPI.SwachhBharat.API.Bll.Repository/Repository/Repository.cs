@@ -10310,7 +10310,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             }
             
         }
-        public async Task<List<NameULB>> GetUlbAsync(int userId, string EmpType, string Status)
+        public async Task<List<NameULB>> GetUlbAsync(int userId, string Status)
         {
             List<NameULB> obj = new List<NameULB>();
             try

@@ -30,13 +30,13 @@ namespace ICTSBMCOREAPI.Controllers
         [Route("Login")]
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult<SBUser>> GetLogin([FromHeader] string EmpType, [FromBody] SBUser objlogin)
+        public async Task<ActionResult<SBUser>> GetLogin([FromBody] SBUser objlogin)
         {
             //IEnumerable<string> headerValue1 = Request.Headers.GetValues("appId");
             //var id = headerValue1.FirstOrDefault();
             //int AppId = int.Parse(id);
 
-            EmpType = "A";
+           var EmpType = "A";
 
             SBUser objresponse = await objRep.CheckSupervisorUserLoginAsync(objlogin.userLoginId, objlogin.userPassword, EmpType);
             return objresponse;
@@ -45,7 +45,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpGet]
         [Route("AllUlb")]
-        public async Task<ActionResult<List<NameULB>>> GetUlb([FromHeader] string authorization, [FromHeader] int userId, [FromHeader] string EmpType, [FromHeader] string status, [FromBody] SBUser objlogin)
+        public async Task<ActionResult<List<NameULB>>> GetUlb([FromHeader] string authorization, [FromHeader] int userId,[FromHeader] string status, [FromBody] SBUser objlogin)
         {
             var stream = authorization.Replace("Bearer ", string.Empty);
             var handler = new JwtSecurityTokenHandler();
@@ -60,7 +60,7 @@ namespace ICTSBMCOREAPI.Controllers
             if(auth_userid == objlogin.userLoginId && auth_password == objlogin.userPassword)
             {
                 List<NameULB> objDetail = new List<NameULB>();
-                objDetail = await objRep.GetUlbAsync(userId, EmpType, status.ToLower());
+                objDetail = await objRep.GetUlbAsync(userId, status.ToLower());
                 return objDetail;
             }
             else
