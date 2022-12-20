@@ -113,6 +113,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             }
         }
 
+
+
         public async Task<SBUser> CheckUserLoginForNormalAsync(string userName, string password, string imi, int AppId, string EmpType)
         {
             SBUser user = new SBUser();
