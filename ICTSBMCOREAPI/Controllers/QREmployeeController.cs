@@ -160,6 +160,8 @@ namespace ICTSBMCOREAPI.Controllers
                     obj.Lat = Convert.ToString(New_Lat);
                     obj.Long = Convert.ToString(New_Long);
 
+                    obj.geom = "POINT ("+ Convert.ToString(New_Long )+ " " + Convert.ToString(New_Lat)+")";
+
                     objDetail1 = await objRep.SaveQrHPDCollectionsAsync(obj, AppId, gcType);
                 }
                 //string[] referancList = referanceId.Split(',');
