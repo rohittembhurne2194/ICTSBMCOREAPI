@@ -5769,8 +5769,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
             {
                 var distCount = "";
-                var New_Lat = "";
-                var New_Long = "";
+                double New_Lat = 0;
+                double New_Long = 0;
                 try
                 {
                     
@@ -5788,33 +5788,14 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     }
                     else if (atten != null)
                     {
-                        string a = obj.Lat;
-                        string b = obj.Long;
-
-                        List<SqlParameter> parms = new List<SqlParameter>
-                        {
-                            // Create parameter(s)    
-                            new SqlParameter { ParameterName = "@LAT", Value = a },
-                            new SqlParameter { ParameterName = "@LONG", Value = b }
-                        };
-                        var Listdist = await db.calculateDistance_Results.FromSqlRaw<calculateDistance_Result>("EXEC calculateDistance @LAT,@LONG", parms.ToArray()).ToListAsync();
-                        var dist = Listdist == null ? null : Listdist.FirstOrDefault(); 
-                        distCount = dist.DISTANCE.ToString();
-                        New_Lat = dist.Lattitude.ToString();
-                        New_Long = dist.Longitude.ToString();
-
-                      
-                        coordinates p = new coordinates()
+                        
+                            coordinates p = new coordinates()
                         {
                             lat = Convert.ToDouble(obj.Lat),
                             lng = Convert.ToDouble(obj.Long)
                         };
-                        if(New_Lat != null || New_Lat != "")
-                        {
-                            obj.Lat = New_Lat;
-                            obj.Long = New_Long;
-                        }
-                      
+                       
+
                         obj.IsIn = false;
                         if (appdetails.AppAreaLatLong != null)
                         {
@@ -6153,11 +6134,12 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     {
                                         house.houseLat = obj.Lat;
                                     }
+                                   
                                     if ((string.IsNullOrEmpty(obj.Long.ToString())) == false)
                                     {
                                         house.houseLong = obj.Long;
                                     }
-
+                                   
                                     house.modified = DateTime.Now;
 
                                     if (obj.areaId > 0 && (string.IsNullOrEmpty(obj.areaId.ToString())) == false)

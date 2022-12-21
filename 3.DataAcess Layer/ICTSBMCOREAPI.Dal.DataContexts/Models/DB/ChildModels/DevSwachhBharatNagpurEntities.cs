@@ -1199,7 +1199,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 
             modelBuilder.Entity<housemaster>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => e.houseId);
 
                 entity.ToTable("housemaster");
 
@@ -1218,8 +1218,6 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
                     .IsUnicode(false);
 
                 entity.Property(e => e.houseAddress).HasMaxLength(500);
-
-                entity.Property(e => e.houseId).ValueGeneratedOnAdd();
 
                 entity.Property(e => e.houseLat).HasMaxLength(500);
 
