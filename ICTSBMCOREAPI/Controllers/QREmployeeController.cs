@@ -118,41 +118,46 @@ namespace ICTSBMCOREAPI.Controllers
                 }
                 double New_Lat = 0;
                 double New_Long = 0;
-                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
-                using (SqlConnection connection = new SqlConnection(db.Database.GetDbConnection().ConnectionString))
+
+                if(obj.new_const == 0)
                 {
-                    //Create the Command Object
-                    SqlCommand cmd = new SqlCommand()
+                    using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                    using (SqlConnection connection = new SqlConnection(db.Database.GetDbConnection().ConnectionString))
                     {
-                        CommandText = "calculateDistance",
-                        Connection = connection,
-                        CommandType = CommandType.StoredProcedure
-                    };
-                    //Set Input Parameter
-                    SqlParameter param1 = new SqlParameter
-                    {
-                        ParameterName = "@LAT", //Parameter name defined in stored procedure
-                        SqlDbType = SqlDbType.NVarChar, //Data Type of Parameter
-                        Value = obj.Lat, //Set the value
-                                         // Direction = ParameterDirection.Input //Specify the parameter as input
-                    };
-                    //Add the parameter to the SqlCommand object
-                    cmd.Parameters.Add(param1);
-                    //Another approach to add Input Parameter
-                    cmd.Parameters.AddWithValue("@LONG", obj.Long);
-                   
-                    connection.Open();
-                    SqlDataReader sdr = cmd.ExecuteReader();
+                        //Create the Command Object
+                        SqlCommand cmd = new SqlCommand()
+                        {
+                            CommandText = "calculateDistance",
+                            Connection = connection,
+                            CommandType = CommandType.StoredProcedure
+                        };
+                        //Set Input Parameter
+                        SqlParameter param1 = new SqlParameter
+                        {
+                            ParameterName = "@LAT", //Parameter name defined in stored procedure
+                            SqlDbType = SqlDbType.NVarChar, //Data Type of Parameter
+                            Value = obj.Lat, //Set the value
+                                             // Direction = ParameterDirection.Input //Specify the parameter as input
+                        };
+                        //Add the parameter to the SqlCommand object
+                        cmd.Parameters.Add(param1);
+                        //Another approach to add Input Parameter
+                        cmd.Parameters.AddWithValue("@LONG", obj.Long);
 
-                    while (sdr.Read())
-                    {
-                       
-                        New_Lat = Convert.ToDouble(sdr[1]);
-                        New_Long = Convert.ToDouble(sdr[2]);
+                        connection.Open();
+                        SqlDataReader sdr = cmd.ExecuteReader();
+
+                        while (sdr.Read())
+                        {
+
+                            New_Lat = Convert.ToDouble(sdr[1]);
+                            New_Long = Convert.ToDouble(sdr[2]);
+                        }
+
+
                     }
-                  
-
                 }
+               
                 Result objDetail1 = new Result();
 
                 if (New_Lat != 0 && New_Long != 0)
