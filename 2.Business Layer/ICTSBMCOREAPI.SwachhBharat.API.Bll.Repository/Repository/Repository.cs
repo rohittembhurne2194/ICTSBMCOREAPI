@@ -1097,13 +1097,13 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     }
                                     if (Vehicaldetail != null)
                                     {
-                                        data.VQRID = Vehicaldetail.vqrId;
+                                        data.VQRId = Vehicaldetail.vqrId;
                                         data.vehicleNumber = Vehicaldetail.VehicalNumber;
                                         data.vtId = Vehicaldetail.VehicalType;
                                     }
                                     else
                                     {
-                                        data.VQRID = null;
+                                        data.VQRId = null;
                                         data.vehicleNumber = obj.vehicleNumber;
                                         data.vtId = obj.vtId;
                                     }
@@ -1137,13 +1137,13 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     }
                                     if (Vehicaldetail != null)
                                     {
-                                        objdata.VQRID = Vehicaldetail.vqrId;
+                                        objdata.VQRId = Vehicaldetail.vqrId;
                                         objdata.vehicleNumber = Vehicaldetail.VehicalNumber;
                                         objdata.vtId = Vehicaldetail.VehicalType;
                                     }
                                     else
                                     {
-                                        objdata.VQRID = null;
+                                        objdata.VQRId = null;
                                         objdata.vehicleNumber = obj.vehicleNumber;
                                         objdata.vtId = obj.vtId;
                                     }
