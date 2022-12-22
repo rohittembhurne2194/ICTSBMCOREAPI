@@ -19,9 +19,6 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string timestamp { get; set; }
         public dynamic data { get; set; }
 
-        public dynamic mydata { get; set; }
-     
-        public string ReferanceId { get; set; }
     }
 
 
