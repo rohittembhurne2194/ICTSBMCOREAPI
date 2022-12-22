@@ -24,8 +24,8 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
 
         public string ReferanceId { get; set; }
 
-        public string userid { get; set; }
-        public string EmployeeName { get; set; }
+        public string CreateEmployeeName { get; set; }
+        public string UpdateEmployeeName { get; set; }
         public string HouseOwnerName { get; set; }
         public string HouseOwnerMobileNo { get; set; }
         public string HouseAddress { get; set; }
