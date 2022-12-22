@@ -892,15 +892,17 @@ namespace ICTSBMCOREAPI.Controllers
                                 var result1 = result.Select(i =>
                                 {
                                     if (i.id == Convert.ToString(house.houseId))
-                                    
+                                    {
                                         i.ReferanceId = house.ReferanceId;
                                         i.HouseOwnerName = house.houseOwner;
                                         i.HouseOwnerMobileNo = house.houseOwnerMobile;
                                         i.HouseAddress = house.houseAddress;
                                         i.userid = house.userId.ToString();
-                                        i.EmployeeName = EmployeeName.userName.ToString(); 
+                                        i.EmployeeName = EmployeeName.userName.ToString();
                                         return i;
-                                  
+                                    }
+                                    return i;
+
                                 }).Where(i=>i.id==Convert.ToString(house.houseId)).ToList();
                               
                                 }
