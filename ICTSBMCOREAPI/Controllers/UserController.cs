@@ -881,18 +881,28 @@ namespace ICTSBMCOREAPI.Controllers
                            
                             using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
                             {
-                                var house = await db.housemasters.Select(x => new { x.ReferanceId, x.houseNumber }).ToListAsync();
-                                if (house != null && house.Count > 0)
-                                {
-                                    foreach (var x in house)
-                                    {
-                                        result.Add(new GisResult()
-                                        {
-                                            ReferanceId = x.ReferanceId
+                                var house = await db.housemasters.Select(x => new { x.ReferanceId, x.houseId }).ToListAsync();
 
-                                        });
-                                    }
+                              
+                                foreach (var x in house)
+                                {
+                                    var result1 = result.Select(i =>
+                                {
+                                    if (i.id == Convert.ToString(x.houseId)) i.ReferanceId = x.ReferanceId;
+                                    return i;
+                                }).Where(i=>i.id==Convert.ToString(x.houseId)).ToList();
                                 }
+                                //if (house != null && house.Count > 0)
+                                //{
+                                //    foreach (var x in house)
+                                //    {
+                                //        result.Add(new GisResult()
+                                //        {
+                                //            ReferanceId = x.ReferanceId
+
+                                //        });
+                                //    }
+                                //}
 
 
                             }
