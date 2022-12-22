@@ -885,7 +885,8 @@ namespace ICTSBMCOREAPI.Controllers
                                 foreach (var c in result)
                                 { 
                                 var house = await db.housemasters.Where(x=>x.houseId==Convert.ToInt32(c.id)).Select(x => new { x.ReferanceId, x.houseId }).FirstOrDefaultAsync();
-                                var result1 = result.Select(i =>
+
+                                    var result1 = result.Select(i =>
                                 {
                                     if (i.id == Convert.ToString(house.houseId)) i.ReferanceId = house.ReferanceId;
                                     return i;
