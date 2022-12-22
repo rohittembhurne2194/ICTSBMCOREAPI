@@ -21,6 +21,8 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string updateTs { get; set; }
         [JsonProperty("geom")]
         public geom? geom { get; set; }
+
+        public string ReferanceId { get; set; }
        
     }
 

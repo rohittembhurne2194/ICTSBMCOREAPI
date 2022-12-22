@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
@@ -876,6 +877,27 @@ namespace ICTSBMCOREAPI.Controllers
 
                             List<GisResult> result = jsonResult.ToObject<List<GisResult>>();
 
+                            List<HouseGisDetails> obj = new List<HouseGisDetails>();
+                           
+                            using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                            {
+                                var house = await db.housemasters.Select(x => new { x.ReferanceId, x.houseNumber }).ToListAsync();
+                                if (house != null && house.Count > 0)
+                                {
+                                    foreach (var x in house)
+                                    {
+                                        result.Add(new GisResult()
+                                        {
+                                            ReferanceId = x.ReferanceId
+
+                                        });
+                                    }
+                                }
+
+
+                            }
+                               // return objDetail;
+                          
                             //objDetail.Add(new HouseGisDetails()
                             //{
                             //    code = dynamicobject.code.ToString(),

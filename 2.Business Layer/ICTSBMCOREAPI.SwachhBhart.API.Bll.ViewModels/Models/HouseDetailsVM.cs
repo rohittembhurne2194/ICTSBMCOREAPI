@@ -8,5 +8,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
     {
         public string houseid { get; set; }
         public string houseNumber { get; set; }
+
+        public string ReferanceId { get; set; }
     }
 }
