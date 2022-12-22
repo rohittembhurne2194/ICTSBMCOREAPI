@@ -5688,7 +5688,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
             using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
             {
-                var distCount = "";
+                var distCount="";
                 var New_Lat = "";
                 var New_Long = "";
                 try
@@ -5717,13 +5717,27 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             new SqlParameter { ParameterName = "@LAT", Value = a },
                             new SqlParameter { ParameterName = "@LONG", Value = b }
                         };
-                        var Listdist = await db.calculateDistance_Results.FromSqlRaw<calculateDistance_Result>("EXEC calculateDistance @LAT,@LONG", parms.ToArray()).ToListAsync();
-                        var dist = Listdist == null ? null : Listdist.FirstOrDefault(); 
-                        distCount = dist.DISTANCE.ToString();
-                        New_Lat = dist.Lattitude.ToString();
-                        New_Long = dist.Longitude.ToString();
+                        DataTable dt = new DataTable();
+                        SqlConnection con = new SqlConnection(db.Database.GetDbConnection().ConnectionString);
+                        SqlCommand cmd = new SqlCommand("calculateDistance", con);
+                        con.Open();
+                        cmd.Parameters.Add("@LAT", SqlDbType.VarChar).Value = parms[0].Value.ToString();
+                        cmd.Parameters.Add("@LONG", SqlDbType.VarChar).Value = parms[1].Value.ToString();
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.ExecuteNonQuery();
+                        SqlDataAdapter da = new SqlDataAdapter(cmd);
 
-                      
+                        da.Fill(dt);
+                        //var Listdist = await db.calculateDistance_Results.FromSqlRaw<calculateDistance_Result>(@"EXEC calculateDistance @LAT,@LONG",parms[0].Value.ToString(),parms[1].Value.ToString()).ToListAsync();
+                        // var Listdist = await db.calculateDistance_Results.FromSqlRaw<calculateDistance_Result>(dt).ToListAsync();
+                        // var dist = Listdist == null ? null : Listdist.FirstOrDefault(); 
+                        //distCount = dt.DISTANCE.ToString();
+                        //New_Lat = dt.Lattitude.ToString();
+                        //New_Long = dt.Longitude.ToString();
+                        distCount = dt.Rows[0].Field<Double>("DISTANCE").ToString();
+                        New_Lat = dt.Rows[0].Field<Double>("Lattitude").ToString();
+                        New_Long = dt.Rows[0].Field<Double>("Longitude").ToString();
+
                         coordinates p = new coordinates()
                         {
                             lat = Convert.ToDouble(obj.Lat),
