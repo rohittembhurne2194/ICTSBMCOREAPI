@@ -881,29 +881,18 @@ namespace ICTSBMCOREAPI.Controllers
                            
                             using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
                             {
-                                var house = await db.housemasters.Select(x => new { x.ReferanceId, x.houseId }).ToListAsync();
 
-                              
-                                foreach (var x in house)
+                                foreach (var c in result)
+                                { 
+                                var house = await db.housemasters.Where(x=>x.houseId==Convert.ToInt32(c.id)).Select(x => new { x.ReferanceId, x.houseId }).FirstOrDefaultAsync();
+                                var result1 = result.Select(i =>
                                 {
-                                    var result1 = result.Select(i =>
-                                {
-                                    if (i.id == Convert.ToString(x.houseId)) i.ReferanceId = x.ReferanceId;
+                                    if (i.id == Convert.ToString(house.houseId)) i.ReferanceId = house.ReferanceId;
                                     return i;
-                                }).Where(i=>i.id==Convert.ToString(x.houseId)).ToList();
+                                }).Where(i=>i.id==Convert.ToString(house.houseId)).ToList();
+                              
                                 }
-                                //if (house != null && house.Count > 0)
-                                //{
-                                //    foreach (var x in house)
-                                //    {
-                                //        result.Add(new GisResult()
-                                //        {
-                                //            ReferanceId = x.ReferanceId
-
-                                //        });
-                                //    }
-                                //}
-
+                               
 
                             }
                                // return objDetail;
