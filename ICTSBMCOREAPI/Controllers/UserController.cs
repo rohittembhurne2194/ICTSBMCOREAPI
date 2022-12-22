@@ -948,7 +948,7 @@ namespace ICTSBMCOREAPI.Controllers
             
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("GisHouseDetails/search")]
         [EnableCors("MyCorsPolicy")]
         public async Task<ActionResult<HouseGisDetails>> HouseGisDetailsSearch([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] List<GisSearch> obj)
@@ -1190,7 +1190,7 @@ namespace ICTSBMCOREAPI.Controllers
           
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("GisGarbageTrail/search")]
         [EnableCors("MyCorsPolicy")]
         public async Task<ActionResult<HouseGisDetails>> GarbageTrailgisSearch([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] List<GisSearch> obj)
@@ -1451,7 +1451,7 @@ namespace ICTSBMCOREAPI.Controllers
            
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("GisHouseTrail/search")]
         [EnableCors("MyCorsPolicy")]
         public async Task<ActionResult<HouseGisDetails>> HouseTrailgisSearch([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] List<GisSearch> obj)

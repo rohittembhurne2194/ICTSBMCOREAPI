@@ -4,10 +4,13 @@ using ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
@@ -113,7 +116,59 @@ namespace ICTSBMCOREAPI.Controllers
                     obj.wastetype = houseList[1];
 
                 }
+                double New_Lat = 0;
+                double New_Long = 0;
 
+                if(obj.new_const == 0)
+                {
+                    using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                    using (SqlConnection connection = new SqlConnection(db.Database.GetDbConnection().ConnectionString))
+                    {
+                        //Create the Command Object
+                        SqlCommand cmd = new SqlCommand()
+                        {
+                            CommandText = "calculateDistance",
+                            Connection = connection,
+                            CommandType = CommandType.StoredProcedure
+                        };
+                        //Set Input Parameter
+                        SqlParameter param1 = new SqlParameter
+                        {
+                            ParameterName = "@LAT", //Parameter name defined in stored procedure
+                            SqlDbType = SqlDbType.NVarChar, //Data Type of Parameter
+                            Value = obj.Lat, //Set the value
+                                             // Direction = ParameterDirection.Input //Specify the parameter as input
+                        };
+                        //Add the parameter to the SqlCommand object
+                        cmd.Parameters.Add(param1);
+                        //Another approach to add Input Parameter
+                        cmd.Parameters.AddWithValue("@LONG", obj.Long);
+
+                        connection.Open();
+                        SqlDataReader sdr = cmd.ExecuteReader();
+
+                        while (sdr.Read())
+                        {
+
+                            New_Lat = Convert.ToDouble(sdr[1]);
+                            New_Long = Convert.ToDouble(sdr[2]);
+                        }
+
+
+                    }
+                }
+               
+                Result objDetail1 = new Result();
+
+                if (New_Lat != 0 && New_Long != 0)
+                {
+                    obj.Lat = Convert.ToString(New_Lat);
+                    obj.Long = Convert.ToString(New_Long);
+
+                    obj.geom = "POINT ("+ Convert.ToString(New_Long )+ " " + Convert.ToString(New_Lat)+")";
+
+                    objDetail1 = await objRep.SaveQrHPDCollectionsAsync(obj, AppId, gcType);
+                }
                 //string[] referancList = referanceId.Split(',');
 
                 //if (referancList.Length > 1)
@@ -121,8 +176,11 @@ namespace ICTSBMCOREAPI.Controllers
                 //    referanceid = referancList[0];
 
                 //}
-                Result objDetail1 = new Result();
-                objDetail1 = await objRep.SaveQrHPDCollectionsAsync(obj, AppId, gcType);
+                else
+                {
+                    objDetail1 = await objRep.SaveQrHPDCollectionsAsync(obj, AppId, gcType);
+                }
+               
                 if (objDetail1.status == "success")
                 {
                     var message = "";
