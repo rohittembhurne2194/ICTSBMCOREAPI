@@ -2739,13 +2739,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     if (obj.IsLocation == false && obj.EmpType == "S" && result.status == "success")
                     {
                         appdetails.Today_Street_Status = true;
-
-
                     }
-
-
                     await dbMain.SaveChangesAsync();
-
                 }
 
                 else
