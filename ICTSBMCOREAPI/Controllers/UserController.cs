@@ -886,8 +886,8 @@ namespace ICTSBMCOREAPI.Controllers
                                 { 
                                 var house = await db.housemasters.Where(x=>x.houseId==Convert.ToInt32(c.id)).Select(x => new { x.ReferanceId, x.houseId, x.userId , x.houseOwner, x.houseOwnerMobile, x.houseAddress}).FirstOrDefaultAsync();
 
-                                var EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.createUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
-                                var Update_EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.updateUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
+                                var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
+                                var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
 
                                  
                                     var result1 = result.Select(i =>
@@ -898,10 +898,10 @@ namespace ICTSBMCOREAPI.Controllers
                                         i.HouseOwnerName = house.houseOwner;
                                         i.HouseOwnerMobileNo = house.houseOwnerMobile;
                                         i.HouseAddress = house.houseAddress;
-                                        i.CreateEmployeeName = EmployeeName.userName.ToString();
+                                        i.CreateEmployeeName = EmployeeName.qrEmpName.ToString();
                                         if(Update_EmployeeName != null)
                                         {
-                                            i.UpdateEmployeeName = Update_EmployeeName.userName.ToString();
+                                            i.UpdateEmployeeName = Update_EmployeeName.qrEmpName.ToString();
                                             
                                         }
                                         else
