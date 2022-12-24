@@ -176,8 +176,8 @@ namespace ICTSBMCOREAPI.Controllers
 
                 if (New_Lat != 0 && New_Long != 0)
                 {
-                    obj.Lat = Convert.ToString(New_Lat);
-                    obj.Long = Convert.ToString(New_Long);
+                    //obj.Lat = Convert.ToString(New_Lat);
+                    //obj.Long = Convert.ToString(New_Long);
 
                     obj.geom = "POINT ("+ Convert.ToString(New_Long )+ " " + Convert.ToString(New_Lat)+")";
 
