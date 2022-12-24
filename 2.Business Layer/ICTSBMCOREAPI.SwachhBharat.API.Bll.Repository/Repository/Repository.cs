@@ -5809,7 +5809,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         if ((obj.IsIn == true && appdetails.IsAreaActive == true) || (appdetails.IsAreaActive == false))
                         {
 
-                            if (gcType == 5)
+                            if (obj.gcType == 5)
                             {
                                 var dump = await db.StreetSweepingDetails.Where(x => x.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
                                 if (dump != null)
@@ -5883,7 +5883,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 }
 
                             }
-                            if (gcType == 4)
+                            if (obj.gcType == 4)
                             {
                                 var dump = await db.LiquidWasteDetails.Where(x => x.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
                                 if (dump != null)
@@ -5957,7 +5957,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 }
 
                             }
-                            if (gcType == 3)
+                            if (obj.gcType == 3)
                             {
                                 var dump = await db.DumpYardDetails.Where(x => x.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
                                 if (dump != null)
@@ -6030,7 +6030,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 }
 
                             }
-                            else if (gcType == 2)
+                            else if (obj.gcType == 2)
                             {
                                 var gp = await db.GarbagePointDetails.Where(x => x.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
 
@@ -6095,7 +6095,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     result.messageMar = "अवैध कचरा पॉइंट आयडी";
                                 }
                             }
-                            else if (gcType == 1)
+                            else if (obj.gcType == 1)
                             {
                                 var house = await db.housemasters.Where(x => x.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
                                 result.houseid = house.houseId;
