@@ -154,7 +154,7 @@ namespace ICTSBMCOREAPI.Controllers
                             //Another approach to add Input Parameter
                             cmd.Parameters.AddWithValue("@LONG", obj.Long);
 
-                            connection.Open();
+                            //connection.Open();
                             SqlDataReader sdr = cmd.ExecuteReader();
 
                             while (sdr.Read())
