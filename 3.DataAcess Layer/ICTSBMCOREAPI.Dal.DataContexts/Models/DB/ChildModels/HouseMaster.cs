@@ -32,5 +32,6 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
         public bool? QRStatus { get; set; }
         public DateTime? QRStatusDate { get; set; }
         public byte[] BinaryQrCodeImage { get; set; }
+        public int? New_Construction { get; set; }
     }
 }

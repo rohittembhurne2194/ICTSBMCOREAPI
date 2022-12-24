@@ -307,7 +307,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 
                 entity.Property(e => e.totalWetWeight).HasColumnType("decimal(18, 4)");
 
-                entity.Property(e => e.transId).HasMaxLength(100);
+                entity.Property(e => e.transId).HasMaxLength(500);
 
                 entity.Property(e => e.vehicleNumber).HasMaxLength(100);
             });
@@ -333,7 +333,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 
                 entity.Property(e => e.totalWetWeight).HasColumnType("decimal(18, 4)");
 
-                entity.Property(e => e.transId).HasMaxLength(100);
+                entity.Property(e => e.transId).HasMaxLength(500);
 
                 entity.Property(e => e.vehicleNumber).HasMaxLength(100);
             });
@@ -886,6 +886,12 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 
                 entity.ToTable("TransDumpTD");
 
+                entity.Property(e => e.bcTotalDryWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.bcTotalGcWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.bcTotalWetWeight).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.bcTransId).HasMaxLength(500);
 
                 entity.Property(e => e.dyId).HasMaxLength(100);
@@ -900,7 +906,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 
                 entity.Property(e => e.totalWetWeight).HasColumnType("decimal(18, 4)");
 
-                entity.Property(e => e.transId).HasMaxLength(100);
+                entity.Property(e => e.transId).HasMaxLength(500);
 
                 entity.Property(e => e.vehicleNumber).HasMaxLength(100);
             });

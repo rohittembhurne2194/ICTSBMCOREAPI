@@ -5866,6 +5866,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     //////////////////////////////////////////////////////////////////
                                     obj.date = DateTime.Now;
                                     obj.ReferanceId = obj.ReferanceId;
+                                    
 
                                     db.Qr_Locations.Add(await FillLocationDetailsAsync(obj, AppId, false));
                                     //////////////////////////////////////////////////////////////////
@@ -6173,7 +6174,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         obj.QRCodeImage = obj.QRCodeImage.Replace("data:image/jpeg;base64,", "");
                                         house.BinaryQrCodeImage = Convert.FromBase64String(obj.QRCodeImage);
                                     }
-
+                                    house.New_Construction = obj.new_const;
                                     //////////////////////////////////////////////////////////////////
                                     obj.date = DateTime.Now;
                                     db.Qr_Locations.Add(await FillLocationDetailsAsync(obj, AppId, false));

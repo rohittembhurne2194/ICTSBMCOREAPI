@@ -20,5 +20,14 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
         public decimal? totalDryWeight { get; set; }
         public decimal? totalWetWeight { get; set; }
         public string bcTransId { get; set; }
+        public bool? TStatus { get; set; }
+        public long? bcStartDateTime { get; set; }
+        public long? bcEndDateTime { get; set; }
+        public decimal? bcTotalGcWeight { get; set; }
+        public decimal? bcTotalDryWeight { get; set; }
+        public decimal? bcTotalWetWeight { get; set; }
+        public TimeSpan? tHr { get; set; }
+        public int? tNh { get; set; }
+        public long? bcThr { get; set; }
     }
 }
