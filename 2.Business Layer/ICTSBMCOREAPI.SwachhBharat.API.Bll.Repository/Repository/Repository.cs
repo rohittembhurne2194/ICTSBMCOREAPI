@@ -65,7 +65,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     var token = new JwtSecurityToken(
                         issuer: _configuration["JWT:ValidIssuer"],
                         audience: _configuration["JWT:ValidAudience"],
-                        expires: DateTime.Now.AddYears(1),
+                        expires: DateTime.Now.AddHours(12),
                         claims: authClaims,
                         signingCredentials: new SigningCredentials(authSigninkey, SecurityAlgorithms.HmacSha256Signature));
                     return new JwtSecurityTokenHandler().WriteToken(token);
