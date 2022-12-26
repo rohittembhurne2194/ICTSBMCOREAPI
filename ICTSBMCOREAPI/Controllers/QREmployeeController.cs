@@ -8,6 +8,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -223,17 +224,44 @@ namespace ICTSBMCOREAPI.Controllers
                             tn.endTs = obj.endTs;
                             tn.geom = obj.geom;
 
+
+
+                            GisSearch stn = new GisSearch();
+                           
+                            stn.id = objDetail1.houseid.ToString();
                             tn.id = objDetail1.houseid.ToString();
-                            if (objDetail1.IsExixts == true)
-                            {
-                                tn.updateTs = obj.createTs;
-                                tn.updateUser = obj.userId;
-                            }
-                            else
+                            
+
+                            HttpClient client1 = new HttpClient();
+
+                            var json1 = JsonConvert.SerializeObject(stn, Formatting.Indented);
+                            var stringContent1 = new StringContent(json1);
+                            stringContent1.Headers.ContentType.MediaType = "application/json";
+                            stringContent1.Headers.Add("url", gis_url + "/" + gis_DBName);
+                            stringContent1.Headers.Add("username", gis_username);
+                            stringContent1.Headers.Add("password", gis_password);
+
+                            var response1 = await client1.PostAsync("http://114.143.244.130:9091/house/search", stringContent1);
+
+
+                            var responseString1 = await response1.Content.ReadAsStringAsync();
+                            var jsonParsed1 = JObject.Parse(responseString1);
+                            var dynamicobject1 = JsonConvert.DeserializeObject<dynamic>(responseString1);
+                            var jsonResult1 = jsonParsed1["data"];
+
+                            List<GisResult> result = jsonResult1.ToObject<List<GisResult>>();
+
+                            if (result.Count == 0)
                             {
                                 tn.createUser = obj.userId;
                                 tn.createTs = obj.createTs;
                             }
+                            else
+                            {
+                                tn.updateTs = obj.createTs;
+                                tn.updateUser = obj.userId;
+                            }
+                            
 
 
                             HttpClient client = new HttpClient();
