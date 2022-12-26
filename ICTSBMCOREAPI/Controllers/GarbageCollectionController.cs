@@ -290,7 +290,7 @@ namespace ICTSBMCOREAPI.Controllers
         }
 
         [HttpPost]
-        [Route("Save/GarbageCollectionOfflineUpload")]
+        [Route("Save/GarbageCollectionOnlineUpload")]
         public async Task<ActionResult<List<CollectionSyncResult>>> OnlineUpload([FromHeader] string authorization, [FromHeader] int AppId, [FromHeader] string batteryStatus, SBGarbageCollectionView item)
         {
 
