@@ -309,19 +309,22 @@ namespace ICTSBMCOREAPI.Controllers
                 int i = 0;
                 try
                 {
-                    string imagePath, FileName;
-                    var objmain = await dbMain.AppDetails.Where(x => x.AppId == AppId).FirstOrDefaultAsync();
-                    var AppDetailURL = objmain.baseImageUrl + objmain.basePath + objmain.Collection + "/";
-                    string hour = DateTime.Now.ToString("hh:mm tt");
-
-                    DateTime scheduledRun = DateTime.Today.AddHours(15);
-                    if (hour == "08:00 AM" && AppId == 3035)
+                    if (item != null)
                     {
-                        await objRep.SaveAttendenceSettingsDetailAsync(AppId, hour);
-                    }
-                    //List<Task> tasks = new List<Task>();
-                    //foreach (var item in objRaw)
-                    //{
+
+                        string imagePath, FileName;
+                        var objmain = await dbMain.AppDetails.Where(x => x.AppId == AppId).FirstOrDefaultAsync();
+                        var AppDetailURL = objmain.baseImageUrl + objmain.basePath + objmain.Collection + "/";
+                        string hour = DateTime.Now.ToString("hh:mm tt");
+
+                        DateTime scheduledRun = DateTime.Today.AddHours(15);
+                        if (hour == "08:00 AM" && AppId == 3035)
+                        {
+                            await objRep.SaveAttendenceSettingsDetailAsync(AppId, hour);
+                        }
+                        //List<Task> tasks = new List<Task>();
+                        //foreach (var item in objRaw)
+                        //{
                         // DevSwachhBharatNagpurEntities db = new DevSwachhBharatNagpurEntities(AppId);
                         DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId);
                         bool IsExist = false;
@@ -510,10 +513,23 @@ namespace ICTSBMCOREAPI.Controllers
                             });
 
                         }
-                  //  }
+                        //  }
 
-                    //await Task.WhenAll(tasks);
-                    return objres;
+                        //await Task.WhenAll(tasks);
+                        return objres;
+                    }
+                    else
+                    {
+                        objres.Add(new CollectionSyncResult()
+                        {
+                            houseId = gcDetail.houseId,
+                            ID = gcDetail.OfflineID,
+                            status = "error",
+                            message = "Missing or Invalid Request Parameters.. ",
+                            messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..",
+                        });
+                        return objres;
+                    }
 
                 }
                 catch (Exception ex)
