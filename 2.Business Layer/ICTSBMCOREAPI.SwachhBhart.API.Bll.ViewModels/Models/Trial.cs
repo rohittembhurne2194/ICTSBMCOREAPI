@@ -7,7 +7,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
     public class Trial
     {
         public string id { get; set; }
-        //public int id { get; set; }
+        public int houseid { get; set; }
         public string startTs { get; set; }
         public string endTs { get; set; }
         public int createUser { get; set; }
