@@ -351,7 +351,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     else
                     {
                         var objEmpMst1 = await db.QrEmployeeMasters.Where(c => c.qrEmpLoginId == userName & c.qrEmpPassword == password).FirstOrDefaultAsync();
-                        var objEmpMst2 = await db.UserMasters.Where(c => c.userLoginId == userName & c.userPassword == password).FirstOrDefaultAsync();
+                        var objEmpMst2 = await db.UserMasters.Where(c => c.userLoginId == userName & c.userPassword == password & c.EmployeeType==null).FirstOrDefaultAsync();
                         if (objEmpMst1 != null)
                         {
                             if (objEmpMst1.isActive == false)
