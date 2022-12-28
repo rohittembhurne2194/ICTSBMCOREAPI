@@ -13,7 +13,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public bool isAttendenceOff { get; set; }
         public string houseId { get; set; }
         public bool IsExist { get; set; }
-
+        public string giserrorMessages { get; set; }
         public string referenceID { get; set; }
 
 

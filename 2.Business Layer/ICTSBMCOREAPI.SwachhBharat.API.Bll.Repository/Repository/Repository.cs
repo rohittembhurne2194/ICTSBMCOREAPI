@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -18,6 +20,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -6251,7 +6254,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     var appdetails = await dbMain.AppDetails.Where(c => c.AppId == AppId).FirstOrDefaultAsync();
                     foreach (var item in obj)
                     {
-
+                     
                         coordinates p = new coordinates()
                         {
                             lat = Convert.ToDouble(item.Lat),
@@ -6652,6 +6655,191 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         message = "Uploaded successfully",
                                         messageMar = "सबमिट यशस्वी",
                                     });
+
+
+                                    //GIS Code Start (28-12-2022)
+
+                                    double New_Lat = 0;
+                                    double New_Long = 0;
+
+                                    if (item.new_const == 0)
+                                    {
+
+
+
+                                        using (SqlConnection connection = new SqlConnection(db.Database.GetDbConnection().ConnectionString))
+                                        {
+                                            connection.Open();
+
+                                            var command = connection.CreateCommand();
+
+                                            const string CheckIfTableExistsStatement = "SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Buildings_CSV]') AND type in (N'U')";
+                                            command.CommandText = CheckIfTableExistsStatement;
+                                            var executeScalar = command.ExecuteScalar();
+                                            if (executeScalar != null)
+                                            {
+                                                SqlCommand cmd = new SqlCommand()
+                                                {
+                                                    CommandText = "calculateDistance",
+                                                    Connection = connection,
+                                                    CommandType = CommandType.StoredProcedure
+                                                };
+                                                //Set Input Parameter
+                                                SqlParameter param1 = new SqlParameter
+                                                {
+                                                    ParameterName = "@LAT", //Parameter name defined in stored procedure
+                                                    SqlDbType = SqlDbType.NVarChar, //Data Type of Parameter
+                                                    Value = item.Lat, //Set the value
+                                                                      // Direction = ParameterDirection.Input //Specify the parameter as input
+                                                };
+                                                //Add the parameter to the SqlCommand object
+                                                cmd.Parameters.Add(param1);
+                                                //Another approach to add Input Parameter
+                                                cmd.Parameters.AddWithValue("@LONG", item.Long);
+
+                                                //connection.Open();
+                                                SqlDataReader sdr = cmd.ExecuteReader();
+
+                                                while (sdr.Read())
+                                                {
+
+                                                    New_Lat = Convert.ToDouble(sdr[1]);
+                                                    New_Long = Convert.ToDouble(sdr[2]);
+                                                }
+                                            }
+
+                                            //Create the Command Object
+
+
+
+                                        }
+                                    }
+                                    Result objDetail1 = new Result();
+                                    if (New_Lat != 0 && New_Long != 0)
+                                    {
+                                        item.geom = "POINT (" + Convert.ToString(New_Long) + " " + Convert.ToString(New_Lat) + ")";
+                                    }
+
+                                    var message = "";
+
+
+                                    //TimeSpan timespan = new TimeSpan(00, 00, 00);
+                                    //DateTime time = DateTime.Now.Add(timespan);
+
+                                    Trial tn = new Trial();
+                                    List<DumpTripStatusResult> objDetail = new List<DumpTripStatusResult>();
+
+                                    try
+                                    {
+                                        var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                                        if (GIS_CON != null)
+                                        {
+                                            var gis_url = GIS_CON.DataSource;
+                                            var gis_DBName = GIS_CON.InitialCatalog;
+                                            var gis_username = GIS_CON.UserId;
+                                            var gis_password = GIS_CON.Password;
+
+                                            //foreach (var item in obj)
+                                            //{
+                                            tn.startTs = item.startTs;
+                                            tn.endTs = item.endTs;
+                                            tn.geom = item.geom;
+
+
+
+                                            GisSearch stn = new GisSearch();
+
+                                            stn.id = house.houseId.ToString();
+                                            tn.id = house.houseId.ToString();
+
+
+                                            HttpClient client1 = new HttpClient();
+
+                                            var json1 = JsonConvert.SerializeObject(stn, Formatting.Indented);
+                                            var stringContent1 = new StringContent(json1);
+                                            stringContent1.Headers.ContentType.MediaType = "application/json";
+                                            stringContent1.Headers.Add("url", gis_url + "/" + gis_DBName);
+                                            stringContent1.Headers.Add("username", gis_username);
+                                            stringContent1.Headers.Add("password", gis_password);
+
+                                            var response1 = await client1.PostAsync("http://114.143.244.130:9091/house/search", stringContent1);
+
+
+                                            var responseString1 = await response1.Content.ReadAsStringAsync();
+                                            var jsonParsed1 = JObject.Parse(responseString1);
+                                            var dynamicobject1 = JsonConvert.DeserializeObject<dynamic>(responseString1);
+                                            var jsonResult1 = jsonParsed1["data"];
+
+                                            List<GisResult> getresult = jsonResult1.ToObject<List<GisResult>>();
+
+                                            if (getresult.Count == 0)
+                                            {
+                                                tn.createUser = item.userId;
+                                                tn.createTs = item.createTs;
+                                            }
+                                            else
+                                            {
+                                                tn.updateTs = item.createTs;
+                                                tn.updateUser = item.userId;
+                                            }
+
+
+
+                                            HttpClient client = new HttpClient();
+                                            var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                                            var stringContent = new StringContent(json);
+                                            stringContent.Headers.ContentType.MediaType = "application/json";
+                                            stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                                            stringContent.Headers.Add("username", gis_username);
+                                            stringContent.Headers.Add("password", gis_password);
+                                            var response = await client.PostAsync("http://114.143.244.130:9091/house", stringContent);
+                                            var responseString = await response.Content.ReadAsStringAsync();
+                                            var dynamicobject2 = JsonConvert.DeserializeObject<dynamic>(responseString);
+                                            objDetail.Add(new DumpTripStatusResult()
+                                            {
+                                                code = dynamicobject2.code.ToString(),
+                                                status = dynamicobject2.status.ToString(),
+                                                message = dynamicobject2.message.ToString(),
+                                                errorMessages = dynamicobject2.errorMessages.ToString(),
+                                                timestamp = dynamicobject2.timestamp.ToString(),
+                                                data = dynamicobject2.data.ToString()
+                                            });
+                                            objDetail1.gismessage = dynamicobject2.message.ToString();
+                                            objDetail1.giserrorMessages = dynamicobject2.errorMessages.ToString();
+                                        }
+                                        else
+                                        {
+
+                                            objDetail.Add(new DumpTripStatusResult()
+                                            {
+                                                code = "",
+                                                status = "",
+                                                message = "",
+                                                errorMessages = "GIS Connection Are Not Available",
+                                                timestamp = "",
+                                                data = ""
+                                            });
+                                            objDetail1.gismessage = "GIS Connection Are Not Available";
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        objDetail.Add(new DumpTripStatusResult()
+                                        {
+                                            code = "",
+                                            status = "",
+                                            message = "",
+                                            errorMessages = ex.Message.ToString(),
+                                            timestamp = "",
+                                            data = ""
+                                        });
+                                        objDetail1.giserrorMessages = ex.Message.ToString();
+                                    }
+                                    //GIS Code End
+
+
+
                                 }
                                 else
                                 {
@@ -6676,6 +6864,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 messageMar = "तुम्ही क्षेत्राबाहेर आहात.कृपया परिसरात जा.."
                             });
                         }
+
                     }
 
                     return result;

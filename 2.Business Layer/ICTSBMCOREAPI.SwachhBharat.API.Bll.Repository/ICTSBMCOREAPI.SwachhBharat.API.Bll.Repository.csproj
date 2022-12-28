@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\3.DataAcess Layer\ICTSBMCOREAPI.Dal.DataContexts\ICTSBMCOREAPI.Dal.DataContexts.csproj" />
     <ProjectReference Include="..\..\ICTSBMCOREAPI.SwachhBharat.API.Bll.Services\ICTSBMCOREAPI.SwachhBharat.API.Bll.Services.csproj" />
     <ProjectReference Include="..\ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels\ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.csproj" />
