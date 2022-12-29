@@ -21,6 +21,9 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string updateTs { get; set; }
         [JsonProperty("geom")]
         public geomt? geom { get; set; }
+
+        public housegeom? Housegeom { get; set; }
+        public int? houseid { get; set; }
     }
 
     public class geomt
@@ -31,4 +34,12 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string[][] coordinates { get; set; }
     }
 
+    public class housegeom
+    {
+        [JsonProperty("houseid")]
+        public int? houseid { get; set; }
+
+        [JsonProperty("housecoordinates")]
+        public string[] housecoordinates { get; set; }
+    }
 }
