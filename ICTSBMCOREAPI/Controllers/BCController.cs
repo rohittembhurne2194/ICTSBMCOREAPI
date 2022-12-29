@@ -34,6 +34,7 @@ namespace ICTSBMCOREAPI.Controllers
         }
 
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         [Route("Save/DumpyardTrip")]
         public async Task<ActionResult<List<CollectionDumpSyncResult>>> SaveDumpyardTrip([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] List<DumpTripVM> objRaw)
         {
@@ -66,7 +67,12 @@ namespace ICTSBMCOREAPI.Controllers
                         int AppIds = Convert.ToInt32(transList[0]);
                         using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppIds))
                         {
-                            var ptripid = db.TransDumpTDs.OrderByDescending(c => c.TransBcId).FirstOrDefault().TransBcId;
+                            int ptripid = 0;
+                            var pdtripid = db.TransDumpTDs.OrderByDescending(c => c.TransBcId).FirstOrDefault();
+                            if (pdtripid != null)
+                            {
+                                ptripid = pdtripid.TransBcId;
+                            }
                             ptid = Convert.ToInt32(ptripid) + 1;
                             gcbcDetail.tripId = ptid;
                             AppDetail objmain = dbMain.AppDetails.Where(x => x.AppId == AppIds).FirstOrDefault();
