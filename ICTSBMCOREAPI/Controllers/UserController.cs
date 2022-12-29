@@ -1307,6 +1307,36 @@ namespace ICTSBMCOREAPI.Controllers
                                 List<GisTrailResult> result = jsonResult.ToObject<List<GisTrailResult>>();
 
 
+                                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                                {
+
+                                    foreach (var c in result)
+                                    {
+                                     
+
+                                        var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) && Convert.ToDateTime(tn.startTs) == x.gcDate).Select(x => new { x.houseId, x.userId ,x.gcDate}).FirstOrDefaultAsync();
+
+                                        var EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.createUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
+                                        var Update_EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.updateUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
+
+
+                                        var result1 = result.Select(i =>
+                                        {
+                                            if (i.createUser == Convert.ToString(GCDetails.userId) && Convert.ToDateTime(i.createTs) == GCDetails.gcDate)
+                                            {
+                                                i.housegeom.houseid = (int)GCDetails.houseId;
+                                                
+                                                return i;
+                                            }
+                                            return i;
+
+                                        }).Where(i => i.createUser == Convert.ToString(GCDetails.userId)).ToList();
+
+                                    }
+
+
+                                }
+
 
                                 objDetail.code = dynamicobject.code.ToString();
                                 objDetail.status = dynamicobject.status.ToString();
