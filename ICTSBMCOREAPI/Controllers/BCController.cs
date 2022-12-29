@@ -199,7 +199,7 @@ namespace ICTSBMCOREAPI.Controllers
            
         }
 
-
+        [HttpGet]
         public string EnryptString(string strEncrypted)
         {
             byte[] b = System.Text.ASCIIEncoding.ASCII.GetBytes(strEncrypted);

@@ -1314,7 +1314,7 @@ namespace ICTSBMCOREAPI.Controllers
                                     {
                                      
 
-                                        var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) && Convert.ToDateTime(tn.startTs) == x.gcDate).Select(x => new { x.houseId, x.userId ,x.gcDate}).FirstOrDefaultAsync();
+                                        var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) &&  x.gcDate >= Convert.ToDateTime(tn.startTs) && x.gcDate <= Convert.ToDateTime(tn.endTs)).Select(x => new { x.houseId, x.userId ,x.gcDate}).FirstOrDefaultAsync();
 
                                         var EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.createUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
                                         var Update_EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.updateUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
@@ -1322,9 +1322,9 @@ namespace ICTSBMCOREAPI.Controllers
 
                                         var result1 = result.Select(i =>
                                         {
-                                            if (i.createUser == Convert.ToString(GCDetails.userId) && Convert.ToDateTime(i.createTs) == GCDetails.gcDate)
+                                            if (i.createUser == Convert.ToString(GCDetails.userId) && Convert.ToDateTime(i.createTs).ToShortDateString() == Convert.ToDateTime(GCDetails.gcDate).ToShortDateString())
                                             {
-                                                i.housegeom.houseid = (int)GCDetails.houseId;
+                                                i.houseid = GCDetails.houseId;
                                                 
                                                 return i;
                                             }
