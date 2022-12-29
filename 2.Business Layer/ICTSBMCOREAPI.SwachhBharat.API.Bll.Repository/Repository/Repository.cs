@@ -1056,6 +1056,182 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             }
         }
 
+
+        public async Task<CollectionDumpSyncResult> SaveDumpyardTripCollection(DumpTripVM obj)
+        {
+            string[] transList = obj.transId.Split('&');
+            int AppId = Convert.ToInt32(transList[0]);
+            using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
+            AppDetail objmain = dbMain.AppDetails.Where(x => x.AppId == AppId).FirstOrDefault();
+
+            obj.transId = string.Join("&", transList);
+            string encryptedString = EnryptString(obj.transId);
+            obj.transId = encryptedString;
+            string decryptedString = DecryptString(encryptedString);
+            CollectionDumpSyncResult result = new CollectionDumpSyncResult();
+            using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+            {
+
+
+                TransDumpTD objTransDumpTD = new TransDumpTD();
+                DateTime Dateeee = Convert.ToDateTime(obj.endDateTime);
+                string hlist = string.Empty;
+                foreach (var item in obj.houseList)
+                {
+                    if (obj.houseList.Length > 1)
+                    {
+                        hlist += item + ",";
+                    }
+
+                }
+                if (obj.houseList.Length > 1)
+                {
+                    hlist = hlist.Substring(0, hlist.Length - 1);
+                }
+
+
+                try
+                {
+
+
+                    if (obj.userId == 0 || string.IsNullOrEmpty(obj.transId) || string.IsNullOrEmpty(obj.dyId) || string.IsNullOrEmpty(obj.houseList.ToString()) || string.IsNullOrEmpty(obj.vehicleNumber) || obj.tripNo == 0 || obj.totalDryWeight == 0 || obj.totalWetWeight == 0 || obj.totalGcWeight == 0 || string.IsNullOrEmpty(obj.startDateTime.ToString()) || string.IsNullOrEmpty(obj.endDateTime.ToString()))
+                    {
+
+                        if (obj.userId == 0)
+                        {
+                            result.message = "User Id Is Not Null or Empty.";
+                            result.messageMar = "वापरकर्ता आयडी शून्य किंवा रिक्त नाही.";
+                        }
+                        if (string.IsNullOrEmpty(obj.transId))
+                        {
+                            result.message = "transId Is Not Null or Empty.";
+                            result.messageMar = "ट्रान्स आयडी शून्य किंवा रिक्त नाही.";
+                        }
+                        if (string.IsNullOrEmpty(obj.dyId))
+                        {
+                            result.message = "dyId Is Not Null or Empty.";
+                            result.messageMar = "डी वाय आयडी शून्य किंवा रिक्त नाही.";
+                        }
+                        if (string.IsNullOrEmpty(hlist))
+                        {
+                            result.message = "houseList Is Not Null or Empty.";
+                            result.messageMar = "घरांची लिस्ट शून्य किंवा रिक्त नाही.";
+                        }
+                        if (string.IsNullOrEmpty(obj.vehicleNumber))
+                        {
+                            result.message = "vehicleNumber Is Not Null or Empty.";
+                            result.messageMar = "वाहन क्रमांक शून्य किंवा रिक्त नाही.";
+                        }
+                        if (obj.tripNo == 0)
+                        {
+                            result.message = "tripNo Is Not Null or Empty.";
+                            result.messageMar = "ट्रिप क्रमांक शून्य किंवा रिक्त नाही.";
+                        }
+                        if (obj.totalDryWeight == 0)
+                        {
+                            result.message = "totalDryWeight Is Not Null or Empty.";
+                            result.messageMar = "एकूण कोरडे वजन शून्य किंवा रिक्त नाही.";
+                        }
+                        if (obj.totalWetWeight == 0)
+                        {
+                            result.message = "totalWetWeight Is Not Null or Empty.";
+                            result.messageMar = "एकूण ओले वजन शून्य किंवा रिक्त नाही.";
+                        }
+                        if (obj.totalGcWeight == 0)
+                        {
+                            result.message = "totalGcWeight Is Not Null or Empty.";
+                            result.messageMar = "एकूण कचरा संकलन वजन शून्य किंवा रिकामे नाही.";
+                        }
+                        if (string.IsNullOrEmpty(obj.startDateTime.ToString()))
+                        {
+                            result.message = "startDateTime Is Not Null or Empty.";
+                            result.messageMar = "प्रारंभ तारीख वेळ शून्य किंवा रिक्त नाही.";
+                        }
+                        if (string.IsNullOrEmpty(obj.endDateTime.ToString()))
+                        {
+                            result.message = "endDateTime Is Not Null or Empty.";
+                            result.messageMar = "समाप्ती तारीख वेळ शून्य किंवा रिक्त नाही.";
+                        }
+                        result.status = "Error";
+                        result.dumpId = obj.dyId;
+                        result.transId = obj.transId;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    result.message = ex.Message;
+                    result.messageMar = ex.Message;
+                    result.status = "Error";
+                    result.dumpId = obj.dyId;
+                    result.transId = obj.transId;
+                    result.bcTransId = obj.bcTransId;
+
+                }
+                objTransDumpTD.transId = obj.transId;
+                objTransDumpTD.dyId = checkNullDump(obj.dyId);
+                objTransDumpTD.startDateTime = Convert.ToDateTime(obj.startDateTime);
+                objTransDumpTD.endDateTime = Convert.ToDateTime(obj.endDateTime);
+                objTransDumpTD.userId = obj.userId;
+                objTransDumpTD.houseList = hlist;
+                objTransDumpTD.tripNo = obj.tripNo;
+                objTransDumpTD.vehicleNumber = obj.vehicleNumber;
+                objTransDumpTD.totalDryWeight = obj.totalDryWeight;
+                objTransDumpTD.totalWetWeight = obj.totalWetWeight;
+                objTransDumpTD.totalGcWeight = obj.totalGcWeight;
+                objTransDumpTD.bcTransId = obj.bcTransId;
+                objTransDumpTD.TStatus = obj.TStatus;
+                objTransDumpTD.bcTotalGcWeight = obj.bcTotalGcWeight;
+                objTransDumpTD.bcTotalWetWeight = obj.bcTotalWetWeight;
+                objTransDumpTD.bcTotalDryWeight = obj.bcTotalDryWeight;
+                objTransDumpTD.bcStartDateTime = obj.bcStartDateTime;
+                objTransDumpTD.bcEndDateTime = obj.bcEndDateTime;
+                objTransDumpTD.tHr = obj.totalHours;
+                objTransDumpTD.tNh = obj.totalNumberOfHouses;
+                objTransDumpTD.bcThr = obj.bcThr;
+                db.TransDumpTDs.Add(objTransDumpTD);
+                db.SaveChanges();
+            }
+            return result;
+
+        }
+        public string checkNullDump(string str)
+        {
+            string result = "";
+            if (str == null || str == "")
+            {
+                result = "";
+                return result;
+            }
+            else
+            {
+                result = str;
+                return result;
+            }
+        }
+        public string DecryptString(string encrString)
+        {
+            byte[] b;
+            string decrypted;
+            try
+            {
+                b = Convert.FromBase64String(encrString);
+                decrypted = System.Text.ASCIIEncoding.ASCII.GetString(b);
+            }
+            catch (FormatException fe)
+            {
+                decrypted = "";
+            }
+            return decrypted;
+        }
+
+        public string EnryptString(string strEncrypted)
+        {
+            byte[] b = System.Text.ASCIIEncoding.ASCII.GetBytes(strEncrypted);
+            string encrypted = Convert.ToBase64String(b);
+            return encrypted;
+        }
+
         public async Task<Result> SaveUserAttendenceForNormalAsync(SBUserAttendence obj, int AppId, int type, string batteryStatus)
         {
 
