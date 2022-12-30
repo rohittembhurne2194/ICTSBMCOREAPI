@@ -1182,6 +1182,15 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 objTransDumpTD.bcThr = obj.bcThr;
                 db.TransDumpTDs.Add(objTransDumpTD);
                 db.SaveChanges();
+                    result.message = "Dump Yard Trip Transaction Save Sucessfully!!";
+                    result.messageMar = "डंप यार्ड ट्रिप व्यवहार यशस्वीरित्या जतन करा!!";
+                    result.status = "Success";
+                    result.dumpId = obj.dyId;
+                    result.transId = obj.transId;
+                    result.bcTransId = obj.bcTransId;
+                    result.gvstatus = obj.TStatus;
+
+
                 }
                 catch (Exception ex)
                 {
@@ -1191,7 +1200,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     result.dumpId = obj.dyId;
                     result.transId = obj.transId;
                     result.bcTransId = obj.bcTransId;
-
+                    result.gvstatus = obj.TStatus;
                 }
             }
             return result;

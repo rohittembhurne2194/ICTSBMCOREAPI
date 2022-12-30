@@ -179,7 +179,8 @@ namespace ICTSBMCOREAPI.Controllers
                                 messageMar = detail.messageMar,
                                 message = detail.message,
                                 dumpId = detail.dumpId,
-                                bcTransId = detail.bcTransId
+                                bcTransId = detail.bcTransId,
+                                gvstatus=detail.gvstatus
                             });
                         }
                     }
