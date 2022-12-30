@@ -34,7 +34,6 @@ namespace ICTSBMCOREAPI.Controllers
         }
 
         [HttpPost]
-        [ApiExplorerSettings(IgnoreApi = true)]
         [Route("Save/DumpyardTrip")]
         public async Task<ActionResult<List<CollectionDumpSyncResult>>> SaveDumpyardTrip([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] List<DumpTripVM> objRaw)
         {
