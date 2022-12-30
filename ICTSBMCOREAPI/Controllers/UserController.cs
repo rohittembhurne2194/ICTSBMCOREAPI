@@ -1317,51 +1317,10 @@ namespace ICTSBMCOREAPI.Controllers
                                        // List<GarbageTrailHouseList> GCDetails = new List<GarbageTrailHouseList>();
                                         var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) &&  x.gcDate >= Convert.ToDateTime(tn.startTs) && x.gcDate <= Convert.ToDateTime(tn.endTs)).Select(x => new { x.houseId, x.userId ,x.gcDate,x.Lat,x.Long}).ToListAsync();
 
-                                        List<GisTrailResult> posts = new List<GisTrailResult>
-                                        {
-                                            new GisTrailResult
-                                            {
+                                        JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                        var output = serializer.Serialize(GCDetails);
 
-                                                Housegeom = new List<string>
-                                                {
-                                                      "1",
-                                                      "2"
-                                                }
-
-                                            }
-                                        };
-
-                                        JObject o = JObject.FromObject(new
-                                        {
-                                            channel = new
-                                            {
-                                                Housegeom =
-                                                        from p in posts
-                                                        select new
-                                                        {
-                                                            houseid = p.Housegeom
-                                                        }
-                                            }
-                                        });
-
-                                        //foreach (var b in GCDetails)
-                                        //{
-
-                                        //    var result1 = result.Select(i =>
-                                        //    {
-                                        //        if (i.createUser == Convert.ToString(b.userId) && Convert.ToDateTime(i.createTs).ToShortDateString() == Convert.ToDateTime(b.gcDate).ToShortDateString())
-                                        //        {
-                                        //            i.Housegeom = b.houseId;
-                                        //            i.Housegeom = b.Lat;
-                                        //            i.Housegeom = b.Long;
-
-                                        //            return i;
-                                        //        }
-                                        //        return i;
-
-                                        //    }).Where(i => i.createUser == Convert.ToString(b.userId)).ToList();
-                                        //}
-
+                                      
                                         var EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.createUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
                                         var Update_EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.updateUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
 

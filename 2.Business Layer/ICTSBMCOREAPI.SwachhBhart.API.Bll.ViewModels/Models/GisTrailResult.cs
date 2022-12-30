@@ -22,9 +22,9 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         [JsonProperty("geom")]
         public geomt? geom { get; set; }
 
-        public IList<string> Housegeom { get; set; }
+        public string Housegeom { get; set; }
         //public int? houseid { get; set; }
-        //public IList<string> Categories { get; set; }
+        public IList<string> Categories { get; set; }
     }
 
     public class geomt
