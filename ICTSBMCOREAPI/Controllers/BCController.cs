@@ -150,7 +150,7 @@ namespace ICTSBMCOREAPI.Controllers
                             gcDetail.totalDryWeight = item.totalDryWeight;
                             gcDetail.totalWetWeight = item.totalWetWeight;
                             gcDetail.totalGcWeight = item.totalGcWeight;
-                            Int64 dec1 = Convert.ToInt64(9071858188);
+                            Int64 dec1 = 9071858188;
                             Int64 a = 100000000;
                             gcDetail.bcTotalDryWeight = (Decimal.ToInt64(item.totalDryWeight * a) * dec1);
                             gcDetail.bcTotalWetWeight = (Decimal.ToInt64(item.totalWetWeight * a) * dec1);

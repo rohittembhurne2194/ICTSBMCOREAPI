@@ -1157,17 +1157,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         result.transId = obj.transId;
                     }
 
-                }
-                catch (Exception ex)
-                {
-                    result.message = ex.Message;
-                    result.messageMar = ex.Message;
-                    result.status = "Error";
-                    result.dumpId = obj.dyId;
-                    result.transId = obj.transId;
-                    result.bcTransId = obj.bcTransId;
-
-                }
+                
+               
                 objTransDumpTD.transId = obj.transId;
                 objTransDumpTD.dyId = checkNullDump(obj.dyId);
                 objTransDumpTD.startDateTime = Convert.ToDateTime(obj.startDateTime);
@@ -1191,6 +1182,17 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 objTransDumpTD.bcThr = obj.bcThr;
                 db.TransDumpTDs.Add(objTransDumpTD);
                 db.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    result.message = ex.Message;
+                    result.messageMar = ex.Message;
+                    result.status = "Error";
+                    result.dumpId = obj.dyId;
+                    result.transId = obj.transId;
+                    result.bcTransId = obj.bcTransId;
+
+                }
             }
             return result;
 
