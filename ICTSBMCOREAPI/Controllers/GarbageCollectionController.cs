@@ -69,7 +69,7 @@ namespace ICTSBMCOREAPI.Controllers
                         DateTime Dateeee = Convert.ToDateTime(item.gcDate);
                         DateTime startDateTime = new DateTime(Dateeee.Year, Dateeee.Month, Dateeee.Day, 00, 00, 00, 000);
                         DateTime endDateTime = new DateTime(Dateeee.Year, Dateeee.Month, Dateeee.Day, 23, 59, 59, 999);
-                        var gethouseid = await db.housemasters.Where(c => c.ReferanceId == item.ReferenceID).Select(c => c.houseId).FirstOrDefaultAsync();
+                        var gethouseid = await db.HouseMasters.Where(c => c.ReferanceId == item.ReferenceID).Select(c => c.houseId).FirstOrDefaultAsync();
                         IsExist = (from p in db.GarbageCollectionDetails where p.houseId == gethouseid && p.gcDate >= startDateTime && p.gcDate <= endDateTime select p).Count() > 0;
                         //var gcd = db.GarbageCollectionDetails.Where(c => c.houseId == gethouseid && c.userId == item.userId && EntityFunctions.TruncateTime(c.gcDate) == EntityFunctions.TruncateTime(Dateeee)).FirstOrDefault();
                         var gcd = await db.GarbageCollectionDetails.Where(c => c.houseId == gethouseid && c.userId == item.userId && EF.Functions.DateDiffDay(c.gcDate, Dateeee) == 0).FirstOrDefaultAsync();
@@ -331,7 +331,7 @@ namespace ICTSBMCOREAPI.Controllers
                         DateTime Dateeee = Convert.ToDateTime(item.gcDate);
                         DateTime startDateTime = new DateTime(Dateeee.Year, Dateeee.Month, Dateeee.Day, 00, 00, 00, 000);
                         DateTime endDateTime = new DateTime(Dateeee.Year, Dateeee.Month, Dateeee.Day, 23, 59, 59, 999);
-                        var gethouseid = await db.housemasters.Where(c => c.ReferanceId == item.ReferenceID).Select(c => c.houseId).FirstOrDefaultAsync();
+                        var gethouseid = await db.HouseMasters.Where(c => c.ReferanceId == item.ReferenceID).Select(c => c.houseId).FirstOrDefaultAsync();
                         IsExist = (from p in db.GarbageCollectionDetails where p.houseId == gethouseid && p.gcDate >= startDateTime && p.gcDate <= endDateTime select p).Count() > 0;
                         //var gcd = db.GarbageCollectionDetails.Where(c => c.houseId == gethouseid && c.userId == item.userId && EntityFunctions.TruncateTime(c.gcDate) == EntityFunctions.TruncateTime(Dateeee)).FirstOrDefault();
                         var gcd = await db.GarbageCollectionDetails.Where(c => c.houseId == gethouseid && c.userId == item.userId && EF.Functions.DateDiffDay(c.gcDate, Dateeee) == 0).FirstOrDefaultAsync();
