@@ -351,7 +351,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     else
                     {
                         var objEmpMst1 = await db.QrEmployeeMasters.Where(c => c.qrEmpLoginId == userName & c.qrEmpPassword == password).FirstOrDefaultAsync();
-                        var objEmpMst2 = await db.UserMasters.Where(c => c.userLoginId == userName & c.userPassword == password & c.EmployeeType==null).FirstOrDefaultAsync();
+                        var objEmpMst2 = await db.UserMasters.Where(c => c.userLoginId == userName & c.userPassword == password & c.EmployeeType == null).FirstOrDefaultAsync();
                         if (objEmpMst1 != null)
                         {
                             if (objEmpMst1.isActive == false)
@@ -1155,33 +1155,34 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         result.status = "Error";
                         result.dumpId = obj.dyId;
                         result.transId = obj.transId;
+                        result.gvstatus = obj.TStatus;
                     }
 
-                
-               
-                objTransDumpTD.transId = obj.transId;
-                objTransDumpTD.dyId = checkNullDump(obj.dyId);
-                objTransDumpTD.startDateTime = Convert.ToDateTime(obj.startDateTime);
-                objTransDumpTD.endDateTime = Convert.ToDateTime(obj.endDateTime);
-                objTransDumpTD.userId = obj.userId;
-                objTransDumpTD.houseList = hlist;
-                objTransDumpTD.tripNo = obj.tripNo;
-                objTransDumpTD.vehicleNumber = obj.vehicleNumber;
-                objTransDumpTD.totalDryWeight = obj.totalDryWeight;
-                objTransDumpTD.totalWetWeight = obj.totalWetWeight;
-                objTransDumpTD.totalGcWeight = obj.totalGcWeight;
-                objTransDumpTD.bcTransId = obj.bcTransId;
-                objTransDumpTD.TStatus = obj.TStatus;
-                objTransDumpTD.bcTotalGcWeight = obj.bcTotalGcWeight;
-                objTransDumpTD.bcTotalWetWeight = obj.bcTotalWetWeight;
-                objTransDumpTD.bcTotalDryWeight = obj.bcTotalDryWeight;
-                objTransDumpTD.bcStartDateTime = obj.bcStartDateTime;
-                objTransDumpTD.bcEndDateTime = obj.bcEndDateTime;
-                objTransDumpTD.tHr = obj.totalHours;
-                objTransDumpTD.tNh = obj.totalNumberOfHouses;
-                objTransDumpTD.bcThr = obj.bcThr;
-                db.TransDumpTDs.Add(objTransDumpTD);
-                db.SaveChanges();
+
+
+                    objTransDumpTD.transId = obj.transId;
+                    objTransDumpTD.dyId = checkNullDump(obj.dyId);
+                    objTransDumpTD.startDateTime = Convert.ToDateTime(obj.startDateTime);
+                    objTransDumpTD.endDateTime = Convert.ToDateTime(obj.endDateTime);
+                    objTransDumpTD.userId = obj.userId;
+                    objTransDumpTD.houseList = hlist;
+                    objTransDumpTD.tripNo = obj.tripNo;
+                    objTransDumpTD.vehicleNumber = obj.vehicleNumber;
+                    objTransDumpTD.totalDryWeight = obj.totalDryWeight;
+                    objTransDumpTD.totalWetWeight = obj.totalWetWeight;
+                    objTransDumpTD.totalGcWeight = obj.totalGcWeight;
+                    objTransDumpTD.bcTransId = obj.bcTransId;
+                    objTransDumpTD.TStatus = obj.TStatus;
+                    objTransDumpTD.bcTotalGcWeight = obj.bcTotalGcWeight;
+                    objTransDumpTD.bcTotalWetWeight = obj.bcTotalWetWeight;
+                    objTransDumpTD.bcTotalDryWeight = obj.bcTotalDryWeight;
+                    objTransDumpTD.bcStartDateTime = obj.bcStartDateTime;
+                    objTransDumpTD.bcEndDateTime = obj.bcEndDateTime;
+                    objTransDumpTD.tHr = obj.totalHours;
+                    objTransDumpTD.tNh = obj.totalNumberOfHouses;
+                    objTransDumpTD.bcThr = obj.bcThr;
+                    db.TransDumpTDs.Add(objTransDumpTD);
+                    db.SaveChanges();
                     result.message = "Dump Yard Trip Transaction Save Sucessfully!!";
                     result.messageMar = "डंप यार्ड ट्रिप व्यवहार यशस्वीरित्या जतन करा!!";
                     result.status = "Success";
@@ -2582,82 +2583,82 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
         public async Task<List<SyncResult>> SaveUserLocationSAAsync(List<SBUserLocation> obj, int AppId, string batteryStatus, int typeId, string EmpType)
         {
-           
-               
 
-                    try
-                    {
-                        List<SyncResult> result = new List<SyncResult>();
-                        var distCount = "";
 
-                    using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
+
+            try
+            {
+                List<SyncResult> result = new List<SyncResult>();
+                var distCount = "";
+
+                using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
+                {
+                    foreach (var x in obj)
                     {
-                        foreach (var x in obj)
+                        DateTime Dateeee = Convert.ToDateTime(x.datetime);
+                        DateTime newTime = Dateeee;
+                        DateTime oldTime;
+                        TimeSpan span = TimeSpan.Zero;
+                        var gcd = await dbMain.UR_Locations.Where(c => c.empId == x.userId && c.type == null && EF.Functions.DateDiffDay(c.datetime, Dateeee) == 0).OrderByDescending(c => c.locId).FirstOrDefaultAsync();
+                        if (gcd != null)
                         {
-                            DateTime Dateeee = Convert.ToDateTime(x.datetime);
-                            DateTime newTime = Dateeee;
-                            DateTime oldTime;
-                            TimeSpan span = TimeSpan.Zero;
-                            var gcd = await dbMain.UR_Locations.Where(c => c.empId == x.userId && c.type == null && EF.Functions.DateDiffDay(c.datetime, Dateeee) == 0).OrderByDescending(c => c.locId).FirstOrDefaultAsync();
-                            if (gcd != null)
+                            oldTime = gcd.datetime.Value;
+                            span = newTime.Subtract(oldTime);
+                        }
+
+                        if (gcd == null || span.Minutes >= 9)
+                        {
+
+                            var u = await dbMain.EmployeeMasters.Where(c => c.EmpId == x.userId && c.isActive == true).FirstOrDefaultAsync();
+                            DateTime Offlinedate = Convert.ToDateTime(x.datetime);
+
+
+                            var atten = await dbMain.HSUR_Daily_Attendances.Where(c => c.userId == x.userId & EF.Functions.DateDiffDay(c.daDate, Offlinedate) == 0).FirstOrDefaultAsync();
+
+                            if (atten == null)
                             {
-                                oldTime = gcd.datetime.Value;
-                                span = newTime.Subtract(oldTime);
+                                result.Add(new SyncResult()
+                                {
+                                    OfflineId = Convert.ToInt32(x.OfflineId),
+                                    isAttendenceOff = true,
+                                    status = "error",
+                                    message = "Your duty is currently off, please start again.. ",
+                                    messageMar = "आपली ड्यूटी सध्या बंद आहे, कृपया पुन्हा सुरू करा..",
+                                });
+
+                                //return result;
+                                continue;
                             }
 
-                            if (gcd == null || span.Minutes >= 9)
+                            if (u != null & x.userId > 0)
                             {
-
-                                var u = await dbMain.EmployeeMasters.Where(c => c.EmpId == x.userId && c.isActive == true).FirstOrDefaultAsync();
-                                DateTime Offlinedate = Convert.ToDateTime(x.datetime);
-
-
-                                var atten = await dbMain.HSUR_Daily_Attendances.Where(c => c.userId == x.userId & EF.Functions.DateDiffDay(c.daDate, Offlinedate) == 0).FirstOrDefaultAsync();
-
-                                if (atten == null)
+                                string addr = "", ar = "";
+                                addr = Address(x.lat + "," + x.@long);
+                                if (addr != "")
                                 {
-                                    result.Add(new SyncResult()
-                                    {
-                                        OfflineId = Convert.ToInt32(x.OfflineId),
-                                        isAttendenceOff = true,
-                                        status = "error",
-                                        message = "Your duty is currently off, please start again.. ",
-                                        messageMar = "आपली ड्यूटी सध्या बंद आहे, कृपया पुन्हा सुरू करा..",
-                                    });
-
-                                    //return result;
-                                    continue;
+                                    ar = area(addr);
                                 }
 
-                                if (u != null & x.userId > 0)
-                                {
-                                    string addr = "", ar = "";
-                                    addr = Address(x.lat + "," + x.@long);
-                                    if (addr != "")
-                                    {
-                                        ar = area(addr);
-                                    }
 
-
-                                    //var locc = await db.SP_UserLatLongDetailMains(x.userId, typeId).FirstOrDefault();
-                                    List<SqlParameter> parms = new List<SqlParameter>
+                                //var locc = await db.SP_UserLatLongDetailMains(x.userId, typeId).FirstOrDefault();
+                                List<SqlParameter> parms = new List<SqlParameter>
                                                                         {
                                                                             // Create parameter(s)    
                                                                             new SqlParameter { ParameterName = "@userid", Value = x.userId },
                                                                             new SqlParameter { ParameterName = "@typeId", Value = typeId }
                                                                         };
-                                    var Listlocc = await dbMain.SP_UserLatLongDetailMain_Results.FromSqlRaw<SP_UserLatLongDetailMain_Result>("EXEC SP_UserLatLongDetailMain @userid,@typeId", parms.ToArray()).ToListAsync();
-                                    var locc = Listlocc == null ? null : Listlocc.FirstOrDefault();
+                                var Listlocc = await dbMain.SP_UserLatLongDetailMain_Results.FromSqlRaw<SP_UserLatLongDetailMain_Result>("EXEC SP_UserLatLongDetailMain @userid,@typeId", parms.ToArray()).ToListAsync();
+                                var locc = Listlocc == null ? null : Listlocc.FirstOrDefault();
 
-                                    if (locc == null || locc.lat == "" || locc.@long == "")
-                                    {
+                                if (locc == null || locc.lat == "" || locc.@long == "")
+                                {
 
 
-                                        string a = x.lat;
-                                        string b = x.@long;
+                                    string a = x.lat;
+                                    string b = x.@long;
 
-                                        //var dist = dbMain.SP_DistanceCount(Convert.ToDouble(a), Convert.ToDouble(b), Convert.ToDouble(x.lat), Convert.ToDouble(x.@long)).FirstOrDefault();
-                                        List<SqlParameter> parms1 = new List<SqlParameter>
+                                    //var dist = dbMain.SP_DistanceCount(Convert.ToDouble(a), Convert.ToDouble(b), Convert.ToDouble(x.lat), Convert.ToDouble(x.@long)).FirstOrDefault();
+                                    List<SqlParameter> parms1 = new List<SqlParameter>
                                                                         {
                                                                             // Create parameter(s)    
                                                                             new SqlParameter { ParameterName = "@sLat", Value = Convert.ToDouble(a) },
@@ -2665,14 +2666,14 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                                                             new SqlParameter { ParameterName = "@dLat", Value = Convert.ToDouble(x.lat) },
                                                                             new SqlParameter { ParameterName = "@dLong", Value = Convert.ToDouble(x.@long) }
                                                                         };
-                                        var Listdist = await dbMain.SP_DistanceCount_Main_Results.FromSqlRaw<SP_DistanceCount_Main_Result>("EXEC SP_DistanceCount @sLat,@sLong,@dLat,@dLong", parms1.ToArray()).ToListAsync();
-                                        var dist = Listdist == null ? null : Listdist.FirstOrDefault();
-                                        distCount = dist.Distance_in_KM.ToString();
-                                    }
-                                    else
-                                    {
-                                        //var dist = dbMain.SP_DistanceCount(Convert.ToDouble(locc.lat), Convert.ToDouble(locc.@long), Convert.ToDouble(x.lat), Convert.ToDouble(x.@long)).FirstOrDefault();
-                                        List<SqlParameter> parms1 = new List<SqlParameter>
+                                    var Listdist = await dbMain.SP_DistanceCount_Main_Results.FromSqlRaw<SP_DistanceCount_Main_Result>("EXEC SP_DistanceCount @sLat,@sLong,@dLat,@dLong", parms1.ToArray()).ToListAsync();
+                                    var dist = Listdist == null ? null : Listdist.FirstOrDefault();
+                                    distCount = dist.Distance_in_KM.ToString();
+                                }
+                                else
+                                {
+                                    //var dist = dbMain.SP_DistanceCount(Convert.ToDouble(locc.lat), Convert.ToDouble(locc.@long), Convert.ToDouble(x.lat), Convert.ToDouble(x.@long)).FirstOrDefault();
+                                    List<SqlParameter> parms1 = new List<SqlParameter>
                                                                         {
                                                                             // Create parameter(s)    
                                                                             new SqlParameter { ParameterName = "@sLat", Value = Convert.ToDouble(locc.lat) },
@@ -2680,64 +2681,64 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                                                             new SqlParameter { ParameterName = "@dLat", Value = Convert.ToDouble(x.lat) },
                                                                             new SqlParameter { ParameterName = "@dLong", Value = Convert.ToDouble(x.@long) }
                                                                         };
-                                        var Listdist = await dbMain.SP_DistanceCount_Main_Results.FromSqlRaw<SP_DistanceCount_Main_Result>("EXEC SP_DistanceCount @sLat,@sLong,@dLat,@dLong", parms1.ToArray()).ToListAsync();
-                                        var dist = Listdist == null ? null : Listdist.FirstOrDefault();
-                                        distCount = dist.Distance_in_KM.ToString();
-                                    }
-
-
-
-                                    dbMain.UR_Locations.Add(new UR_Location()
-                                    {
-                                        empId = x.userId,
-                                        lat = x.lat,
-                                        _long = x.@long,
-                                        datetime = x.datetime,
-                                        address = addr,
-                                        area = ar,
-                                        batteryStatus = batteryStatus,
-                                        Distnace = Convert.ToDecimal(distCount),
-                                        CreatedDate = DateTime.Now,
-                                        type = null,
-                                    });
-                                    await dbMain.SaveChangesAsync();
+                                    var Listdist = await dbMain.SP_DistanceCount_Main_Results.FromSqlRaw<SP_DistanceCount_Main_Result>("EXEC SP_DistanceCount @sLat,@sLong,@dLat,@dLong", parms1.ToArray()).ToListAsync();
+                                    var dist = Listdist == null ? null : Listdist.FirstOrDefault();
+                                    distCount = dist.Distance_in_KM.ToString();
                                 }
+
+
+
+                                dbMain.UR_Locations.Add(new UR_Location()
+                                {
+                                    empId = x.userId,
+                                    lat = x.lat,
+                                    _long = x.@long,
+                                    datetime = x.datetime,
+                                    address = addr,
+                                    area = ar,
+                                    batteryStatus = batteryStatus,
+                                    Distnace = Convert.ToDecimal(distCount),
+                                    CreatedDate = DateTime.Now,
+                                    type = null,
+                                });
+                                await dbMain.SaveChangesAsync();
                             }
-
-                            result.Add(new SyncResult()
-                            {
-                                OfflineId = Convert.ToInt32(x.OfflineId),
-                                status = "success",
-                                message = "Uploaded successfully",
-                                messageMar = "सबमिट यशस्वी",
-                            });
-
-
                         }
 
-
-
-                        return result;
-                    }
-                    }
-                    catch (Exception ex)
-                    {
-                    _logger.LogError(ex.ToString(), ex);
-                    List<SyncResult> objres = new List<SyncResult>();
-                        objres.Add(new SyncResult()
+                        result.Add(new SyncResult()
                         {
-                            OfflineId = 0,
-                            status = "error",
-                            messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..",
-                            message = "Something is wrong,Try Again.. ",
+                            OfflineId = Convert.ToInt32(x.OfflineId),
+                            status = "success",
+                            message = "Uploaded successfully",
+                            messageMar = "सबमिट यशस्वी",
                         });
 
 
-                        return objres;
                     }
 
-               
-            
+
+
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                List<SyncResult> objres = new List<SyncResult>();
+                objres.Add(new SyncResult()
+                {
+                    OfflineId = 0,
+                    status = "error",
+                    messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..",
+                    message = "Something is wrong,Try Again.. ",
+                });
+
+
+                return objres;
+            }
+
+
+
         }
 
         public string Address(string location)
@@ -2751,8 +2752,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             {
                 string[] ad = address.Split(',');
                 int l = ad.Length - 4;
-                if(l >= 0 && ad.Length > 0)
-                return ad[l];
+                if (l >= 0 && ad.Length > 0)
+                    return ad[l];
             }
 
             return string.Empty;
@@ -2784,8 +2785,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         {
             CollectionSyncResult result = new CollectionSyncResult();
             // var appdetails = dbMain.AppDetails.Where(c => c.AppId == AppId).FirstOrDefault();
-            
-            
+
+
             using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
             using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
             {
@@ -2955,7 +2956,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
 
 
-            
+
             //using (new TransactionScope(
             //         TransactionScopeOption.Required,
             //         new TransactionOptions
@@ -2998,7 +2999,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             objdata.Lat = obj.Lat;
                             objdata.Long = obj.Long;
                             //    objdata.garbageType = obj.garbageType;
-                            var atten = await db.Daily_Attendances.Where(c => c.userId == obj.userId && EF.Functions.DateDiffDay(c.daDate, Dateeee) == 0 ).FirstOrDefaultAsync();
+                            var atten = await db.Daily_Attendances.Where(c => c.userId == obj.userId && EF.Functions.DateDiffDay(c.daDate, Dateeee) == 0).FirstOrDefaultAsync();
 
                             Location loc = new Location();
 
@@ -3053,7 +3054,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             if (IsExist == true)
                             {
 
-                                var gcd = await db.GarbageCollectionDetails.Where(c => c.houseId == house.houseId && c.userId == obj.userId && EF.Functions.DateDiffDay(c.gcDate, Dateeee) == 0 ).FirstOrDefaultAsync();
+                                var gcd = await db.GarbageCollectionDetails.Where(c => c.houseId == house.houseId && c.userId == obj.userId && EF.Functions.DateDiffDay(c.gcDate, Dateeee) == 0).FirstOrDefaultAsync();
                                 if (gcd == null)
                                 {
                                     result.ID = obj.OfflineID;
@@ -3531,9 +3532,9 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         //await tx.CommitAsync();
                         return result;
                     }
-                   
+
                 }
-                
+
             }
             //}
         }
@@ -3544,7 +3545,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             CollectionSyncResult result = new CollectionSyncResult();
             HouseMaster dbHouse = new HouseMaster();
 
-            
+
             //using (new TransactionScope(
             //         TransactionScopeOption.Required,
             //         new TransactionOptions
@@ -3795,7 +3796,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         {
 
             CollectionSyncResult result = new CollectionSyncResult();
-            
+
             //using (new TransactionScope(
             //         TransactionScopeOption.Required,
             //         new TransactionOptions
@@ -3836,7 +3837,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                         //var atten = db.Daily_Attendance.Where(c => c.userId == obj.userId & c.endTime == "" & c.daDate == EntityFunctions.TruncateTime(Dateeee)).FirstOrDefault();
 
-                        var atten = await db.Daily_Attendances.Where(c => c.userId == obj.userId && EF.Functions.DateDiffDay(c.daDate, Dateeee) == 0 ).FirstOrDefaultAsync();
+                        var atten = await db.Daily_Attendances.Where(c => c.userId == obj.userId && EF.Functions.DateDiffDay(c.daDate, Dateeee) == 0).FirstOrDefaultAsync();
 
                         if (atten == null)
                         {
@@ -3871,7 +3872,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     return result;
                                 }
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 //_logger.LogError(ex.ToString(), ex);
                                 result.ID = obj.OfflineID;
@@ -3981,7 +3982,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 housemob = "";
                                 addre = checkNull(gpdetails.dyAddress);
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 //_logger.LogError(ex.ToString(), ex);
                                 result.ID = obj.OfflineID;
@@ -4091,7 +4092,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         {
 
             CollectionSyncResult result = new CollectionSyncResult();
-            
+
             //using (new TransactionScope(
             //         TransactionScopeOption.Required,
             //         new TransactionOptions
@@ -4167,7 +4168,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     return result;
                                 }
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 //_logger.LogError(ex.ToString(), ex);
                                 result.ID = obj.OfflineID;
@@ -4279,7 +4280,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 housemob = "";
                                 addre = checkNull(gpdetails.dyAddress);
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 //_logger.LogError(ex.ToString(), ex);
                                 result.ID = obj.OfflineID;
@@ -4390,7 +4391,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         {
 
             CollectionSyncResult result = new CollectionSyncResult();
-            
+
             //using (new TransactionScope(
             //         TransactionScopeOption.Required,
             //         new TransactionOptions
@@ -4414,7 +4415,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                 try
                 {
-                    var gcd = await db.GarbageCollectionDetails.Where(c => c.userId == obj.userId && c.dyId == dydetails.dyId && EF.Functions.DateDiffDay(c.gcDate, Dateeee) == 0 ).OrderByDescending(c => c.gcDate).FirstOrDefaultAsync();
+                    var gcd = await db.GarbageCollectionDetails.Where(c => c.userId == obj.userId && c.dyId == dydetails.dyId && EF.Functions.DateDiffDay(c.gcDate, Dateeee) == 0).OrderByDescending(c => c.gcDate).FirstOrDefaultAsync();
                     if (gcd != null)
                     {
                         oldTime = gcd.gcDate.Value;
@@ -4431,7 +4432,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                         //var atten = db.Daily_Attendance.Where(c => c.userId == obj.userId & c.endTime == "" & c.daDate == EntityFunctions.TruncateTime(Dateeee)).FirstOrDefault();
 
-                        var atten = await db.Daily_Attendances.Where(c => c.userId == obj.userId && EF.Functions.DateDiffDay(c.daDate, Dateeee) == 0 ).FirstOrDefaultAsync();
+                        var atten = await db.Daily_Attendances.Where(c => c.userId == obj.userId && EF.Functions.DateDiffDay(c.daDate, Dateeee) == 0).FirstOrDefaultAsync();
 
                         if (atten == null)
                         {
@@ -4466,7 +4467,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     return result;
                                 }
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 //_logger.LogError(ex.ToString(), ex);
                                 result.ID = obj.OfflineID;
@@ -4554,7 +4555,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         gcd.gcDate = Dateeee;
                         gcd.Lat = obj.Lat;
                         gcd.Long = obj.Long;
-                        var atten = await db.Daily_Attendances.Where(c => c.userId == obj.userId && EF.Functions.DateDiffDay(c.daDate, Dateeee) == 0 ).FirstOrDefaultAsync();
+                        var atten = await db.Daily_Attendances.Where(c => c.userId == obj.userId && EF.Functions.DateDiffDay(c.daDate, Dateeee) == 0).FirstOrDefaultAsync();
 
                         if (atten == null)
                         {
@@ -4578,7 +4579,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 housemob = "";
                                 addre = checkNull(gpdetails.dyAddress);
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 //_logger.LogError(ex.ToString(), ex);
                                 result.ID = obj.OfflineID;
@@ -4688,7 +4689,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         {
 
             CollectionSyncResult result = new CollectionSyncResult();
-            
+
             //using (new TransactionScope(
             //         TransactionScopeOption.Required,
             //         new TransactionOptions
@@ -4712,7 +4713,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                 try
                 {
-                    var gcd = await db.GarbageCollectionDetails.Where(c => c.userId == obj.userId && c.LWId == dydetails.LWId && EF.Functions.DateDiffDay(c.gcDate, Dateeee) == 0 ).OrderByDescending(c => c.gcDate).FirstOrDefaultAsync();
+                    var gcd = await db.GarbageCollectionDetails.Where(c => c.userId == obj.userId && c.LWId == dydetails.LWId && EF.Functions.DateDiffDay(c.gcDate, Dateeee) == 0).OrderByDescending(c => c.gcDate).FirstOrDefaultAsync();
                     if (gcd != null)
                     {
                         oldTime = gcd.gcDate.Value;
@@ -4954,7 +4955,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         try
                         {
                             // Update code
-                            
+
                             var updateappdetails = await dbMain.SP_DailyScanCount_Results.FromSqlRaw<SP_DailyScanCount_Result>($"EXEC DailyScanCount {AppId.ToString()}").ToListAsync();
 
 
@@ -4986,7 +4987,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         {
             int i = 0;
             CollectionSyncResult result = new CollectionSyncResult();
-            
+
             //using (new TransactionScope(
             //         TransactionScopeOption.Required,
             //         new TransactionOptions
@@ -5010,7 +5011,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                 try
                 {
-                    var gcd = await db.GarbageCollectionDetails.Where(c => c.userId == obj.userId && c.SSId == dydetails.SSId && EF.Functions.DateDiffDay(c.gcDate, Dateeee) == 0 ).OrderByDescending(c => c.gcDate).FirstOrDefaultAsync();
+                    var gcd = await db.GarbageCollectionDetails.Where(c => c.userId == obj.userId && c.SSId == dydetails.SSId && EF.Functions.DateDiffDay(c.gcDate, Dateeee) == 0).OrderByDescending(c => c.gcDate).FirstOrDefaultAsync();
                     if (gcd != null)
                     {
                         oldTime = gcd.gcDate.Value;
@@ -5250,7 +5251,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     var sd1 = await db.StreetSweepingDetails.Where(z => z.ReferanceId == sbeatcount.ReferanceId1 || z.ReferanceId == sbeatcount.ReferanceId2 || z.ReferanceId == sbeatcount.ReferanceId3 || z.ReferanceId == sbeatcount.ReferanceId4 || z.ReferanceId == sbeatcount.ReferanceId5).ToListAsync();
                     foreach (var x in sd1)
                     {
-                        var sgcd = await db.GarbageCollectionDetails.Where(c => c.userId == obj.userId && c.SSId == x.SSId && EF.Functions.DateDiffDay(c.gcDate, Dateeee) == 0 ).OrderByDescending(c => c.gcDate).FirstOrDefaultAsync();
+                        var sgcd = await db.GarbageCollectionDetails.Where(c => c.userId == obj.userId && c.SSId == x.SSId && EF.Functions.DateDiffDay(c.gcDate, Dateeee) == 0).OrderByDescending(c => c.gcDate).FirstOrDefaultAsync();
                         if (sgcd != null)
                         {
                             i++;
@@ -5308,7 +5309,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         {
 
             CollectionSyncResult result = new CollectionSyncResult();
-            
+
             //using (new TransactionScope(
             //         TransactionScopeOption.Required,
             //         new TransactionOptions
@@ -5349,7 +5350,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                         //var atten = db.Daily_Attendance.Where(c => c.userId == obj.userId & c.endTime == "" & c.daDate == EntityFunctions.TruncateTime(Dateeee)).FirstOrDefault();
 
-                        var atten = await db.Daily_Attendances.Where(c => c.userId == obj.userId && EF.Functions.DateDiffDay(c.daDate, Dateeee) == 0  && c.endTime == "").FirstOrDefaultAsync();
+                        var atten = await db.Daily_Attendances.Where(c => c.userId == obj.userId && EF.Functions.DateDiffDay(c.daDate, Dateeee) == 0 && c.endTime == "").FirstOrDefaultAsync();
 
                         if (atten == null)
                         {
@@ -5607,7 +5608,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
         public async Task<CollectionSyncResult> SaveUserLocationOfflineSyncAsync(SBGarbageCollectionView obj, int AppId, int typeId)
         {
-           
+
             using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
             {
                 try
@@ -5621,7 +5622,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         DateTime newTime = Dateeee;
                         DateTime oldTime;
                         TimeSpan span = TimeSpan.Zero;
-                        var gcd = await db.Locations.Where(c => c.userId == obj.userId && c.type == null && EF.Functions.DateDiffDay(c.datetime, Dateeee) == 0 ).OrderByDescending(c => c.locId).FirstOrDefaultAsync();
+                        var gcd = await db.Locations.Where(c => c.userId == obj.userId && c.type == null && EF.Functions.DateDiffDay(c.datetime, Dateeee) == 0).OrderByDescending(c => c.locId).FirstOrDefaultAsync();
                         if (gcd != null)
                         {
                             oldTime = gcd.datetime.Value;
@@ -5690,7 +5691,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         DateTime newTime = Dateeee;
                         DateTime oldTime;
                         TimeSpan span = TimeSpan.Zero;
-                        var IsSameRecordQr_Location = await db.Qr_Locations.Where(c => c.empId == obj.userId && c.type == null && EF.Functions.DateDiffDay(c.datetime, Dateeee) == 0 ).OrderByDescending(c => c.locId).FirstOrDefaultAsync();
+                        var IsSameRecordQr_Location = await db.Qr_Locations.Where(c => c.empId == obj.userId && c.type == null && EF.Functions.DateDiffDay(c.datetime, Dateeee) == 0).OrderByDescending(c => c.locId).FirstOrDefaultAsync();
                         if (IsSameRecordQr_Location != null)
                         {
                             oldTime = IsSameRecordQr_Location.datetime.Value;
@@ -5752,7 +5753,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     }
                     return result;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     _logger.LogError(ex.ToString(), ex);
                     CollectionSyncResult result = new CollectionSyncResult();
@@ -5821,7 +5822,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         }
                     }
 
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         _logger.LogError(ex.ToString(), ex);
                         result.status = "error";
@@ -5837,7 +5838,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                     try
                     {
-                        Qr_Employee_Daily_Attendance objdata = await db.Qr_Employee_Daily_Attendances.Where(c => EF.Functions.DateDiffDay(c.startDate, obj.startDate) == 0  && c.qrEmpId == obj.qrEmpId && (c.endTime == "" || c.endTime == null)).FirstOrDefaultAsync();
+                        Qr_Employee_Daily_Attendance objdata = await db.Qr_Employee_Daily_Attendances.Where(c => EF.Functions.DateDiffDay(c.startDate, obj.startDate) == 0 && c.qrEmpId == obj.qrEmpId && (c.endTime == "" || c.endTime == null)).FirstOrDefaultAsync();
                         if (objdata != null)
                         {
 
@@ -5911,7 +5912,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             return result;
                         }
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         _logger.LogError(ex.ToString(), ex);
                         result.status = "error";
@@ -5941,7 +5942,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         public async Task<Result> SaveQrHPDCollectionsAsync(BigVQRHPDVM obj, int AppId, int gcType)
         {
             Result result = new Result();
-            
+
             // var appdetails = dbMain.AppDetails.Where(c => c.AppId == AppId).FirstOrDefault();
             //using (new TransactionScope(
             //       TransactionScopeOption.Required,
@@ -5958,11 +5959,11 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 double New_Long = 0;
                 try
                 {
-                    
+
                     var appdetails = await dbMain.AppDetails.Where(c => c.AppId == AppId).FirstOrDefaultAsync();
 
                     DateTime Dateeee = DateTime.Now;
-                    var atten = await db.Qr_Employee_Daily_Attendances.Where(c => c.qrEmpId == obj.userId && EF.Functions.DateDiffDay(c.startDate, Dateeee) == 0 ).FirstOrDefaultAsync();
+                    var atten = await db.Qr_Employee_Daily_Attendances.Where(c => c.qrEmpId == obj.userId && EF.Functions.DateDiffDay(c.startDate, Dateeee) == 0).FirstOrDefaultAsync();
                     var Activeuser = await db.QrEmployeeMasters.Where(c => c.qrEmpId == obj.userId).FirstOrDefaultAsync();
                     if (Activeuser.isActive == false)
                     {
@@ -5973,13 +5974,13 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     }
                     else if (atten != null)
                     {
-                        
-                            coordinates p = new coordinates()
+
+                        coordinates p = new coordinates()
                         {
                             lat = Convert.ToDouble(obj.Lat),
                             lng = Convert.ToDouble(obj.Long)
                         };
-                       
+
 
                         obj.IsIn = false;
                         if (appdetails.AppAreaLatLong != null)
@@ -6056,7 +6057,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     //////////////////////////////////////////////////////////////////
                                     obj.date = DateTime.Now;
                                     obj.ReferanceId = obj.ReferanceId;
-                                    
+
 
                                     db.Qr_Locations.Add(await FillLocationDetailsAsync(obj, AppId, false));
                                     //////////////////////////////////////////////////////////////////
@@ -6320,12 +6321,12 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     {
                                         house.houseLat = obj.Lat;
                                     }
-                                   
+
                                     if ((string.IsNullOrEmpty(obj.Long.ToString())) == false)
                                     {
                                         house.houseLong = obj.Long;
                                     }
-                                   
+
                                     house.modified = DateTime.Now;
 
                                     if (obj.areaId > 0 && (string.IsNullOrEmpty(obj.areaId.ToString())) == false)
@@ -6375,7 +6376,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     result.status = "success";
                                     result.message = "Uploaded successfully";
                                     result.messageMar = "सबमिट यशस्वी";
-                                   
+
                                 }
                                 else
                                 {
@@ -6432,7 +6433,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         public async Task<List<CollectionSyncResult>> SaveQrHPDCollectionsOfflineAsync(List<BigVQRHPDVM> obj, int AppId)
         {
             List<CollectionSyncResult> result = new List<CollectionSyncResult>();
-            
+
             using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
             using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
             {
@@ -6441,7 +6442,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     var appdetails = await dbMain.AppDetails.Where(c => c.AppId == AppId).FirstOrDefaultAsync();
                     foreach (var item in obj)
                     {
-                     
+
                         coordinates p = new coordinates()
                         {
                             lat = Convert.ToDouble(item.Lat),
@@ -7107,7 +7108,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         });
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     _logger.LogError(ex.ToString(), ex);
                     return obj;
@@ -7118,7 +7119,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         public async Task<List<BigVQrworkhistorydetails>> GetQrWorkHistoryDetailsAsync(DateTime date, int AppId, int userId)
         {
             List<BigVQrworkhistorydetails> obj = new List<BigVQrworkhistorydetails>();
-            
+
             using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
             using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
             {
@@ -7196,7 +7197,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     _logger.LogError(ex.ToString(), ex);
                     return obj;
                 }
-                
+
 
             }
         }
@@ -7311,7 +7312,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     return Details;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return Details;
@@ -7454,7 +7455,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return result;
@@ -7501,7 +7502,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return result;
@@ -7990,356 +7991,356 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         try
                         {
                             DateTime Datee = Convert.ToDateTime(cdate);
-                        var IsSameRecordLocation = await db.Locations.Where(c => c.userId == x.userId && c.datetime == Datee && c.type == null && c.EmployeeType == "L").FirstOrDefaultAsync();
+                            var IsSameRecordLocation = await db.Locations.Where(c => c.userId == x.userId && c.datetime == Datee && c.type == null && c.EmployeeType == "L").FirstOrDefaultAsync();
 
-                        bool _IsInSync = false, _IsOutSync = false;
-                        var user = await db.UserMasters.Where(c => c.userId == x.userId && c.EmployeeType == "L").FirstOrDefaultAsync();
+                            bool _IsInSync = false, _IsOutSync = false;
+                            var user = await db.UserMasters.Where(c => c.userId == x.userId && c.EmployeeType == "L").FirstOrDefaultAsync();
 
-                        if (user.isActive == true)
-                        {
-
-                            var IsSameRecord = db.Daily_Attendances.Where(
-                                   c => c.userId == x.userId &&
-                                   //c.startLat == x.startLat &&
-                                   //c.startLong == x.startLong &&
-                                   //c.endLat == x.endLat &&
-                                   //c.endLong == x.endLong &&
-                                   c.startTime == x.startTime &&
-                                   c.endTime == x.endTime &&
-                                   EF.Functions.DateDiffDay(c.daDate, x.daDate) == 0 &&
-                                   EF.Functions.DateDiffDay(c.daEndDate, x.daEndDate) == 0 &&
-                                   c.EmployeeType == "L"
-                                 ).FirstOrDefault();
-
-                            if (IsSameRecord == null)
+                            if (user.isActive == true)
                             {
 
-                                var objdata = await db.Daily_Attendances.Where(c => EF.Functions.DateDiffDay(c.daDate, x.daDate) == 0 && c.userId == x.userId && (c.endTime == "" || c.endTime == null) && c.EmployeeType == "L").FirstOrDefaultAsync();
-                                if (objdata != null && x.endTime == null)
-                                {
-                                    objdata.endTime = x.startTime;
-                                    objdata.daEndDate = x.daDate;
-                                    objdata.endLat = x.startLat;
-                                    objdata.endLong = x.startLong;
-                                    objdata.OutbatteryStatus = x.batteryStatus;
-                                    objdata.totalKm = x.totalKm;
-                                    objdata.EmployeeType = "L";
-                                    db.SaveChanges();
-                                }
-                                if (objdata != null)
+                                var IsSameRecord = db.Daily_Attendances.Where(
+                                       c => c.userId == x.userId &&
+                                       //c.startLat == x.startLat &&
+                                       //c.startLong == x.startLong &&
+                                       //c.endLat == x.endLat &&
+                                       //c.endLong == x.endLong &&
+                                       c.startTime == x.startTime &&
+                                       c.endTime == x.endTime &&
+                                       EF.Functions.DateDiffDay(c.daDate, x.daDate) == 0 &&
+                                       EF.Functions.DateDiffDay(c.daEndDate, x.daEndDate) == 0 &&
+                                       c.EmployeeType == "L"
+                                     ).FirstOrDefault();
+
+                                if (IsSameRecord == null)
                                 {
 
-                                    objdata.userId = x.userId;
-                                    objdata.startLat = x.startLat;
-                                    objdata.startLong = x.startLong;
-                                    objdata.startTime = x.startTime;
-                                    objdata.daDate = x.daDate;
-                                    objdata.vehicleNumber = x.vehicleNumber;
-                                    objdata.vtId = x.vtId;
-                                    objdata.EmployeeType = "L";
-                                    //objdata.daEndDate = x.daEndDate;
-
-                                    if (x.daEndDate.Equals(DateTime.MinValue))
+                                    var objdata = await db.Daily_Attendances.Where(c => EF.Functions.DateDiffDay(c.daDate, x.daDate) == 0 && c.userId == x.userId && (c.endTime == "" || c.endTime == null) && c.EmployeeType == "L").FirstOrDefaultAsync();
+                                    if (objdata != null && x.endTime == null)
                                     {
-                                        objdata.daEndDate = null;
-                                        objdata.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
+                                        objdata.endTime = x.startTime;
+                                        objdata.daEndDate = x.daDate;
+                                        objdata.endLat = x.startLat;
+                                        objdata.endLong = x.startLong;
+                                        objdata.OutbatteryStatus = x.batteryStatus;
+                                        objdata.totalKm = x.totalKm;
+                                        objdata.EmployeeType = "L";
+                                        db.SaveChanges();
                                     }
-                                    else
+                                    if (objdata != null)
                                     {
+
+                                        objdata.userId = x.userId;
+                                        objdata.startLat = x.startLat;
+                                        objdata.startLong = x.startLong;
+                                        objdata.startTime = x.startTime;
+                                        objdata.daDate = x.daDate;
+                                        objdata.vehicleNumber = x.vehicleNumber;
+                                        objdata.vtId = x.vtId;
+                                        objdata.EmployeeType = "L";
                                         //objdata.daEndDate = x.daEndDate;
-                                        if (x.daEndDate == x.daDate)
+
+                                        if (x.daEndDate.Equals(DateTime.MinValue))
                                         {
-                                            objdata.daEndDate = x.daEndDate;
+                                            objdata.daEndDate = null;
                                             objdata.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
                                         }
                                         else
                                         {
-                                            objdata.daEndDate = x.daDate;
-                                            objdata.endTime = "11:50 PM";
-                                        }
-                                    }
-
-                                    objdata.endLat = x.endLat;
-                                    objdata.endLong = x.endLong;
-                                    //objdata.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime); //x.endTime;
-                                    objdata.daStartNote = x.daStartNote;
-                                    objdata.daEndNote = x.daEndNote;
-                                    objdata.OutbatteryStatus = x.batteryStatus;
-                                    //  objdata.batteryStatus = x.batteryStatus;
-                                    if (objdata != null && x.endTime == null)
-                                    {
-                                        db.Daily_Attendances.Add(objdata);
-                                    }
-                                    _IsInSync = true;
-
-                                    if (x.endLat != null && x.endLong != null && IsSameRecordLocation == null)
-                                    {
-                                        string Time2 = x.endTime;
-                                        DateTime date2 = DateTime.Parse(Time2, System.Globalization.CultureInfo.CurrentCulture);
-                                        string t2 = date2.ToString("hh:mm:ss tt");
-                                        string dt2 = Convert.ToDateTime(x.daEndDate).ToString("MM/dd/yyyy");
-                                        DateTime? edate = Convert.ToDateTime(dt2 + " " + t2);
-
-                                        Location loc = new Location();
-                                        loc.userId = x.userId;
-                                        loc.datetime = edate;
-                                        loc.lat = x.endLat;
-                                        loc._long = x.endLong;
-                                        loc.batteryStatus = x.batteryStatus;
-                                        loc.address = Address(x.endLat + "," + x.endLong);
-                                        if (loc.address != "")
-                                        {
-                                            loc.area = area(loc.address);
-                                        }
-                                        else
-                                        {
-                                            loc.area = "";
-                                        }
-
-                                        loc.IsOffline = true;
-                                        loc.CreatedDate = DateTime.Now;
-                                        loc.EmployeeType = "L";
-                                        db.Locations.Add(loc);
-                                        _IsOutSync = true;
-                                        _IsInSync = false;
-                                    }
-
-                                    await db.SaveChangesAsync();
-                                }
-                                else
-                                {
-                                    var OutTime = await db.Daily_Attendances.Where(a => a.userId == x.userId && a.startTime == x.startTime && a.daDate == x.daDate && a.EmployeeType == "L").OrderByDescending(m => m.daID).FirstOrDefaultAsync();
-
-                                    if (OutTime != null && OutTime.endTime == "11:50 PM")
-                                    {
-                                        OutTime.userId = x.userId;
-                                        OutTime.startLat = x.startLat;
-                                        OutTime.startLong = x.startLong;
-                                        OutTime.startTime = x.startTime;
-                                        OutTime.daDate = x.daDate;
-                                        OutTime.vehicleNumber = x.vehicleNumber;
-                                        OutTime.vtId = x.vtId;
-                                        OutTime.EmployeeType = "L";
-                                        if (x.daEndDate.Equals(DateTime.MinValue))
-                                        {
-                                            OutTime.daEndDate = null;
-                                            OutTime.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
-                                        }
-                                        else
-                                        {
+                                            //objdata.daEndDate = x.daEndDate;
                                             if (x.daEndDate == x.daDate)
                                             {
-                                                OutTime.daEndDate = x.daEndDate;
+                                                objdata.daEndDate = x.daEndDate;
+                                                objdata.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
+                                            }
+                                            else
+                                            {
+                                                objdata.daEndDate = x.daDate;
+                                                objdata.endTime = "11:50 PM";
+                                            }
+                                        }
+
+                                        objdata.endLat = x.endLat;
+                                        objdata.endLong = x.endLong;
+                                        //objdata.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime); //x.endTime;
+                                        objdata.daStartNote = x.daStartNote;
+                                        objdata.daEndNote = x.daEndNote;
+                                        objdata.OutbatteryStatus = x.batteryStatus;
+                                        //  objdata.batteryStatus = x.batteryStatus;
+                                        if (objdata != null && x.endTime == null)
+                                        {
+                                            db.Daily_Attendances.Add(objdata);
+                                        }
+                                        _IsInSync = true;
+
+                                        if (x.endLat != null && x.endLong != null && IsSameRecordLocation == null)
+                                        {
+                                            string Time2 = x.endTime;
+                                            DateTime date2 = DateTime.Parse(Time2, System.Globalization.CultureInfo.CurrentCulture);
+                                            string t2 = date2.ToString("hh:mm:ss tt");
+                                            string dt2 = Convert.ToDateTime(x.daEndDate).ToString("MM/dd/yyyy");
+                                            DateTime? edate = Convert.ToDateTime(dt2 + " " + t2);
+
+                                            Location loc = new Location();
+                                            loc.userId = x.userId;
+                                            loc.datetime = edate;
+                                            loc.lat = x.endLat;
+                                            loc._long = x.endLong;
+                                            loc.batteryStatus = x.batteryStatus;
+                                            loc.address = Address(x.endLat + "," + x.endLong);
+                                            if (loc.address != "")
+                                            {
+                                                loc.area = area(loc.address);
+                                            }
+                                            else
+                                            {
+                                                loc.area = "";
+                                            }
+
+                                            loc.IsOffline = true;
+                                            loc.CreatedDate = DateTime.Now;
+                                            loc.EmployeeType = "L";
+                                            db.Locations.Add(loc);
+                                            _IsOutSync = true;
+                                            _IsInSync = false;
+                                        }
+
+                                        await db.SaveChangesAsync();
+                                    }
+                                    else
+                                    {
+                                        var OutTime = await db.Daily_Attendances.Where(a => a.userId == x.userId && a.startTime == x.startTime && a.daDate == x.daDate && a.EmployeeType == "L").OrderByDescending(m => m.daID).FirstOrDefaultAsync();
+
+                                        if (OutTime != null && OutTime.endTime == "11:50 PM")
+                                        {
+                                            OutTime.userId = x.userId;
+                                            OutTime.startLat = x.startLat;
+                                            OutTime.startLong = x.startLong;
+                                            OutTime.startTime = x.startTime;
+                                            OutTime.daDate = x.daDate;
+                                            OutTime.vehicleNumber = x.vehicleNumber;
+                                            OutTime.vtId = x.vtId;
+                                            OutTime.EmployeeType = "L";
+                                            if (x.daEndDate.Equals(DateTime.MinValue))
+                                            {
+                                                OutTime.daEndDate = null;
                                                 OutTime.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
                                             }
                                             else
                                             {
-                                                OutTime.daEndDate = x.daDate;
-                                                OutTime.endTime = "11:50 PM";
+                                                if (x.daEndDate == x.daDate)
+                                                {
+                                                    OutTime.daEndDate = x.daEndDate;
+                                                    OutTime.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
+                                                }
+                                                else
+                                                {
+                                                    OutTime.daEndDate = x.daDate;
+                                                    OutTime.endTime = "11:50 PM";
+                                                }
+
                                             }
 
-                                        }
+                                            OutTime.endLat = x.endLat;
+                                            OutTime.endLong = x.endLong;
+                                            //OutTime.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime); //x.endTime;
+                                            OutTime.daStartNote = x.daStartNote;
+                                            OutTime.daEndNote = x.daEndNote;
+                                            OutTime.batteryStatus = x.batteryStatus;
 
-                                        OutTime.endLat = x.endLat;
-                                        OutTime.endLong = x.endLong;
-                                        //OutTime.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime); //x.endTime;
-                                        OutTime.daStartNote = x.daStartNote;
-                                        OutTime.daEndNote = x.daEndNote;
-                                        OutTime.batteryStatus = x.batteryStatus;
+                                            //db.Daily_Attendance.Add(attendance);
+                                            _IsInSync = true;
 
-                                        //db.Daily_Attendance.Add(attendance);
-                                        _IsInSync = true;
-
-                                    }
-                                    else
-                                    {
-                                        attendance.userId = x.userId;
-                                        attendance.startLat = x.startLat;
-                                        attendance.startLong = x.startLong;
-                                        attendance.startTime = x.startTime;
-                                        attendance.daDate = x.daDate;
-                                        attendance.vehicleNumber = x.vehicleNumber;
-                                        attendance.vtId = x.vtId;
-                                        attendance.EmployeeType = "L";
-                                        if (x.daEndDate.Equals(DateTime.MinValue))
-                                        {
-                                            attendance.daEndDate = null;
-                                            attendance.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
                                         }
                                         else
                                         {
-                                            if (x.daEndDate == x.daDate)
+                                            attendance.userId = x.userId;
+                                            attendance.startLat = x.startLat;
+                                            attendance.startLong = x.startLong;
+                                            attendance.startTime = x.startTime;
+                                            attendance.daDate = x.daDate;
+                                            attendance.vehicleNumber = x.vehicleNumber;
+                                            attendance.vtId = x.vtId;
+                                            attendance.EmployeeType = "L";
+                                            if (x.daEndDate.Equals(DateTime.MinValue))
                                             {
-                                                attendance.daEndDate = x.daEndDate;
+                                                attendance.daEndDate = null;
                                                 attendance.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
-
                                             }
                                             else
                                             {
-                                                attendance.daEndDate = x.daDate;
-                                                attendance.endTime = "11:50 PM";
-                                            }
-                                        }
+                                                if (x.daEndDate == x.daDate)
+                                                {
+                                                    attendance.daEndDate = x.daEndDate;
+                                                    attendance.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
 
-                                        attendance.endLat = x.endLat;
-                                        attendance.endLong = x.endLong;
-                                        //attendance.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime); //x.endTime;
-                                        attendance.daStartNote = x.daStartNote;
-                                        attendance.daEndNote = x.daEndNote;
-                                        attendance.batteryStatus = x.batteryStatus;
-                                        if (OutTime != null)
-                                        {
-                                            if (OutTime.endTime == "" || OutTime.endTime == null)
+                                                }
+                                                else
+                                                {
+                                                    attendance.daEndDate = x.daDate;
+                                                    attendance.endTime = "11:50 PM";
+                                                }
+                                            }
+
+                                            attendance.endLat = x.endLat;
+                                            attendance.endLong = x.endLong;
+                                            //attendance.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime); //x.endTime;
+                                            attendance.daStartNote = x.daStartNote;
+                                            attendance.daEndNote = x.daEndNote;
+                                            attendance.batteryStatus = x.batteryStatus;
+                                            if (OutTime != null)
+                                            {
+                                                if (OutTime.endTime == "" || OutTime.endTime == null)
+                                                {
+                                                    db.Daily_Attendances.Add(attendance);
+                                                }
+                                                OutTime.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
+                                            }
+                                            if (OutTime == null)
                                             {
                                                 db.Daily_Attendances.Add(attendance);
                                             }
-                                            OutTime.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
+                                            _IsInSync = true;
+                                            //  db.SaveChanges();
+                                            //if ((!string.IsNullOrEmpty(x.endLat))  && (!string.IsNullOrEmpty(x.endLong)))
+                                            //{
+                                            //    string Time2 = x.endTime;
+                                            //    DateTime date2 = DateTime.Parse(Time2, System.Globalization.CultureInfo.CurrentCulture);
+                                            //    string t2 = date2.ToString("hh:mm:ss tt");
+                                            //    string dt2 = Convert.ToDateTime(x.daEndDate).ToString("MM/dd/yyyy");
+                                            //    DateTime? edate = Convert.ToDateTime(dt2 + " " + t2);
+
+                                            //    Location loc = new Location();
+                                            //    loc.userId = x.userId;
+                                            //    loc.datetime = edate;
+                                            //    loc.lat = x.endLat;
+                                            //    loc.@long = x.endLong;
+                                            //    loc.batteryStatus = x.batteryStatus;
+                                            //    loc.address = Address(x.endLat + "," + x.endLong);
+                                            //    if (loc.address != "")
+                                            //    {
+                                            //        loc.area = area(loc.address);
+                                            //    }
+                                            //    else
+                                            //    {
+                                            //        loc.area = "";
+                                            //    }
+
+                                            //    loc.IsOffline = true;
+                                            //    loc.CreatedDate = DateTime.Now;
+
+                                            //    db.Locations.Add(loc);
+                                            //    _IsOutSync = true;
+                                            //}
+
+                                            //db.SaveChanges();
+
                                         }
-                                        if (OutTime == null)
+                                        if ((!string.IsNullOrEmpty(x.endLat)) && (!string.IsNullOrEmpty(x.endLong)) && IsSameRecordLocation == null)
                                         {
-                                            db.Daily_Attendances.Add(attendance);
+                                            string Time2 = x.endTime;
+                                            DateTime date2 = DateTime.Parse(Time2, System.Globalization.CultureInfo.CurrentCulture);
+                                            string t2 = date2.ToString("hh:mm:ss tt");
+                                            string dt2 = Convert.ToDateTime(x.daEndDate).ToString("MM/dd/yyyy");
+                                            DateTime? edate = Convert.ToDateTime(dt2 + " " + t2);
+
+                                            Location loc = new Location();
+                                            loc.userId = x.userId;
+                                            loc.datetime = edate;
+                                            loc.lat = x.endLat;
+                                            loc._long = x.endLong;
+                                            loc.batteryStatus = x.batteryStatus;
+                                            loc.address = Address(x.endLat + "," + x.endLong);
+                                            if (loc.address != "")
+                                            {
+                                                loc.area = area(loc.address);
+                                            }
+                                            else
+                                            {
+                                                loc.area = "";
+                                            }
+
+                                            loc.IsOffline = true;
+                                            loc.CreatedDate = DateTime.Now;
+                                            loc.EmployeeType = "L";
+                                            db.Locations.Add(loc);
+                                            _IsOutSync = true;
                                         }
-                                        _IsInSync = true;
-                                        //  db.SaveChanges();
-                                        //if ((!string.IsNullOrEmpty(x.endLat))  && (!string.IsNullOrEmpty(x.endLong)))
-                                        //{
-                                        //    string Time2 = x.endTime;
-                                        //    DateTime date2 = DateTime.Parse(Time2, System.Globalization.CultureInfo.CurrentCulture);
-                                        //    string t2 = date2.ToString("hh:mm:ss tt");
-                                        //    string dt2 = Convert.ToDateTime(x.daEndDate).ToString("MM/dd/yyyy");
-                                        //    DateTime? edate = Convert.ToDateTime(dt2 + " " + t2);
 
-                                        //    Location loc = new Location();
-                                        //    loc.userId = x.userId;
-                                        //    loc.datetime = edate;
-                                        //    loc.lat = x.endLat;
-                                        //    loc.@long = x.endLong;
-                                        //    loc.batteryStatus = x.batteryStatus;
-                                        //    loc.address = Address(x.endLat + "," + x.endLong);
-                                        //    if (loc.address != "")
-                                        //    {
-                                        //        loc.area = area(loc.address);
-                                        //    }
-                                        //    else
-                                        //    {
-                                        //        loc.area = "";
-                                        //    }
+                                        if ((!string.IsNullOrEmpty(x.startLat)) && (!string.IsNullOrEmpty(x.startLong)) && IsSameRecordLocation == null)
+                                        {
+                                            string Time2 = x.startTime;
+                                            DateTime date2 = DateTime.Parse(Time2, System.Globalization.CultureInfo.CurrentCulture);
+                                            string t2 = date2.ToString("hh:mm:ss tt");
+                                            string dt2 = Convert.ToDateTime(x.daDate).ToString("MM/dd/yyyy");
+                                            DateTime? sdate = Convert.ToDateTime(dt2 + " " + t2);
 
-                                        //    loc.IsOffline = true;
-                                        //    loc.CreatedDate = DateTime.Now;
+                                            Location loc = new Location();
+                                            loc.userId = x.userId;
+                                            loc.datetime = sdate;
+                                            loc.lat = x.startLat;
+                                            loc._long = x.startLong;
+                                            loc.batteryStatus = x.batteryStatus;
+                                            loc.address = Address(x.startLat + "," + x.startLong);
+                                            if (loc.address != "")
+                                            {
+                                                loc.area = area(loc.address);
+                                            }
+                                            else
+                                            {
+                                                loc.area = "";
+                                            }
 
-                                        //    db.Locations.Add(loc);
-                                        //    _IsOutSync = true;
-                                        //}
-
-                                        //db.SaveChanges();
-
+                                            loc.IsOffline = true;
+                                            loc.CreatedDate = DateTime.Now;
+                                            loc.EmployeeType = "L";
+                                            db.Locations.Add(loc);
+                                            _IsOutSync = false;
+                                        }
+                                        await db.SaveChangesAsync();
                                     }
-                                    if ((!string.IsNullOrEmpty(x.endLat)) && (!string.IsNullOrEmpty(x.endLong)) && IsSameRecordLocation == null)
+
+                                    result.Add(new SyncResult1()
                                     {
-                                        string Time2 = x.endTime;
-                                        DateTime date2 = DateTime.Parse(Time2, System.Globalization.CultureInfo.CurrentCulture);
-                                        string t2 = date2.ToString("hh:mm:ss tt");
-                                        string dt2 = Convert.ToDateTime(x.daEndDate).ToString("MM/dd/yyyy");
-                                        DateTime? edate = Convert.ToDateTime(dt2 + " " + t2);
+                                        ID = x.OfflineID,
+                                        status = "success",
+                                        message = "Shift started Successfully",
+                                        messageMar = "शिफ्ट सुरू",
+                                        IsInSync = _IsInSync,
+                                        IsOutSync = _IsOutSync,
+                                        EmpType = "L",
 
-                                        Location loc = new Location();
-                                        loc.userId = x.userId;
-                                        loc.datetime = edate;
-                                        loc.lat = x.endLat;
-                                        loc._long = x.endLong;
-                                        loc.batteryStatus = x.batteryStatus;
-                                        loc.address = Address(x.endLat + "," + x.endLong);
-                                        if (loc.address != "")
-                                        {
-                                            loc.area = area(loc.address);
-                                        }
-                                        else
-                                        {
-                                            loc.area = "";
-                                        }
-
-                                        loc.IsOffline = true;
-                                        loc.CreatedDate = DateTime.Now;
-                                        loc.EmployeeType = "L";
-                                        db.Locations.Add(loc);
-                                        _IsOutSync = true;
-                                    }
-
-                                    if ((!string.IsNullOrEmpty(x.startLat)) && (!string.IsNullOrEmpty(x.startLong)) && IsSameRecordLocation == null)
-                                    {
-                                        string Time2 = x.startTime;
-                                        DateTime date2 = DateTime.Parse(Time2, System.Globalization.CultureInfo.CurrentCulture);
-                                        string t2 = date2.ToString("hh:mm:ss tt");
-                                        string dt2 = Convert.ToDateTime(x.daDate).ToString("MM/dd/yyyy");
-                                        DateTime? sdate = Convert.ToDateTime(dt2 + " " + t2);
-
-                                        Location loc = new Location();
-                                        loc.userId = x.userId;
-                                        loc.datetime = sdate;
-                                        loc.lat = x.startLat;
-                                        loc._long = x.startLong;
-                                        loc.batteryStatus = x.batteryStatus;
-                                        loc.address = Address(x.startLat + "," + x.startLong);
-                                        if (loc.address != "")
-                                        {
-                                            loc.area = area(loc.address);
-                                        }
-                                        else
-                                        {
-                                            loc.area = "";
-                                        }
-
-                                        loc.IsOffline = true;
-                                        loc.CreatedDate = DateTime.Now;
-                                        loc.EmployeeType = "L";
-                                        db.Locations.Add(loc);
-                                        _IsOutSync = false;
-                                    }
-                                    await db.SaveChangesAsync();
+                                    });
                                 }
-
-                                result.Add(new SyncResult1()
+                                else
                                 {
-                                    ID = x.OfflineID,
-                                    status = "success",
-                                    message = "Shift started Successfully",
-                                    messageMar = "शिफ्ट सुरू",
-                                    IsInSync = _IsInSync,
-                                    IsOutSync = _IsOutSync,
-                                    EmpType = "L",
+                                    result.Add(new SyncResult1()
+                                    {
+                                        ID = x.OfflineID,
+                                        status = "success",
+                                        message = "Shift started Successfully",
+                                        messageMar = "शिफ्ट सुरू",
+                                        IsInSync = true,
+                                        IsOutSync = true,
+                                        EmpType = "L",
+                                    });
+                                }
+                            }
 
-                                });
-                            }
-                            else
-                            {
-                                result.Add(new SyncResult1()
-                                {
-                                    ID = x.OfflineID,
-                                    status = "success",
-                                    message = "Shift started Successfully",
-                                    messageMar = "शिफ्ट सुरू",
-                                    IsInSync = true,
-                                    IsOutSync = true,
-                                    EmpType = "L",
-                                });
-                            }
                         }
-
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex.ToString(), ex);
-                        result.Add(new SyncResult1()
+                        catch (Exception ex)
                         {
-                            ID = x.OfflineID,
-                            status = "error",
-                            message = "Something is wrong,Try Again.. ",
-                            messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..",
-                            IsInSync = false,
-                            IsOutSync = false,
-                            EmpType = "L",
-                        });
+                            _logger.LogError(ex.ToString(), ex);
+                            result.Add(new SyncResult1()
+                            {
+                                ID = x.OfflineID,
+                                status = "error",
+                                message = "Something is wrong,Try Again.. ",
+                                messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..",
+                                IsInSync = false,
+                                IsOutSync = false,
+                                EmpType = "L",
+                            });
                             return result;
                         }
 
@@ -8368,357 +8369,357 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         try
                         {
                             DateTime Datee = Convert.ToDateTime(cdate);
-                        var IsSameRecordLocation = await db.Locations.Where(c => c.userId == x.userId && c.datetime == Datee && c.type == null && c.EmployeeType == "S").FirstOrDefaultAsync();
+                            var IsSameRecordLocation = await db.Locations.Where(c => c.userId == x.userId && c.datetime == Datee && c.type == null && c.EmployeeType == "S").FirstOrDefaultAsync();
 
-                        bool _IsInSync = false, _IsOutSync = false;
-                        var user = await db.UserMasters.Where(c => c.userId == x.userId && c.EmployeeType == "S").FirstOrDefaultAsync();
+                            bool _IsInSync = false, _IsOutSync = false;
+                            var user = await db.UserMasters.Where(c => c.userId == x.userId && c.EmployeeType == "S").FirstOrDefaultAsync();
 
-                        if (user.isActive == true)
-                        {
-
-                            var IsSameRecord = await db.Daily_Attendances.Where(
-                                   c => c.userId == x.userId &&
-                                   //c.startLat == x.startLat &&
-                                   //c.startLong == x.startLong &&
-                                   //c.endLat == x.endLat &&
-                                   //c.endLong == x.endLong &&
-                                   c.startTime == x.startTime &&
-                                   c.endTime == x.endTime &&
-                                   EF.Functions.DateDiffDay(c.daDate, x.daDate) == 0 &&
-                                   EF.Functions.DateDiffDay(c.daEndDate, x.daEndDate) == 0 &&
-                                   c.EmployeeType == "S"
-                                 ).FirstOrDefaultAsync();
-
-                            if (IsSameRecord == null)
+                            if (user.isActive == true)
                             {
 
-                                var objdata = await db.Daily_Attendances.Where(c => EF.Functions.DateDiffDay(c.daDate, x.daDate) == 0 && c.userId == x.userId && (c.endTime == "" || c.endTime == null) && c.EmployeeType == "S").FirstOrDefaultAsync();
-                                if (objdata != null && x.endTime == null)
-                                {
-                                    objdata.endTime = x.startTime;
-                                    objdata.daEndDate = x.daDate;
-                                    objdata.endLat = x.startLat;
-                                    objdata.endLong = x.startLong;
-                                    objdata.OutbatteryStatus = x.batteryStatus;
-                                    objdata.totalKm = x.totalKm;
-                                    objdata.EmployeeType = "S";
-                                    await db.SaveChangesAsync();
-                                }
-                                if (objdata != null)
+                                var IsSameRecord = await db.Daily_Attendances.Where(
+                                       c => c.userId == x.userId &&
+                                       //c.startLat == x.startLat &&
+                                       //c.startLong == x.startLong &&
+                                       //c.endLat == x.endLat &&
+                                       //c.endLong == x.endLong &&
+                                       c.startTime == x.startTime &&
+                                       c.endTime == x.endTime &&
+                                       EF.Functions.DateDiffDay(c.daDate, x.daDate) == 0 &&
+                                       EF.Functions.DateDiffDay(c.daEndDate, x.daEndDate) == 0 &&
+                                       c.EmployeeType == "S"
+                                     ).FirstOrDefaultAsync();
+
+                                if (IsSameRecord == null)
                                 {
 
-                                    objdata.userId = x.userId;
-                                    objdata.startLat = x.startLat;
-                                    objdata.startLong = x.startLong;
-                                    objdata.startTime = x.startTime;
-                                    objdata.daDate = x.daDate;
-                                    objdata.vehicleNumber = x.vehicleNumber;
-                                    objdata.vtId = x.vtId;
-                                    objdata.EmployeeType = "S";
-                                    //objdata.daEndDate = x.daEndDate;
-
-                                    if (x.daEndDate.Equals(DateTime.MinValue))
+                                    var objdata = await db.Daily_Attendances.Where(c => EF.Functions.DateDiffDay(c.daDate, x.daDate) == 0 && c.userId == x.userId && (c.endTime == "" || c.endTime == null) && c.EmployeeType == "S").FirstOrDefaultAsync();
+                                    if (objdata != null && x.endTime == null)
                                     {
-                                        objdata.daEndDate = null;
-                                        objdata.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
+                                        objdata.endTime = x.startTime;
+                                        objdata.daEndDate = x.daDate;
+                                        objdata.endLat = x.startLat;
+                                        objdata.endLong = x.startLong;
+                                        objdata.OutbatteryStatus = x.batteryStatus;
+                                        objdata.totalKm = x.totalKm;
+                                        objdata.EmployeeType = "S";
+                                        await db.SaveChangesAsync();
                                     }
-                                    else
+                                    if (objdata != null)
                                     {
+
+                                        objdata.userId = x.userId;
+                                        objdata.startLat = x.startLat;
+                                        objdata.startLong = x.startLong;
+                                        objdata.startTime = x.startTime;
+                                        objdata.daDate = x.daDate;
+                                        objdata.vehicleNumber = x.vehicleNumber;
+                                        objdata.vtId = x.vtId;
+                                        objdata.EmployeeType = "S";
                                         //objdata.daEndDate = x.daEndDate;
-                                        if (x.daEndDate == x.daDate)
+
+                                        if (x.daEndDate.Equals(DateTime.MinValue))
                                         {
-                                            objdata.daEndDate = x.daEndDate;
+                                            objdata.daEndDate = null;
                                             objdata.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
                                         }
                                         else
                                         {
-                                            objdata.daEndDate = x.daDate;
-                                            objdata.endTime = "11:50 PM";
-                                        }
-                                    }
-
-                                    objdata.endLat = x.endLat;
-                                    objdata.endLong = x.endLong;
-                                    //objdata.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime); //x.endTime;
-                                    objdata.daStartNote = x.daStartNote;
-                                    objdata.daEndNote = x.daEndNote;
-                                    objdata.OutbatteryStatus = x.batteryStatus;
-                                    //  objdata.batteryStatus = x.batteryStatus;
-                                    if (objdata != null && x.endTime == null)
-                                    {
-                                        db.Daily_Attendances.Add(objdata);
-                                    }
-                                    _IsInSync = true;
-
-                                    if (x.endLat != null && x.endLong != null && IsSameRecordLocation == null)
-                                    {
-                                        string Time2 = x.endTime;
-                                        DateTime date2 = DateTime.Parse(Time2, System.Globalization.CultureInfo.CurrentCulture);
-                                        string t2 = date2.ToString("hh:mm:ss tt");
-                                        string dt2 = Convert.ToDateTime(x.daEndDate).ToString("MM/dd/yyyy");
-                                        DateTime? edate = Convert.ToDateTime(dt2 + " " + t2);
-
-                                        Location loc = new Location();
-                                        loc.userId = x.userId;
-                                        loc.datetime = edate;
-                                        loc.lat = x.endLat;
-                                        loc._long = x.endLong;
-                                        loc.batteryStatus = x.batteryStatus;
-                                        loc.address = Address(x.endLat + "," + x.endLong);
-                                        if (loc.address != "")
-                                        {
-                                            loc.area = area(loc.address);
-                                        }
-                                        else
-                                        {
-                                            loc.area = "";
-                                        }
-
-                                        loc.IsOffline = true;
-                                        loc.CreatedDate = DateTime.Now;
-                                        loc.EmployeeType = "S";
-                                        db.Locations.Add(loc);
-                                        _IsOutSync = true;
-                                        _IsInSync = false;
-                                    }
-
-                                    await db.SaveChangesAsync();
-                                }
-                                else
-                                {
-                                    var OutTime = await db.Daily_Attendances.Where(a => a.userId == x.userId && a.startTime == x.startTime && a.daDate == x.daDate && a.EmployeeType == "S").OrderByDescending(m => m.daID).FirstOrDefaultAsync();
-
-                                    if (OutTime != null && OutTime.endTime == "11:50 PM")
-                                    {
-                                        OutTime.userId = x.userId;
-                                        OutTime.startLat = x.startLat;
-                                        OutTime.startLong = x.startLong;
-                                        OutTime.startTime = x.startTime;
-                                        OutTime.daDate = x.daDate;
-                                        OutTime.vehicleNumber = x.vehicleNumber;
-                                        OutTime.vtId = x.vtId;
-                                        OutTime.EmployeeType = "S";
-                                        if (x.daEndDate.Equals(DateTime.MinValue))
-                                        {
-                                            OutTime.daEndDate = null;
-                                            OutTime.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
-                                        }
-                                        else
-                                        {
+                                            //objdata.daEndDate = x.daEndDate;
                                             if (x.daEndDate == x.daDate)
                                             {
-                                                OutTime.daEndDate = x.daEndDate;
+                                                objdata.daEndDate = x.daEndDate;
+                                                objdata.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
+                                            }
+                                            else
+                                            {
+                                                objdata.daEndDate = x.daDate;
+                                                objdata.endTime = "11:50 PM";
+                                            }
+                                        }
+
+                                        objdata.endLat = x.endLat;
+                                        objdata.endLong = x.endLong;
+                                        //objdata.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime); //x.endTime;
+                                        objdata.daStartNote = x.daStartNote;
+                                        objdata.daEndNote = x.daEndNote;
+                                        objdata.OutbatteryStatus = x.batteryStatus;
+                                        //  objdata.batteryStatus = x.batteryStatus;
+                                        if (objdata != null && x.endTime == null)
+                                        {
+                                            db.Daily_Attendances.Add(objdata);
+                                        }
+                                        _IsInSync = true;
+
+                                        if (x.endLat != null && x.endLong != null && IsSameRecordLocation == null)
+                                        {
+                                            string Time2 = x.endTime;
+                                            DateTime date2 = DateTime.Parse(Time2, System.Globalization.CultureInfo.CurrentCulture);
+                                            string t2 = date2.ToString("hh:mm:ss tt");
+                                            string dt2 = Convert.ToDateTime(x.daEndDate).ToString("MM/dd/yyyy");
+                                            DateTime? edate = Convert.ToDateTime(dt2 + " " + t2);
+
+                                            Location loc = new Location();
+                                            loc.userId = x.userId;
+                                            loc.datetime = edate;
+                                            loc.lat = x.endLat;
+                                            loc._long = x.endLong;
+                                            loc.batteryStatus = x.batteryStatus;
+                                            loc.address = Address(x.endLat + "," + x.endLong);
+                                            if (loc.address != "")
+                                            {
+                                                loc.area = area(loc.address);
+                                            }
+                                            else
+                                            {
+                                                loc.area = "";
+                                            }
+
+                                            loc.IsOffline = true;
+                                            loc.CreatedDate = DateTime.Now;
+                                            loc.EmployeeType = "S";
+                                            db.Locations.Add(loc);
+                                            _IsOutSync = true;
+                                            _IsInSync = false;
+                                        }
+
+                                        await db.SaveChangesAsync();
+                                    }
+                                    else
+                                    {
+                                        var OutTime = await db.Daily_Attendances.Where(a => a.userId == x.userId && a.startTime == x.startTime && a.daDate == x.daDate && a.EmployeeType == "S").OrderByDescending(m => m.daID).FirstOrDefaultAsync();
+
+                                        if (OutTime != null && OutTime.endTime == "11:50 PM")
+                                        {
+                                            OutTime.userId = x.userId;
+                                            OutTime.startLat = x.startLat;
+                                            OutTime.startLong = x.startLong;
+                                            OutTime.startTime = x.startTime;
+                                            OutTime.daDate = x.daDate;
+                                            OutTime.vehicleNumber = x.vehicleNumber;
+                                            OutTime.vtId = x.vtId;
+                                            OutTime.EmployeeType = "S";
+                                            if (x.daEndDate.Equals(DateTime.MinValue))
+                                            {
+                                                OutTime.daEndDate = null;
                                                 OutTime.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
                                             }
                                             else
                                             {
-                                                OutTime.daEndDate = x.daDate;
-                                                OutTime.endTime = "11:50 PM";
+                                                if (x.daEndDate == x.daDate)
+                                                {
+                                                    OutTime.daEndDate = x.daEndDate;
+                                                    OutTime.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
+                                                }
+                                                else
+                                                {
+                                                    OutTime.daEndDate = x.daDate;
+                                                    OutTime.endTime = "11:50 PM";
+                                                }
+
                                             }
 
-                                        }
+                                            OutTime.endLat = x.endLat;
+                                            OutTime.endLong = x.endLong;
+                                            //OutTime.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime); //x.endTime;
+                                            OutTime.daStartNote = x.daStartNote;
+                                            OutTime.daEndNote = x.daEndNote;
+                                            OutTime.batteryStatus = x.batteryStatus;
 
-                                        OutTime.endLat = x.endLat;
-                                        OutTime.endLong = x.endLong;
-                                        //OutTime.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime); //x.endTime;
-                                        OutTime.daStartNote = x.daStartNote;
-                                        OutTime.daEndNote = x.daEndNote;
-                                        OutTime.batteryStatus = x.batteryStatus;
+                                            //db.Daily_Attendance.Add(attendance);
+                                            _IsInSync = true;
 
-                                        //db.Daily_Attendance.Add(attendance);
-                                        _IsInSync = true;
-
-                                    }
-                                    else
-                                    {
-                                        attendance.userId = x.userId;
-                                        attendance.startLat = x.startLat;
-                                        attendance.startLong = x.startLong;
-                                        attendance.startTime = x.startTime;
-                                        attendance.daDate = x.daDate;
-                                        attendance.vehicleNumber = x.vehicleNumber;
-                                        attendance.vtId = x.vtId;
-                                        attendance.EmployeeType = "S";
-                                        if (x.daEndDate.Equals(DateTime.MinValue))
-                                        {
-                                            attendance.daEndDate = null;
-                                            attendance.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
                                         }
                                         else
                                         {
-                                            if (x.daEndDate == x.daDate)
+                                            attendance.userId = x.userId;
+                                            attendance.startLat = x.startLat;
+                                            attendance.startLong = x.startLong;
+                                            attendance.startTime = x.startTime;
+                                            attendance.daDate = x.daDate;
+                                            attendance.vehicleNumber = x.vehicleNumber;
+                                            attendance.vtId = x.vtId;
+                                            attendance.EmployeeType = "S";
+                                            if (x.daEndDate.Equals(DateTime.MinValue))
                                             {
-                                                attendance.daEndDate = x.daEndDate;
+                                                attendance.daEndDate = null;
                                                 attendance.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
-
                                             }
                                             else
                                             {
-                                                attendance.daEndDate = x.daDate;
-                                                attendance.endTime = "11:50 PM";
-                                            }
-                                        }
+                                                if (x.daEndDate == x.daDate)
+                                                {
+                                                    attendance.daEndDate = x.daEndDate;
+                                                    attendance.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
 
-                                        attendance.endLat = x.endLat;
-                                        attendance.endLong = x.endLong;
-                                        //attendance.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime); //x.endTime;
-                                        attendance.daStartNote = x.daStartNote;
-                                        attendance.daEndNote = x.daEndNote;
-                                        attendance.batteryStatus = x.batteryStatus;
-                                        if (OutTime != null)
-                                        {
-                                            if (OutTime.endTime == "" || OutTime.endTime == null)
+                                                }
+                                                else
+                                                {
+                                                    attendance.daEndDate = x.daDate;
+                                                    attendance.endTime = "11:50 PM";
+                                                }
+                                            }
+
+                                            attendance.endLat = x.endLat;
+                                            attendance.endLong = x.endLong;
+                                            //attendance.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime); //x.endTime;
+                                            attendance.daStartNote = x.daStartNote;
+                                            attendance.daEndNote = x.daEndNote;
+                                            attendance.batteryStatus = x.batteryStatus;
+                                            if (OutTime != null)
+                                            {
+                                                if (OutTime.endTime == "" || OutTime.endTime == null)
+                                                {
+                                                    db.Daily_Attendances.Add(attendance);
+                                                }
+                                                OutTime.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
+                                            }
+                                            if (OutTime == null)
                                             {
                                                 db.Daily_Attendances.Add(attendance);
                                             }
-                                            OutTime.endTime = (string.IsNullOrEmpty(x.endTime) ? "" : x.endTime);
+                                            _IsInSync = true;
+                                            //  db.SaveChanges();
+                                            //if ((!string.IsNullOrEmpty(x.endLat))  && (!string.IsNullOrEmpty(x.endLong)))
+                                            //{
+                                            //    string Time2 = x.endTime;
+                                            //    DateTime date2 = DateTime.Parse(Time2, System.Globalization.CultureInfo.CurrentCulture);
+                                            //    string t2 = date2.ToString("hh:mm:ss tt");
+                                            //    string dt2 = Convert.ToDateTime(x.daEndDate).ToString("MM/dd/yyyy");
+                                            //    DateTime? edate = Convert.ToDateTime(dt2 + " " + t2);
+
+                                            //    Location loc = new Location();
+                                            //    loc.userId = x.userId;
+                                            //    loc.datetime = edate;
+                                            //    loc.lat = x.endLat;
+                                            //    loc.@long = x.endLong;
+                                            //    loc.batteryStatus = x.batteryStatus;
+                                            //    loc.address = Address(x.endLat + "," + x.endLong);
+                                            //    if (loc.address != "")
+                                            //    {
+                                            //        loc.area = area(loc.address);
+                                            //    }
+                                            //    else
+                                            //    {
+                                            //        loc.area = "";
+                                            //    }
+
+                                            //    loc.IsOffline = true;
+                                            //    loc.CreatedDate = DateTime.Now;
+
+                                            //    db.Locations.Add(loc);
+                                            //    _IsOutSync = true;
+                                            //}
+
+                                            //db.SaveChanges();
+
                                         }
-                                        if (OutTime == null)
+                                        if ((!string.IsNullOrEmpty(x.endLat)) && (!string.IsNullOrEmpty(x.endLong)) && IsSameRecordLocation == null)
                                         {
-                                            db.Daily_Attendances.Add(attendance);
+                                            string Time2 = x.endTime;
+                                            DateTime date2 = DateTime.Parse(Time2, System.Globalization.CultureInfo.CurrentCulture);
+                                            string t2 = date2.ToString("hh:mm:ss tt");
+                                            string dt2 = Convert.ToDateTime(x.daEndDate).ToString("MM/dd/yyyy");
+                                            DateTime? edate = Convert.ToDateTime(dt2 + " " + t2);
+
+                                            Location loc = new Location();
+                                            loc.userId = x.userId;
+                                            loc.datetime = edate;
+                                            loc.lat = x.endLat;
+                                            loc._long = x.endLong;
+                                            loc.batteryStatus = x.batteryStatus;
+                                            loc.address = Address(x.endLat + "," + x.endLong);
+                                            if (loc.address != "")
+                                            {
+                                                loc.area = area(loc.address);
+                                            }
+                                            else
+                                            {
+                                                loc.area = "";
+                                            }
+
+                                            loc.IsOffline = true;
+                                            loc.CreatedDate = DateTime.Now;
+                                            loc.EmployeeType = "S";
+                                            db.Locations.Add(loc);
+                                            _IsOutSync = true;
                                         }
-                                        _IsInSync = true;
-                                        //  db.SaveChanges();
-                                        //if ((!string.IsNullOrEmpty(x.endLat))  && (!string.IsNullOrEmpty(x.endLong)))
-                                        //{
-                                        //    string Time2 = x.endTime;
-                                        //    DateTime date2 = DateTime.Parse(Time2, System.Globalization.CultureInfo.CurrentCulture);
-                                        //    string t2 = date2.ToString("hh:mm:ss tt");
-                                        //    string dt2 = Convert.ToDateTime(x.daEndDate).ToString("MM/dd/yyyy");
-                                        //    DateTime? edate = Convert.ToDateTime(dt2 + " " + t2);
 
-                                        //    Location loc = new Location();
-                                        //    loc.userId = x.userId;
-                                        //    loc.datetime = edate;
-                                        //    loc.lat = x.endLat;
-                                        //    loc.@long = x.endLong;
-                                        //    loc.batteryStatus = x.batteryStatus;
-                                        //    loc.address = Address(x.endLat + "," + x.endLong);
-                                        //    if (loc.address != "")
-                                        //    {
-                                        //        loc.area = area(loc.address);
-                                        //    }
-                                        //    else
-                                        //    {
-                                        //        loc.area = "";
-                                        //    }
+                                        if ((!string.IsNullOrEmpty(x.startLat)) && (!string.IsNullOrEmpty(x.startLong)) && IsSameRecordLocation == null)
+                                        {
+                                            string Time2 = x.startTime;
+                                            DateTime date2 = DateTime.Parse(Time2, System.Globalization.CultureInfo.CurrentCulture);
+                                            string t2 = date2.ToString("hh:mm:ss tt");
+                                            string dt2 = Convert.ToDateTime(x.daDate).ToString("MM/dd/yyyy");
+                                            DateTime? sdate = Convert.ToDateTime(dt2 + " " + t2);
 
-                                        //    loc.IsOffline = true;
-                                        //    loc.CreatedDate = DateTime.Now;
+                                            Location loc = new Location();
+                                            loc.userId = x.userId;
+                                            loc.datetime = sdate;
+                                            loc.lat = x.startLat;
+                                            loc._long = x.startLong;
+                                            loc.batteryStatus = x.batteryStatus;
+                                            loc.address = Address(x.startLat + "," + x.startLong);
+                                            if (loc.address != "")
+                                            {
+                                                loc.area = area(loc.address);
+                                            }
+                                            else
+                                            {
+                                                loc.area = "";
+                                            }
 
-                                        //    db.Locations.Add(loc);
-                                        //    _IsOutSync = true;
-                                        //}
-
-                                        //db.SaveChanges();
-
+                                            loc.IsOffline = true;
+                                            loc.CreatedDate = DateTime.Now;
+                                            loc.EmployeeType = "S";
+                                            db.Locations.Add(loc);
+                                            _IsOutSync = false;
+                                        }
+                                        await db.SaveChangesAsync();
                                     }
-                                    if ((!string.IsNullOrEmpty(x.endLat)) && (!string.IsNullOrEmpty(x.endLong)) && IsSameRecordLocation == null)
+
+                                    result.Add(new SyncResult1()
                                     {
-                                        string Time2 = x.endTime;
-                                        DateTime date2 = DateTime.Parse(Time2, System.Globalization.CultureInfo.CurrentCulture);
-                                        string t2 = date2.ToString("hh:mm:ss tt");
-                                        string dt2 = Convert.ToDateTime(x.daEndDate).ToString("MM/dd/yyyy");
-                                        DateTime? edate = Convert.ToDateTime(dt2 + " " + t2);
+                                        ID = x.OfflineID,
+                                        status = "success",
+                                        message = "Shift started Successfully",
+                                        messageMar = "शिफ्ट सुरू",
+                                        IsInSync = _IsInSync,
+                                        IsOutSync = _IsOutSync,
+                                        EmpType = "S",
 
-                                        Location loc = new Location();
-                                        loc.userId = x.userId;
-                                        loc.datetime = edate;
-                                        loc.lat = x.endLat;
-                                        loc._long = x.endLong;
-                                        loc.batteryStatus = x.batteryStatus;
-                                        loc.address = Address(x.endLat + "," + x.endLong);
-                                        if (loc.address != "")
-                                        {
-                                            loc.area = area(loc.address);
-                                        }
-                                        else
-                                        {
-                                            loc.area = "";
-                                        }
-
-                                        loc.IsOffline = true;
-                                        loc.CreatedDate = DateTime.Now;
-                                        loc.EmployeeType = "S";
-                                        db.Locations.Add(loc);
-                                        _IsOutSync = true;
-                                    }
-
-                                    if ((!string.IsNullOrEmpty(x.startLat)) && (!string.IsNullOrEmpty(x.startLong)) && IsSameRecordLocation == null)
-                                    {
-                                        string Time2 = x.startTime;
-                                        DateTime date2 = DateTime.Parse(Time2, System.Globalization.CultureInfo.CurrentCulture);
-                                        string t2 = date2.ToString("hh:mm:ss tt");
-                                        string dt2 = Convert.ToDateTime(x.daDate).ToString("MM/dd/yyyy");
-                                        DateTime? sdate = Convert.ToDateTime(dt2 + " " + t2);
-
-                                        Location loc = new Location();
-                                        loc.userId = x.userId;
-                                        loc.datetime = sdate;
-                                        loc.lat = x.startLat;
-                                        loc._long = x.startLong;
-                                        loc.batteryStatus = x.batteryStatus;
-                                        loc.address = Address(x.startLat + "," + x.startLong);
-                                        if (loc.address != "")
-                                        {
-                                            loc.area = area(loc.address);
-                                        }
-                                        else
-                                        {
-                                            loc.area = "";
-                                        }
-
-                                        loc.IsOffline = true;
-                                        loc.CreatedDate = DateTime.Now;
-                                        loc.EmployeeType = "S";
-                                        db.Locations.Add(loc);
-                                        _IsOutSync = false;
-                                    }
-                                    await db.SaveChangesAsync();
+                                    });
                                 }
-
-                                result.Add(new SyncResult1()
+                                else
                                 {
-                                    ID = x.OfflineID,
-                                    status = "success",
-                                    message = "Shift started Successfully",
-                                    messageMar = "शिफ्ट सुरू",
-                                    IsInSync = _IsInSync,
-                                    IsOutSync = _IsOutSync,
-                                    EmpType = "S",
-
-                                });
-                            }
-                            else
-                            {
-                                result.Add(new SyncResult1()
-                                {
-                                    ID = x.OfflineID,
-                                    status = "success",
-                                    message = "Shift started Successfully",
-                                    messageMar = "शिफ्ट सुरू",
-                                    IsInSync = true,
-                                    IsOutSync = true,
-                                    EmpType = "S",
-                                });
+                                    result.Add(new SyncResult1()
+                                    {
+                                        ID = x.OfflineID,
+                                        status = "success",
+                                        message = "Shift started Successfully",
+                                        messageMar = "शिफ्ट सुरू",
+                                        IsInSync = true,
+                                        IsOutSync = true,
+                                        EmpType = "S",
+                                    });
+                                }
                             }
                         }
-                    }
-                    catch(Exception ex)
-                    {
-                        _logger.LogError(ex.ToString(), ex);
-                        result.Add(new SyncResult1()
+                        catch (Exception ex)
                         {
-                            ID = x.OfflineID,
-                            status = "error",
-                            message = "Something is wrong,Try Again.. ",
-                            messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..",
-                            IsInSync = false,
-                            IsOutSync = false,
-                            EmpType = "S",
-                        });
-                        return result;
-                    }
+                            _logger.LogError(ex.ToString(), ex);
+                            result.Add(new SyncResult1()
+                            {
+                                ID = x.OfflineID,
+                                status = "error",
+                                message = "Something is wrong,Try Again.. ",
+                                messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..",
+                                IsInSync = false,
+                                IsOutSync = false,
+                                EmpType = "S",
+                            });
+                            return result;
+                        }
 
 
                     }
@@ -9472,7 +9473,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 }
                 return obj;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return obj;
@@ -9533,7 +9534,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             }
             catch (Exception ex)
             {
-               _logger.LogError(ex.ToString(), ex);
+                _logger.LogError(ex.ToString(), ex);
                 return obj;
             }
         }
@@ -9609,7 +9610,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 }
                 return obj;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return obj;
@@ -9944,7 +9945,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 //return obj.OrderByDescending(c => c.time).ToList(); 
                 return obj.ToList();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return obj;
@@ -9993,12 +9994,12 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             {
                 using (var db = new DevICTSBMChildEntities(AppId))
                 {
-                    data = await db.WardNumbers.Select( x => new CMSBWardZoneVM
+                    data = await db.WardNumbers.Select(x => new CMSBWardZoneVM
                     {
                         WardID = x.Id,
                         WardNo = x.WardNo,
                         zoneId = x.zoneId,
-                        Zone =  db.ZoneMasters.Where(c => c.zoneId == x.zoneId).Select(c => c.name).FirstOrDefault()
+                        Zone = db.ZoneMasters.Where(c => c.zoneId == x.zoneId).Select(c => c.name).FirstOrDefault()
                     }).ToListAsync();
 
                     return data.OrderByDescending(c => c.WardID).ToList();
@@ -10009,7 +10010,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 _logger.LogError(ex.ToString(), ex);
                 return data;
             }
-            
+
 
         }
         public async Task<List<CMSBAreaVM>> GetAreaListAsync(int AppId, string SearchString)
@@ -10019,7 +10020,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             {
                 using (var db = new DevICTSBMChildEntities(AppId))
                 {
-                    data = await db.TeritoryMasters.Select( x => new CMSBAreaVM
+                    data = await db.TeritoryMasters.Select(x => new CMSBAreaVM
                     {
                         id = x.Id,
                         area = x.Area,
@@ -10057,13 +10058,13 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return data;
 
             }
-            
+
 
         }
 
@@ -10101,7 +10102,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                                 };
                     var data = await db.CollecctionArea_Results.FromSqlRaw<CollecctionArea_Result>("EXEC CollecctionArea @type", parms.ToArray()).ToListAsync();
 
-                    
+
 
                     foreach (var x in data)
                     {
@@ -10276,12 +10277,12 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 return obj;
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return obj;
             }
-            
+
         }
 
         public async Task<List<HouseDetailsVM>> GetAreaHouseForLiquidAsync(int AppId, int areaId)
@@ -10328,7 +10329,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 return obj;
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return obj;
@@ -10380,13 +10381,13 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 return obj;
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return obj;
 
             }
-            
+
         }
         public async Task<List<HouseDetailsVM>> GetDumpListAsync(int AppId)
         {
@@ -10414,13 +10415,13 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 }
                 return obj;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return obj;
 
             }
-            
+
         }
 
         public async Task<List<HouseDetailsVM>> GetVehicleListAsync(int AppId)
@@ -10449,13 +10450,13 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 return obj;
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return obj;
 
             }
-            
+
         }
 
 
@@ -10482,8 +10483,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 return obj;
 
             }
-           
-            
+
+
         }
 
 
@@ -10596,7 +10597,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 _logger.LogError(ex.ToString(), ex);
                 return res;
             }
-            
+
 
 
         }
@@ -10611,7 +10612,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
                 {
                     var data = await db.GarbagePointDetails.Where(c => c.areaId == areaId).ToListAsync();
-                    if(data != null && data.Count > 0)
+                    if (data != null && data.Count > 0)
                     {
                         foreach (var x in data)
                         {
@@ -10629,7 +10630,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             });
                         }
                     }
-                    
+
 
                 }
                 return obj;
@@ -10651,7 +10652,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
                 {
                     var data = await db.DumpYardDetails.Where(c => c.areaId == areaId).ToListAsync();
-                    if(data != null && data.Count > 0)
+                    if (data != null && data.Count > 0)
                     {
                         foreach (var x in data)
                         {
@@ -10669,12 +10670,12 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             });
                         }
                     }
-                    
+
 
                 }
                 return obj;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return obj;
@@ -10725,7 +10726,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             result.imei = imei1;
                         }
                     }
-                    
+
 
                 }
                 return result;
@@ -10736,7 +10737,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 return result;
 
             }
-            
+
         }
         public async Task<SBUser> CheckSupervisorUserLoginAsync(string userName, string password, string EmpType)
         {
@@ -10768,7 +10769,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 _logger.LogError(ex.ToString(), ex);
                 return user;
             }
-            
+
         }
         public async Task<List<NameULB>> GetUlbAsync(int userId, string Status)
         {
@@ -10786,7 +10787,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         {
                             if (Status == "false")
                             {
-                                var data = await dbMain.AppDetails.Where(c => c.AppId.ToString().ToLower().Contains(author.Replace(" ","").ToLower())).ToListAsync();
+                                var data = await dbMain.AppDetails.Where(c => c.AppId.ToString().ToLower().Contains(author.Replace(" ", "").ToLower())).ToListAsync();
                                 foreach (var x in data)
                                 {
                                     obj.Add(new NameULB()
@@ -10847,12 +10848,12 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 return obj.OrderBy(c => c.ulb).ToList();
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return obj;
             }
-            
+
         }
         public async Task<HSDashboard> GetSelectedUlbDataAsync(int userId, string EmpType, int appId)
         {
@@ -10919,7 +10920,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 {
                     {
                         var data = await db.QrEmployeeMasters.Where(c => c.isActive == true).ToListAsync();
-                        if(data != null && data.Count > 0)
+                        if (data != null && data.Count > 0)
                         {
                             foreach (var x in data)
                             {
@@ -10931,7 +10932,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             }
 
                         }
-                        
+
                     }
                     if (obj != null && obj.Count > 0)
                         return obj.OrderBy(c => c.EmployeeName).ToList();
@@ -11045,7 +11046,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     {
                         foreach (var x in data)
                         {
-                            var data1 = await db.Qr_Employee_Daily_Attendances.Where(c => c.qrEmpId == x.qrEMpId && EF.Functions.DateDiffDay(c.startDate, FromDate) <= 0 && EF.Functions.DateDiffDay(c.startDate, Todate) >= 0 ).ToListAsync();
+                            var data1 = await db.Qr_Employee_Daily_Attendances.Where(c => c.qrEmpId == x.qrEMpId && EF.Functions.DateDiffDay(c.startDate, FromDate) <= 0 && EF.Functions.DateDiffDay(c.startDate, Todate) >= 0).ToListAsync();
 
                             if (data1 != null && data1.Count != 0)
                             {
@@ -11077,7 +11078,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         return obj.OrderByDescending(c => c.LiquidCount).ThenByDescending(c => c.HouseCount).ThenByDescending(c => c.StreetCount);
                     else
                         return obj;
-                    
+
 
                 }
             }
@@ -11086,7 +11087,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 _logger.LogError(ex.ToString(), ex);
                 return obj;
             }
-            
+
         }
 
         public async Task<SBUser> SupervisorLoginAsync(string userName, string password, string EmpType)
@@ -11274,7 +11275,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return obj;
@@ -11449,7 +11450,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return obj;
@@ -11484,7 +11485,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 });
                             }
                         }
-                        
+
                     }
                     else
                     {
@@ -11509,7 +11510,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 });
                             }
                         }
-                        
+
                     }
 
                 }
@@ -11721,7 +11722,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     }
 
                 }
-                    
+
 
             }
             catch (Exception ex)
@@ -11908,7 +11909,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         }
                     }
 
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         _logger.LogError(ex.ToString(), ex);
                         result.status = "error";
@@ -12010,7 +12011,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             return result;
                         }
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         _logger.LogError(ex.ToString(), ex);
                         result.status = "error";
@@ -12029,7 +12030,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             Result result = new Result();
             try
             {
-                using(DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
+                using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
                 {
                     HSUR_Daily_Attendance objdata = new HSUR_Daily_Attendance();
                     var isActive = await dbMain.EmployeeMasters.Where(c => c.EmpId == obj.qrEmpId && c.isActive == true && c.type == "SA").FirstOrDefaultAsync();
@@ -12064,10 +12065,10 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     }
 
                 }
-                
+
             }
 
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 result.status = "error";
@@ -12113,7 +12114,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             });
                         }
                     }
-                    
+
 
                     var dump = await db.DumpYardDetails.Where(x => x.ReferanceId.Contains(EmpType) && x.dyLat != null && x.dyLong != null).Select(x => new { x.ReferanceId }).ToListAsync();
                     if (dump != null && dump.Count > 0)
@@ -12130,10 +12131,10 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         }
 
                     }
-                    
+
 
                     var LW = db.LiquidWasteDetails.Where(x => x.ReferanceId.Contains(EmpType) && x.LWLat != null && x.LWLong != null).Select(x => new { x.ReferanceId }).ToList();
-                    if(LW != null && LW.Count > 0)
+                    if (LW != null && LW.Count > 0)
                     {
                         foreach (var x in LW)
                         {
@@ -12145,9 +12146,9 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             });
                         }
                     }
-                    
+
                     var SSD = db.StreetSweepingDetails.Where(x => x.ReferanceId.Contains(EmpType) && x.SSLat != null && x.SSLong != null).Select(x => new { x.ReferanceId }).ToList();
-                    if(SSD != null && SSD.Count > 0)
+                    if (SSD != null && SSD.Count > 0)
                     {
                         foreach (var x in SSD)
                         {
@@ -12164,7 +12165,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 }
                 return obj;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return obj;
@@ -12258,13 +12259,13 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             }
 
                         }
-                        
+
                     }
                     return obj;
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return obj;
@@ -12328,7 +12329,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 });
                             }
                         }
-                        
+
 
                     }
                     return obj;
@@ -12336,7 +12337,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return obj;
@@ -12403,7 +12404,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             }
                         }
                     }
-                    
+
                     return obj;
                 }
 
@@ -12480,7 +12481,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
                 return obj;
@@ -12493,14 +12494,14 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             List<UREmployeeAttendence> obj = new List<UREmployeeAttendence>();
             try
             {
-                using(DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
+                using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
                 {
                     if (type == true)
                     {
                         if (userid == 0)
                         {
                             var data = await dbMain.HSUR_Daily_Attendances.Where(c => c.startLat != null && c.daDate >= FromDate && c.daDate <= Todate).ToListAsync();
-                            if(data != null && data.Count > 0)
+                            if (data != null && data.Count > 0)
                             {
                                 foreach (var x in data)
                                 {
@@ -12526,12 +12527,12 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     });
                                 }
                             }
-                            
+
                         }
                         else
                         {
                             var data = await dbMain.HSUR_Daily_Attendances.Where(c => c.startLat != null && c.daDate >= FromDate && c.daDate <= Todate && c.userId == userid).ToListAsync();
-                            if(data != null && data.Count > 0)
+                            if (data != null && data.Count > 0)
                             {
                                 foreach (var x in data)
                                 {
@@ -12558,7 +12559,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 }
 
                             }
-                            
+
                         }
 
                     }
@@ -12593,12 +12594,12 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     });
                                 }
                             }
-                                
+
                         }
                         else
                         {
                             var data = await dbMain.HSUR_Daily_Attendances.Where(c => c.startLat == null && c.daDate >= FromDate && c.daDate <= Todate && c.userId == userid).ToListAsync();
-                            if (data!= null && data.Count>0)
+                            if (data != null && data.Count > 0)
                             {
                                 foreach (var x in data)
                                 {
@@ -12624,12 +12625,12 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     });
                                 }
                             }
-                            
+
                         }
 
                     }
                 }
-                
+
 
 
             }
@@ -12806,9 +12807,9 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         {
                             cmd.CommandText = spName;
                             cmd.CommandType = CommandType.StoredProcedure;
-                            if(parms != null)
+                            if (parms != null)
                             {
-                                foreach(var parm in parms)
+                                foreach (var parm in parms)
                                 {
                                     cmd.Parameters.Add(parm);
                                 }
@@ -12845,7 +12846,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
             using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
             {
-                try {
+                try
+                {
                     //var locc = dbMain2.SP_UserLatLongDetailMain(obj.userId, 0).FirstOrDefault();
                     List<SqlParameter> parms = new List<SqlParameter>
                                                 {
@@ -12912,7 +12914,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     _logger.LogError(ex.ToString(), ex);
                     return loc;
                 }
-             }
+            }
 
             return loc;
         }
