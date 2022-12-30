@@ -891,7 +891,7 @@ namespace ICTSBMCOREAPI.Controllers
                                 var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
 
                                  
-                                    var result1 = result.Select(i =>
+                                var result1 = result.Select(i =>
                                 {
                                     if (i.id == Convert.ToString(house.houseId))
                                     {
@@ -1317,10 +1317,34 @@ namespace ICTSBMCOREAPI.Controllers
                                        // List<GarbageTrailHouseList> GCDetails = new List<GarbageTrailHouseList>();
                                         var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) &&  x.gcDate >= Convert.ToDateTime(tn.startTs) && x.gcDate <= Convert.ToDateTime(tn.endTs)).Select(x => new { x.houseId, x.userId ,x.gcDate,x.Lat,x.Long}).ToListAsync();
 
+                                        //foreach (var b in GCDetails)
+                                        //{
+                                        //    JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                        //    var output = serializer.Serialize(b);
+
+                                        //    var result1 = result.Select(i =>
+                                        //    {
+
+                                        //        i.Housegeom = JObject.Parse(output);
+
+                                        //        return i;
+
+
+                                        //    }).Where(i => i.id == Convert.ToString(b.userId)).ToList();
+                                        //}
+
                                         JavaScriptSerializer serializer = new JavaScriptSerializer();
                                         var output = serializer.Serialize(GCDetails);
+                                        var result1 = result.Select(i =>
+                                          {
 
-                                      
+                                              i.Housegeom = output;
+
+                                              return i;
+
+
+                                          }).ToList();
+
                                         var EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.createUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
                                         var Update_EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.updateUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
 
