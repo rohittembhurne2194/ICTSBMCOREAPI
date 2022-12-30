@@ -885,7 +885,7 @@ namespace ICTSBMCOREAPI.Controllers
 
                                 foreach (var c in result)
                                 { 
-                                var house = await db.housemasters.Where(x=>x.houseId==Convert.ToInt32(c.id)).Select(x => new { x.ReferanceId, x.houseId, x.userId , x.houseOwner, x.houseOwnerMobile, x.houseAddress}).FirstOrDefaultAsync();
+                                var house = await db.HouseMasters.Where(x=>x.houseId==Convert.ToInt32(c.id)).Select(x => new { x.ReferanceId, x.houseId, x.userId , x.houseOwner, x.houseOwnerMobile, x.houseAddress}).FirstOrDefaultAsync();
 
                                 var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
                                 var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();

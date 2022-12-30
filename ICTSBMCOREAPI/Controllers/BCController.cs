@@ -34,6 +34,7 @@ namespace ICTSBMCOREAPI.Controllers
         }
 
         [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         [Route("Save/DumpyardTrip")]
         public async Task<ActionResult<List<CollectionDumpSyncResult>>> SaveDumpyardTrip([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] List<DumpTripVM> objRaw)
         {
@@ -66,7 +67,12 @@ namespace ICTSBMCOREAPI.Controllers
                         int AppIds = Convert.ToInt32(transList[0]);
                         using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppIds))
                         {
-                            var ptripid = db.TransDumpTDs.OrderByDescending(c => c.TransBcId).FirstOrDefault().TransBcId;
+                            int ptripid = 0;
+                            var pdtripid = db.TransDumpTDs.OrderByDescending(c => c.TransBcId).FirstOrDefault();
+                            if (pdtripid != null)
+                            {
+                                ptripid = pdtripid.TransBcId;
+                            }
                             ptid = Convert.ToInt32(ptripid) + 1;
                             gcbcDetail.tripId = ptid;
                             AppDetail objmain = dbMain.AppDetails.Where(x => x.AppId == AppIds).FirstOrDefault();
@@ -144,7 +150,7 @@ namespace ICTSBMCOREAPI.Controllers
                             gcDetail.totalDryWeight = item.totalDryWeight;
                             gcDetail.totalWetWeight = item.totalWetWeight;
                             gcDetail.totalGcWeight = item.totalGcWeight;
-                            Int64 dec1 = Convert.ToInt64(9071858188);
+                            Int64 dec1 = 9071858188;
                             Int64 a = 100000000;
                             gcDetail.bcTotalDryWeight = (Decimal.ToInt64(item.totalDryWeight * a) * dec1);
                             gcDetail.bcTotalWetWeight = (Decimal.ToInt64(item.totalWetWeight * a) * dec1);
@@ -173,7 +179,8 @@ namespace ICTSBMCOREAPI.Controllers
                                 messageMar = detail.messageMar,
                                 message = detail.message,
                                 dumpId = detail.dumpId,
-                                bcTransId = detail.bcTransId
+                                bcTransId = detail.bcTransId,
+                                gvstatus=detail.gvstatus
                             });
                         }
                     }

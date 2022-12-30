@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -30,7 +31,8 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public Nullable<long> bcTotalGcWeight { get; set; }
         public Nullable<long> bcTotalDryWeight { get; set; }
         public Nullable<long> bcTotalWetWeight { get; set; }
-        public Nullable<System.TimeSpan> totalHours { get; set; }
+        [JsonIgnore]
+        public TimeSpan? totalHours { get; set; }
 
         public Nullable<long> bcThr { get; set; }
     }

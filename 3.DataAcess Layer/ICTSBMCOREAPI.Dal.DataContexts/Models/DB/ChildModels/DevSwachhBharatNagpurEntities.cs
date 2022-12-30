@@ -44,6 +44,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
         public virtual DbSet<GramCleaningComplient> GramCleaningComplients { get; set; }
         public virtual DbSet<HouseBunch> HouseBunches { get; set; }
         public virtual DbSet<HouseList> HouseLists { get; set; }
+        public virtual DbSet<HouseMaster> HouseMasters { get; set; }
         public virtual DbSet<LanguageInfo> LanguageInfos { get; set; }
         public virtual DbSet<LiquidWasteDetail> LiquidWasteDetails { get; set; }
         public virtual DbSet<Location> Locations { get; set; }
@@ -81,7 +82,6 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
         public virtual DbSet<WardNumber> WardNumbers { get; set; }
         public virtual DbSet<ZoneMaster> ZoneMasters { get; set; }
         public virtual DbSet<__MigrationHistory> __MigrationHistories { get; set; }
-        public virtual DbSet<housemaster> housemasters { get; set; }
         public virtual DbSet<questionnaire> questionnaires { get; set; }
         public virtual DbSet<view_LLocation> view_LLocations { get; set; }
         public virtual DbSet<view_Location> view_Locations { get; set; }
@@ -568,6 +568,48 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
                     .IsUnicode(false);
             });
 
+            modelBuilder.Entity<HouseMaster>(entity =>
+            {
+                entity.HasKey(e => e.houseId)
+                    .HasName("PK_housemaster");
+
+                entity.ToTable("HouseMaster");
+
+                entity.Property(e => e.FCMID)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.QRStatusDate).HasColumnType("datetime");
+
+                entity.Property(e => e.RFIDTagId).HasMaxLength(255);
+
+                entity.Property(e => e.ReferanceId).HasMaxLength(350);
+
+                entity.Property(e => e.WasteType)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.houseAddress).HasMaxLength(500);
+
+                entity.Property(e => e.houseLat).HasMaxLength(500);
+
+                entity.Property(e => e.houseLong).HasMaxLength(500);
+
+                entity.Property(e => e.houseNumber).HasMaxLength(500);
+
+                entity.Property(e => e.houseOwner)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.houseOwnerMar).HasMaxLength(200);
+
+                entity.Property(e => e.houseOwnerMobile).HasMaxLength(200);
+
+                entity.Property(e => e.lastModifiedEntry).HasColumnType("datetime");
+
+                entity.Property(e => e.modified).HasColumnType("datetime");
+            });
+
             modelBuilder.Entity<LanguageInfo>(entity =>
             {
                 entity.ToTable("LanguageInfo");
@@ -886,12 +928,6 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 
                 entity.ToTable("TransDumpTD");
 
-                entity.Property(e => e.bcTotalDryWeight).HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.bcTotalGcWeight).HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.bcTotalWetWeight).HasColumnType("decimal(18, 4)");
-
                 entity.Property(e => e.bcTransId).HasMaxLength(500);
 
                 entity.Property(e => e.dyId).HasMaxLength(100);
@@ -1201,47 +1237,6 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
                 entity.Property(e => e.ProductVersion)
                     .IsRequired()
                     .HasMaxLength(32);
-            });
-
-            modelBuilder.Entity<housemaster>(entity =>
-            {
-                entity.HasKey(e => e.houseId);
-
-                entity.ToTable("housemaster");
-
-                entity.Property(e => e.FCMID)
-                    .HasMaxLength(500)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.QRStatusDate).HasColumnType("datetime");
-
-                entity.Property(e => e.RFIDTagId).HasMaxLength(255);
-
-                entity.Property(e => e.ReferanceId).HasMaxLength(350);
-
-                entity.Property(e => e.WasteType)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.houseAddress).HasMaxLength(500);
-
-                entity.Property(e => e.houseLat).HasMaxLength(500);
-
-                entity.Property(e => e.houseLong).HasMaxLength(500);
-
-                entity.Property(e => e.houseNumber).HasMaxLength(500);
-
-                entity.Property(e => e.houseOwner)
-                    .HasMaxLength(200)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.houseOwnerMar).HasMaxLength(200);
-
-                entity.Property(e => e.houseOwnerMobile).HasMaxLength(200);
-
-                entity.Property(e => e.lastModifiedEntry).HasColumnType("datetime");
-
-                entity.Property(e => e.modified).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<questionnaire>(entity =>

@@ -18,6 +18,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.OpenApi.Models;
 using ICTSBMCOREAPI.Dal.DataContexts.Models.DB;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace ICTSBMCOREAPI
 {
@@ -91,13 +94,31 @@ namespace ICTSBMCOREAPI
 
                 };
             });
-
+    
             services.AddCors(p => p.AddPolicy("MyCorsPolicy", build =>
              {
                  build.WithOrigins("http://114.143.244.130:8080").AllowAnyHeader().WithMethods("GET","POST");
              }));
-        }
 
+            services.AddControllers()
+        .AddJsonOptions(options =>
+            options.JsonSerializerOptions.Converters.Add(new TimeSpanToStringConverter()));
+
+
+        }
+        public class TimeSpanToStringConverter : JsonConverter<TimeSpan>
+        {
+            public override TimeSpan Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            {
+                var value = reader.GetString();
+                return TimeSpan.Parse(value);
+            }
+
+            public override void Write(Utf8JsonWriter writer, TimeSpan value, JsonSerializerOptions options)
+            {
+                writer.WriteStringValue(value.ToString());
+            }
+        }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {

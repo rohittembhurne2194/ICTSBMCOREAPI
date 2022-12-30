@@ -1157,17 +1157,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         result.transId = obj.transId;
                     }
 
-                }
-                catch (Exception ex)
-                {
-                    result.message = ex.Message;
-                    result.messageMar = ex.Message;
-                    result.status = "Error";
-                    result.dumpId = obj.dyId;
-                    result.transId = obj.transId;
-                    result.bcTransId = obj.bcTransId;
-
-                }
+                
+               
                 objTransDumpTD.transId = obj.transId;
                 objTransDumpTD.dyId = checkNullDump(obj.dyId);
                 objTransDumpTD.startDateTime = Convert.ToDateTime(obj.startDateTime);
@@ -1191,6 +1182,26 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 objTransDumpTD.bcThr = obj.bcThr;
                 db.TransDumpTDs.Add(objTransDumpTD);
                 db.SaveChanges();
+                    result.message = "Dump Yard Trip Transaction Save Sucessfully!!";
+                    result.messageMar = "डंप यार्ड ट्रिप व्यवहार यशस्वीरित्या जतन करा!!";
+                    result.status = "Success";
+                    result.dumpId = obj.dyId;
+                    result.transId = obj.transId;
+                    result.bcTransId = obj.bcTransId;
+                    result.gvstatus = obj.TStatus;
+
+
+                }
+                catch (Exception ex)
+                {
+                    result.message = ex.Message;
+                    result.messageMar = ex.Message;
+                    result.status = "Error";
+                    result.dumpId = obj.dyId;
+                    result.transId = obj.transId;
+                    result.bcTransId = obj.bcTransId;
+                    result.gvstatus = obj.TStatus;
+                }
             }
             return result;
 
@@ -2459,7 +2470,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     DateTime newTimeh = DateTime.Now;
                                     DateTime oldTimeh;
                                     TimeSpan spanh = TimeSpan.Zero;
-                                    var hd = await db.housemasters.Where(c => c.houseLat != null && c.houseLong != null && EF.Functions.DateDiffDay(c.modified, newTimeh) == 0).OrderByDescending(c => c.houseId).FirstOrDefaultAsync();
+                                    var hd = await db.HouseMasters.Where(c => c.houseLat != null && c.houseLong != null && EF.Functions.DateDiffDay(c.modified, newTimeh) == 0).OrderByDescending(c => c.houseId).FirstOrDefaultAsync();
                                     if (hd != null)
                                     {
                                         oldTimeh = hd.modified.Value;
@@ -2783,7 +2794,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 string House_Long = obj.Long;
                 string HouseLat = House_Lat.Substring(0, 5);
                 string HouseLong = House_Long.Substring(0, 5);
-                var house = db.housemasters.Where(c => c.ReferanceId == obj.houseId && c.houseLat.Contains(HouseLat) && c.houseLong.Contains(HouseLong)).FirstOrDefault();
+                var house = db.HouseMasters.Where(c => c.ReferanceId == obj.houseId && c.houseLat.Contains(HouseLat) && c.houseLong.Contains(HouseLong)).FirstOrDefault();
                 coordinates p = new coordinates()
                 {
                     lat = Convert.ToDouble(obj.Lat),
@@ -2940,7 +2951,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             int locType = 0;
             string mes = string.Empty;
             CollectionSyncResult result = new CollectionSyncResult();
-            housemaster dbHouse = new housemaster();
+            HouseMaster dbHouse = new HouseMaster();
 
 
 
@@ -2958,7 +2969,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 //await using var tx = await db.Database.BeginTransactionAsync();
                 var appdetails = await dbMain.AppDetails.Where(c => c.AppId == AppId).FirstOrDefaultAsync();
                 string name = "", housemob = "", nameMar = "", addre = "";
-                var house = await db.housemasters.Where(c => c.ReferanceId == obj.houseId).FirstOrDefaultAsync();
+                var house = await db.HouseMasters.Where(c => c.ReferanceId == obj.houseId).FirstOrDefaultAsync();
                 bool IsExist = false;
                 if (house == null)
                 {
@@ -3531,7 +3542,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         {
             int locType = 0;
             CollectionSyncResult result = new CollectionSyncResult();
-            housemaster dbHouse = new housemaster();
+            HouseMaster dbHouse = new HouseMaster();
 
             
             //using (new TransactionScope(
@@ -6277,7 +6288,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             }
                             else if (obj.gcType == 1)
                             {
-                                var house = await db.housemasters.Where(x => x.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
+                                var house = await db.HouseMasters.Where(x => x.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
                                 result.houseid = house.houseId;
                                 if (house.houseLat != null)
                                 {
@@ -6760,7 +6771,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     item.wastetype = houseList[1];
 
                                 }
-                                var house = await db.housemasters.Where(x => x.ReferanceId == item.ReferanceId).FirstOrDefaultAsync();
+                                var house = await db.HouseMasters.Where(x => x.ReferanceId == item.ReferanceId).FirstOrDefaultAsync();
                                 if (house != null)
                                 {
                                     if (!string.IsNullOrEmpty(item.houseNumber.ToString()))
@@ -7142,7 +7153,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         });
                     }
 
-                    var data2 = await db.housemasters.Where(c => EF.Functions.DateDiffDay(c.modified, date) == 0 && c.userId == userId).ToListAsync();
+                    var data2 = await db.HouseMasters.Where(c => EF.Functions.DateDiffDay(c.modified, date) == 0 && c.userId == userId).ToListAsync();
                     foreach (var z in data2)
                     {
                         obj.Add(new BigVQrworkhistorydetails()
@@ -9658,7 +9669,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         {
                             try
                             {
-                                var house = await db.housemasters.Where(c => c.houseId == x.houseId).FirstOrDefaultAsync();
+                                var house = await db.HouseMasters.Where(c => c.houseId == x.houseId).FirstOrDefaultAsync();
                                 housnum = checkNull(house.ReferanceId);
 
                                 if (languageId == 1)
@@ -10558,7 +10569,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     }
 
 
-                    var FCM = from h in db.housemasters
+                    var FCM = from h in db.HouseMasters
                               join d in db.DeviceDetails on h.ReferanceId equals d.ReferenceID
                               select new { FCMID = d };
 
@@ -11213,7 +11224,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                             DateTime startDate = Convert.ToDateTime(a + " " + Time1);
                             DateTime endDate = Convert.ToDateTime(b + " " + Time2);
-                            var houseCount = await db.housemasters.Where(c => c.modified >= startDate && c.modified <= endDate && c.userId == x.qrEmpId).CountAsync();
+                            var houseCount = await db.HouseMasters.Where(c => c.modified >= startDate && c.modified <= endDate && c.userId == x.qrEmpId).CountAsync();
                             var liquidCount = await db.LiquidWasteDetails.Where(c => c.lastModifiedDate >= startDate && c.lastModifiedDate <= endDate && c.userId == x.qrEmpId).CountAsync();
                             var streetCount = await db.StreetSweepingDetails.Where(c => c.lastModifiedDate >= startDate && c.lastModifiedDate <= endDate && c.userId == x.qrEmpId).CountAsync();
                             var dumpyardcount = await db.DumpYardDetails.Where(c => c.lastModifiedDate >= startDate && c.lastModifiedDate <= endDate && c.userId == x.qrEmpId).CountAsync();
@@ -11730,14 +11741,14 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         public async Task<CollectionQRStatusResult> UpdateQRstatusAsync(HSHouseDetailsGrid obj, int AppId)
         {
             CollectionQRStatusResult result = new CollectionQRStatusResult();
-            housemaster objdata = new housemaster();
+            HouseMaster objdata = new HouseMaster();
             using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
             {
                 try
                 {
                     if (obj.ReferanceId != null)
                     {
-                        var model = await db.housemasters.Where(c => c.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
+                        var model = await db.HouseMasters.Where(c => c.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
                         if (model != null)
                         {
 
@@ -12083,7 +12094,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             {
                 using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
                 {
-                    var house = await db.housemasters.Where(x => x.ReferanceId.Contains(EmpType) && x.houseLat != null && x.houseLong != null).Select(x => new { x.ReferanceId, x.houseNumber }).ToListAsync();
+                    var house = await db.HouseMasters.Where(x => x.ReferanceId.Contains(EmpType) && x.houseLat != null && x.houseLong != null).Select(x => new { x.ReferanceId, x.houseNumber }).ToListAsync();
                     if (house != null && house.Count > 0)
                     {
                         foreach (var x in house)
@@ -12195,7 +12206,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             {
                 using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(appId))
                 {
-                    var data = await db.housemasters.Where(x => x.ReferanceId == ReferanceId).ToListAsync();
+                    var data = await db.HouseMasters.Where(x => x.ReferanceId == ReferanceId).ToListAsync();
                     if (data != null && data.Count > 0)
                     {
                         foreach (var x in data)
@@ -12204,7 +12215,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             if (name != null)
                             {
                                 string QRCodeImage = "";
-                                var BQI = await db.housemasters.Where(c => c.ReferanceId == ReferanceId).Select(c => new { c.BinaryQrCodeImage }).FirstOrDefaultAsync();
+                                var BQI = await db.HouseMasters.Where(c => c.ReferanceId == ReferanceId).Select(c => new { c.BinaryQrCodeImage }).FirstOrDefaultAsync();
                                 if (BQI.BinaryQrCodeImage != null)
                                 {
                                     QRCodeImage = Convert.ToBase64String(x.BinaryQrCodeImage);

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 {
-    public partial class housemaster
+    public partial class HouseMaster
     {
         public int houseId { get; set; }
         public string houseNumber { get; set; }
