@@ -39,7 +39,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
     {
         public int? houseid { get; set; }
 
-        public string? houselat { get; set; }
-        public string? houselong { get; set; }
+        public string? Lat { get; set; }
+        public string? Long { get; set; }
     }
 }
