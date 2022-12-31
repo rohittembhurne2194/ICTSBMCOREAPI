@@ -890,8 +890,10 @@ namespace ICTSBMCOREAPI.Controllers
                                 var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
                                 var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
 
-                                 
-                                var result1 = result.Select(i =>
+
+                             
+
+                                    var result1 = result.Select(i =>
                                 {
                                     if (i.id == Convert.ToString(house.houseId))
                                     {
@@ -909,7 +911,12 @@ namespace ICTSBMCOREAPI.Controllers
                                         {
                                             i.UpdateEmployeeName = "";
                                         }
-                                        
+                                      
+                                        var value = new List<HouseProperty> { new HouseProperty { name = "ReferanceId", value = house.ReferanceId, type = "String", Index = 0 },
+                                            new HouseProperty { name = "CreateEmployeeName", value = EmployeeName.qrEmpName.ToString(), type = "String", Index = 1 } };
+                                      
+
+                                        i.HouseProperty = value;
                                         return i;
                                     }
                                     return i;
