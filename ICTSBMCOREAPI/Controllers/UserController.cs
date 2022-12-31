@@ -1335,11 +1335,11 @@ namespace ICTSBMCOREAPI.Controllers
 
                                         JavaScriptSerializer serializer = new JavaScriptSerializer();
                                         var output = serializer.Serialize(GCDetails);
-                                        var foos = new JavaScriptSerializer().Deserialize<GisHouseList[]>(output);
+                                        var housedatalist = new JavaScriptSerializer().Deserialize<GisHouseList[]>(output);
                                         var result1 = result.Select(i =>
                                           {
 
-                                              i.Housegeom = foos;
+                                              i.Housegeom = housedatalist;
 
                                               return i;
 
