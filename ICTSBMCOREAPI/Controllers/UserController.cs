@@ -904,13 +904,19 @@ namespace ICTSBMCOREAPI.Controllers
                                         if(Update_EmployeeName != null)
                                         {
                                             i.UpdateEmployeeName = Update_EmployeeName.qrEmpName.ToString();
-                                            
+
                                         }
                                         else
                                         {
                                             i.UpdateEmployeeName = "";
                                         }
-                                        
+                                      
+                                        var value = new List<HouseProperty> { new HouseProperty { name = "ReferanceId", value = house.ReferanceId, type = "String", Index = 0 },
+                                            new HouseProperty { name = "Create Employee Name", value = EmployeeName.qrEmpName.ToString(), type = "String", Index = 1 },
+                                            new HouseProperty { name = "House Owner Name", value = house.houseOwner, type = "String", Index = 2 } };
+                                      
+
+                                        i.HouseProperty = value;
                                         return i;
                                     }
                                     return i;
