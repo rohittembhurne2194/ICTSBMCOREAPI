@@ -21,6 +21,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -1335,15 +1336,26 @@ namespace ICTSBMCOREAPI.Controllers
 
                                         JavaScriptSerializer serializer = new JavaScriptSerializer();
                                         var output = serializer.Serialize(GCDetails);
+
+                                        StringBuilder sb = new StringBuilder(output);
+                                        sb.Replace(@"\", "");
+                                        // var sb.Length - 1;
+                                        //var output1 = serializer.Serialize(sb);
+
+                                        //var t = sb.Length - 1;
+                                        //  return sb.ToString();
+
+                                      //  string [] obhs  = output.ToString();
                                         var result1 = result.Select(i =>
                                           {
 
-                                              i.Housegeom = output;
+                                            //  i.Housegeom = sb.;
 
                                               return i;
 
 
                                           }).ToList();
+
 
                                         var EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.createUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
                                         var Update_EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.updateUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
