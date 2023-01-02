@@ -30,7 +30,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string HouseOwnerMobileNo { get; set; }
         public string HouseAddress { get; set; }
         [JsonProperty("HouseProperty")]
-        public dynamic HouseProperty { get; set;}
+        public dynamic HouseProperty { get; set; }
     }
 
     public class geom
@@ -47,6 +47,5 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string? value { get; set; }
         public string? type { get; set; }
         public int? Index { get; set; }
-
     }
 }
