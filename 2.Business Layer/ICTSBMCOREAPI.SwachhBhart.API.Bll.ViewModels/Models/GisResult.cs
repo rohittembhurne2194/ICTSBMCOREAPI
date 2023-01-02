@@ -47,5 +47,6 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string? value { get; set; }
         public string? type { get; set; }
         public int? Index { get; set; }
+
     }
 }
