@@ -29,7 +29,8 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string HouseOwnerName { get; set; }
         public string HouseOwnerMobileNo { get; set; }
         public string HouseAddress { get; set; }
-       
+        [JsonProperty("HouseProperty")]
+        public dynamic HouseProperty { get; set; }
     }
 
     public class geom
@@ -40,4 +41,11 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string[] coordinates { get; set; }
     }
 
+    public class HouseProperty
+    {
+        public string? name { get; set; }
+        public string? value { get; set; }
+        public string? type { get; set; }
+        public int? Index { get; set; }
+    }
 }

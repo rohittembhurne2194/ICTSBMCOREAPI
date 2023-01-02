@@ -890,8 +890,10 @@ namespace ICTSBMCOREAPI.Controllers
                                 var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
                                 var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
 
-                                 
-                                var result1 = result.Select(i =>
+
+                             
+
+                                    var result1 = result.Select(i =>
                                 {
                                     if (i.id == Convert.ToString(house.houseId))
                                     {
@@ -903,13 +905,19 @@ namespace ICTSBMCOREAPI.Controllers
                                         if(Update_EmployeeName != null)
                                         {
                                             i.UpdateEmployeeName = Update_EmployeeName.qrEmpName.ToString();
-                                            
+
                                         }
                                         else
                                         {
                                             i.UpdateEmployeeName = "";
                                         }
-                                        
+                                      
+                                        var value = new List<HouseProperty> { new HouseProperty { name = "ReferanceId", value = house.ReferanceId, type = "String", Index = 0 },
+                                            new HouseProperty { name = "Create Employee Name", value = EmployeeName.qrEmpName.ToString(), type = "String", Index = 1 },
+                                            new HouseProperty { name = "House Owner Name", value = house.houseOwner, type = "String", Index = 2 } };
+                                      
+
+                                        i.HouseProperty = value;
                                         return i;
                                     }
                                     return i;
@@ -1314,53 +1322,35 @@ namespace ICTSBMCOREAPI.Controllers
                                     foreach (var c in result)
                                     {
 
-                                       // List<GarbageTrailHouseList> GCDetails = new List<GarbageTrailHouseList>();
                                         var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) &&  x.gcDate >= Convert.ToDateTime(tn.startTs) && x.gcDate <= Convert.ToDateTime(tn.endTs)).Select(x => new { x.houseId, x.userId ,x.gcDate,x.Lat,x.Long}).ToListAsync();
 
-                                        //foreach (var b in GCDetails)
-                                        //{
-                                        //    JavaScriptSerializer serializer = new JavaScriptSerializer();
-                                        //    var output = serializer.Serialize(b);
+                                        if(GCDetails.Count > 0)
+                                        {
+                                            JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                            var output = serializer.Serialize(GCDetails);
+                                            var housedatalist = new JavaScriptSerializer().Deserialize<GisHouseList[]>(output);
+                                            var result1 = result.Select(i =>
+                                            {
+                                                i.Housegeom = housedatalist;
 
-                                        //    var result1 = result.Select(i =>
-                                        //    {
+                                                return i;
 
-                                        //        i.Housegeom = JObject.Parse(output);
+                                            }).ToList();
 
-                                        //        return i;
+                                            var EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.createUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
+                                            var Update_EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.updateUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
 
-
-                                        //    }).Where(i => i.id == Convert.ToString(b.userId)).ToList();
-                                        //}
-
-                                        JavaScriptSerializer serializer = new JavaScriptSerializer();
-                                        var output = serializer.Serialize(GCDetails);
-                                        var result1 = result.Select(i =>
-                                          {
-
-                                              i.Housegeom = output;
-
-                                              return i;
-
-
-                                          }).ToList();
-
-                                        var EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.createUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
-                                        var Update_EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.updateUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
-
+                                        }
 
                                     }
 
-
                                 }
-
 
                                 objDetail.code = dynamicobject.code.ToString();
                                 objDetail.status = dynamicobject.status.ToString();
                                 objDetail.message = dynamicobject.message.ToString();
                                 objDetail.timestamp = dynamicobject.timestamp.ToString();
                                 objDetail.data = result;
-
 
                             }
                             else
