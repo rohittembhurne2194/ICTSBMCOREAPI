@@ -896,20 +896,20 @@ namespace ICTSBMCOREAPI.Controllers
                                 {
                                     if (i.id == Convert.ToString(house.houseId))
                                     {
-                                        i.ReferanceId = house.ReferanceId;
-                                        i.HouseOwnerName = house.houseOwner;
-                                        i.HouseOwnerMobileNo = house.houseOwnerMobile;
-                                        i.HouseAddress = house.houseAddress;
-                                        i.CreateEmployeeName = EmployeeName.qrEmpName.ToString();
-                                        if(Update_EmployeeName != null)
-                                        {
-                                            i.UpdateEmployeeName = Update_EmployeeName.qrEmpName.ToString();
+                                        //i.ReferanceId = house.ReferanceId;
+                                        //i.HouseOwnerName = house.houseOwner;
+                                        //i.HouseOwnerMobileNo = house.houseOwnerMobile;
+                                        //i.HouseAddress = house.houseAddress;
+                                        //i.CreateEmployeeName = EmployeeName.qrEmpName.ToString();
+                                        //if(Update_EmployeeName != null)
+                                        //{
+                                        //    i.UpdateEmployeeName = Update_EmployeeName.qrEmpName.ToString();
 
-                                        }
-                                        else
-                                        {
-                                            i.UpdateEmployeeName = "";
-                                        }
+                                        //}
+                                        //else
+                                        //{
+                                        //    i.UpdateEmployeeName = "";
+                                        //}
                                       
                                         var value = new List<HouseProperty> { new HouseProperty { name = "ReferanceId", value = house.ReferanceId, type = "String", Index = 0 },
                                             new HouseProperty { name = "Create Employee Name", value = EmployeeName.qrEmpName.ToString(), type = "String", Index = 1 },
@@ -1321,13 +1321,36 @@ namespace ICTSBMCOREAPI.Controllers
                                     foreach (var c in result)
                                     {
 
-                                        var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) && x.gcDate >= Convert.ToDateTime(tn.startTs) && x.gcDate <= Convert.ToDateTime(tn.endTs)).Select(x => new { x.houseId, x.userId, x.gcDate, x.Lat, x.Long }).ToListAsync();
+                                        //var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) && x.gcDate >= Convert.ToDateTime(tn.startTs) && x.gcDate <= Convert.ToDateTime(tn.endTs)).Select(x => new { x.houseId, x.userId, x.gcDate, houselat = x.Lat, houselong = x.Long  }).ToListAsync();
 
-                                        if (GCDetails.Count > 0)
+                                        var query = (from s in db.GarbageCollectionDetails
+                                                     from cs in db.HouseMasters
+                                                     from um in db.UserMasters
+                                                     where s.houseId == cs.houseId
+                                                     where s.userId == um.userId
+                                                     where s.userId == Convert.ToInt32(c.createUser) && s.gcDate >= Convert.ToDateTime(tn.startTs) && s.gcDate <= Convert.ToDateTime(tn.endTs)
+                                                     select new
+                                                     {
+                                                         houseId = s.houseId,
+                                                         userId = s.userId,
+                                                         gcDate = s.gcDate,
+                                                         houselat = s.Lat,
+                                                         houselong = s.Long,
+                                                         ReferanceId = cs.ReferanceId,
+                                                         houseOwner = cs.houseOwner,
+                                                         houseOwnerMobile = cs.houseOwnerMobile,
+                                                         houseAddress = cs.houseAddress,
+                                                         employeename = um.userName
+                                                     }).ToList();
+
+                                        
+
+                                        if (query.Count > 0)
                                         {
                                             JavaScriptSerializer serializer = new JavaScriptSerializer();
-                                            var output = serializer.Serialize(GCDetails);
+                                            var output = serializer.Serialize(query);
                                             var housedatalist = new JavaScriptSerializer().Deserialize<GisHouseList[]>(output);
+
                                             var result1 = result.Select(i =>
                                             {
                                                 i.Housegeom = housedatalist;
