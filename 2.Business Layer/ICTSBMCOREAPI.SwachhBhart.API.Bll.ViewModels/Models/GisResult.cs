@@ -40,4 +40,11 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string[] coordinates { get; set; }
     }
 
+    public class HouseProperty
+    {
+        public string? name { get; set; }
+        public string? value { get; set; }
+        public string? type { get; set; }
+        public int? Index { get; set; }
+    }
 }
