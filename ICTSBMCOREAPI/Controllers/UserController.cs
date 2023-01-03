@@ -927,7 +927,7 @@ namespace ICTSBMCOREAPI.Controllers
                                
 
                             }
-                               // return objDetail;
+                            // return objDetail;
                           
                             //objDetail.Add(new HouseGisDetails()
                             //{
