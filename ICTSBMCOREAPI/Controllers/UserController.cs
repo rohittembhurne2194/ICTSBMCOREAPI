@@ -1353,7 +1353,7 @@ namespace ICTSBMCOREAPI.Controllers
 
                                             var result1 = result.Select(i =>
                                             {
-                                                i.Housegeom = housedatalist;
+                                                i.HouseList = housedatalist;
 
                                                 return i;
 
