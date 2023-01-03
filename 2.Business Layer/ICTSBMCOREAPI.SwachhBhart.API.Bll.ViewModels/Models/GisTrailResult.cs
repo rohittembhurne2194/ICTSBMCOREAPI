@@ -25,7 +25,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
 
          public  dynamic Housegeom { get; set; }
         //public int? houseid { get; set; }
-        public IList<string> Categories { get; set; }
+        //public IList<string> Categories { get; set; }
     }
 
     public class geomt
@@ -42,5 +42,10 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
 
         public string? houselat { get; set; }
         public string? houselong { get; set; }
+        public string? ReferanceId { get; set; }
+        public string? houseOwner { get; set; }
+        public string? houseOwnerMobile { get; set; }
+        public string? houseAddress { get; set; }
+        public string? employeename { get; set; }
     }
 }

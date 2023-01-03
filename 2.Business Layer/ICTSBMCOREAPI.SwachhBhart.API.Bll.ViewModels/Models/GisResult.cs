@@ -22,13 +22,13 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         [JsonProperty("geom")]
         public geom? geom { get; set; }
 
-        public string ReferanceId { get; set; }
+        //public string ReferanceId { get; set; }
 
-        public string CreateEmployeeName { get; set; }
-        public string UpdateEmployeeName { get; set; }
-        public string HouseOwnerName { get; set; }
-        public string HouseOwnerMobileNo { get; set; }
-        public string HouseAddress { get; set; }
+        //public string CreateEmployeeName { get; set; }
+        //public string UpdateEmployeeName { get; set; }
+        //public string HouseOwnerName { get; set; }
+        //public string HouseOwnerMobileNo { get; set; }
+        //public string HouseAddress { get; set; }
         [JsonProperty("HouseProperty")]
         public dynamic HouseProperty { get; set; }
     }
