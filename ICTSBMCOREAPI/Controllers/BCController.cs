@@ -161,7 +161,7 @@ namespace ICTSBMCOREAPI.Controllers
                             gcDetail.dyId = item.dyId;
                             gcDetail.userId = item.userId;
                             gcDetail.totalNumberOfHouses = item.houseList.Length;
-                            gcDetail.totalHours = item.totalHours;
+                            gcDetail.totalHours = gcbcDetail.totalHours;
 
                             string time = Convert.ToString(gcbcDetail.totalHours);
                             double seconds = TimeSpan.Parse(time).TotalSeconds;
