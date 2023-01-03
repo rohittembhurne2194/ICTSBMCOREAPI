@@ -18,5 +18,9 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string bcTransId { get; set; }
 
         public bool gvstatus { get; set; }
+
+        public int offlineId { get; set; }
+
+        
     }
 }

@@ -7,6 +7,10 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
 {
    public class DumpTripVM
     {
+        public int tripId { get; set; }
+
+        public int offlineId { get; set; }
+
         public String transId { get; set; }
         public string startDateTime { get; set; }
         public string endDateTime { get; set; } /// UserTypeID i.e. 0 = Ghanta Gadi, 1 = Scanify , 2 = Waste Management

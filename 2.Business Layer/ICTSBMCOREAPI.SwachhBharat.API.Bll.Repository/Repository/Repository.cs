@@ -1183,7 +1183,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     objTransDumpTD.bcThr = obj.bcThr;
                     db.TransDumpTDs.Add(objTransDumpTD);
                     db.SaveChanges();
-                    result.message = "Dump Yard Trip Transaction Save Sucessfully!!";
+                    result.message = "Dump Yard Trip Transaction Save Successfully!!";
                     result.messageMar = "डंप यार्ड ट्रिप व्यवहार यशस्वीरित्या जतन करा!!";
                     result.status = "Success";
                     result.dumpId = obj.dyId;
