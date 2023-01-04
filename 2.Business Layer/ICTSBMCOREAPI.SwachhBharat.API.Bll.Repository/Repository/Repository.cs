@@ -1181,6 +1181,9 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     objTransDumpTD.tHr = obj.totalHours;
                     objTransDumpTD.tNh = obj.totalNumberOfHouses;
                     objTransDumpTD.bcThr = obj.bcThr;
+                    objTransDumpTD.UsTotalDryWeight = obj.USTotalDryWeight;
+                    objTransDumpTD.UsTotalGcWeight = obj.USTotalGcWeight;
+                    objTransDumpTD.UsTotalWetWeight = obj.USTotalWetWeight;
                     db.TransDumpTDs.Add(objTransDumpTD);
                     db.SaveChanges();
                     result.message = "Dump Yard Trip Transaction Save Successfully!!";
