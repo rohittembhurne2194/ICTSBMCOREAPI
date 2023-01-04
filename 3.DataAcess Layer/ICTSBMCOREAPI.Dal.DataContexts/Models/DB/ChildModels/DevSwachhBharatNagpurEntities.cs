@@ -29,8 +29,6 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
         public virtual DbSet<ComplaintMaster> ComplaintMasters { get; set; }
         public virtual DbSet<Daily_Attendance> Daily_Attendances { get; set; }
         public virtual DbSet<DeviceDetail> DeviceDetails { get; set; }
-        public virtual DbSet<DumpTripDetail> DumpTripDetails { get; set; }
-        public virtual DbSet<DumpTripDetailM> DumpTripDetailMs { get; set; }
         public virtual DbSet<DumpYardDetail> DumpYardDetails { get; set; }
         public virtual DbSet<EmpBeatMap> EmpBeatMaps { get; set; }
         public virtual DbSet<EmpShift> EmpShifts { get; set; }
@@ -288,54 +286,6 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
                 entity.Property(e => e.InstallDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ReferenceID).HasMaxLength(50);
-            });
-
-            modelBuilder.Entity<DumpTripDetail>(entity =>
-            {
-                entity.HasKey(e => e.tripId)
-                    .HasName("PK__DumpTrip__303EBF85069CD96F");
-
-                entity.Property(e => e.dyId).HasMaxLength(100);
-
-                entity.Property(e => e.endDateTime).HasColumnType("datetime");
-
-                entity.Property(e => e.startDateTime).HasColumnType("datetime");
-
-                entity.Property(e => e.totalDryWeight).HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.totalGcWeight).HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.totalWetWeight).HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.transId).HasMaxLength(500);
-
-                entity.Property(e => e.vehicleNumber).HasMaxLength(100);
-            });
-
-            modelBuilder.Entity<DumpTripDetailM>(entity =>
-            {
-                entity.HasKey(e => e.tripId)
-                    .HasName("PK__DumpTrip__303EBF851E24862A");
-
-                entity.ToTable("DumpTripDetailM");
-
-                entity.Property(e => e.bcTransId).HasMaxLength(500);
-
-                entity.Property(e => e.dyId).HasMaxLength(100);
-
-                entity.Property(e => e.endDateTime).HasColumnType("datetime");
-
-                entity.Property(e => e.startDateTime).HasColumnType("datetime");
-
-                entity.Property(e => e.totalDryWeight).HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.totalGcWeight).HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.totalWetWeight).HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.transId).HasMaxLength(500);
-
-                entity.Property(e => e.vehicleNumber).HasMaxLength(100);
             });
 
             modelBuilder.Entity<DumpYardDetail>(entity =>
@@ -927,6 +877,12 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
                     .HasName("PK__TransDum__46195E11E052C142");
 
                 entity.ToTable("TransDumpTD");
+
+                entity.Property(e => e.UsTotalDryWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.UsTotalGcWeight).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.UsTotalWetWeight).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.bcTransId).HasMaxLength(500);
 
