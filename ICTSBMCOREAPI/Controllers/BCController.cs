@@ -62,6 +62,10 @@ namespace ICTSBMCOREAPI.Controllers
                     int ptid = 0;
                     foreach (var item in objRaw)
                     {
+
+                        decimal USTtotalGcWeight = (item.totalGcWeight * Convert.ToDecimal(0.00110231)) * 1000;
+                        decimal USTtotalDryWeight = (item.totalDryWeight * Convert.ToDecimal(0.00110231)) * 1000 ;
+                        decimal USTtotalWetWeight = (item.totalWetWeight * Convert.ToDecimal(0.00110231)) * 1000;
                         string[] transList = item.transId.Split('&');
                         int AppIds = Convert.ToInt32(transList[0]);
                         using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppIds))
@@ -87,9 +91,9 @@ namespace ICTSBMCOREAPI.Controllers
                             gcbcDetail.houseList = item.houseList;
                             gcbcDetail.tripNo = item.tripNo;
                             gcbcDetail.vehicleNumber = item.vehicleNumber;
-                            gcbcDetail.totalDryWeight = item.totalDryWeight;
-                            gcbcDetail.totalWetWeight = item.totalWetWeight;
-                            gcbcDetail.totalGcWeight = item.totalGcWeight;
+                            gcbcDetail.totalDryWeight = decimal.Round(USTtotalDryWeight, 4);
+                            gcbcDetail.totalWetWeight = decimal.Round(USTtotalWetWeight, 4);
+                            gcbcDetail.totalGcWeight = decimal.Round(USTtotalGcWeight, 4);
                             gcbcDetail.totalNumberOfHouses = item.houseList.Length;
                             TimeSpan ts = Convert.ToDateTime(item.endDateTime) - Convert.ToDateTime(item.startDateTime);
                             gcbcDetail.totalHours = ts;
