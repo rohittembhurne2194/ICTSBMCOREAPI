@@ -1181,9 +1181,12 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     objTransDumpTD.tHr = obj.totalHours;
                     objTransDumpTD.tNh = obj.totalNumberOfHouses;
                     objTransDumpTD.bcThr = obj.bcThr;
+                    objTransDumpTD.UsTotalDryWeight = obj.USTotalDryWeight;
+                    objTransDumpTD.UsTotalGcWeight = obj.USTotalGcWeight;
+                    objTransDumpTD.UsTotalWetWeight = obj.USTotalWetWeight;
                     db.TransDumpTDs.Add(objTransDumpTD);
                     db.SaveChanges();
-                    result.message = "Dump Yard Trip Transaction Save Sucessfully!!";
+                    result.message = "Dump Yard Trip Transaction Save Successfully!!";
                     result.messageMar = "डंप यार्ड ट्रिप व्यवहार यशस्वीरित्या जतन करा!!";
                     result.status = "Success";
                     result.dumpId = obj.dyId;

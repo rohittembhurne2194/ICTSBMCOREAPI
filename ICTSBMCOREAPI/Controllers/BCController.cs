@@ -62,6 +62,10 @@ namespace ICTSBMCOREAPI.Controllers
                     int ptid = 0;
                     foreach (var item in objRaw)
                     {
+
+                        decimal USTtotalGcWeight = (item.totalGcWeight * Convert.ToDecimal(0.00110231)) * 1000;
+                        decimal USTtotalDryWeight = (item.totalDryWeight * Convert.ToDecimal(0.00110231)) * 1000 ;
+                        decimal USTtotalWetWeight = (item.totalWetWeight * Convert.ToDecimal(0.00110231)) * 1000;
                         string[] transList = item.transId.Split('&');
                         int AppIds = Convert.ToInt32(transList[0]);
                         using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppIds))
@@ -87,9 +91,9 @@ namespace ICTSBMCOREAPI.Controllers
                             gcbcDetail.houseList = item.houseList;
                             gcbcDetail.tripNo = item.tripNo;
                             gcbcDetail.vehicleNumber = item.vehicleNumber;
-                            gcbcDetail.totalDryWeight = item.totalDryWeight;
-                            gcbcDetail.totalWetWeight = item.totalWetWeight;
-                            gcbcDetail.totalGcWeight = item.totalGcWeight;
+                            gcbcDetail.totalDryWeight = decimal.Round(USTtotalDryWeight, 4);
+                            gcbcDetail.totalWetWeight = decimal.Round(USTtotalWetWeight, 4);
+                            gcbcDetail.totalGcWeight = decimal.Round(USTtotalGcWeight, 4);
                             gcbcDetail.totalNumberOfHouses = item.houseList.Length;
                             TimeSpan ts = Convert.ToDateTime(item.endDateTime) - Convert.ToDateTime(item.startDateTime);
                             gcbcDetail.totalHours = ts;
@@ -151,9 +155,9 @@ namespace ICTSBMCOREAPI.Controllers
                             gcDetail.totalGcWeight = item.totalGcWeight;
                             Int64 dec1 = 9071858188;
                             Int64 a = 100000000;
-                            gcDetail.bcTotalDryWeight = (Decimal.ToInt64(item.totalDryWeight * a) * dec1);
-                            gcDetail.bcTotalWetWeight = (Decimal.ToInt64(item.totalWetWeight * a) * dec1);
-                            gcDetail.bcTotalGcWeight = (Decimal.ToInt64(item.totalGcWeight * a) * dec1);
+                            gcDetail.bcTotalDryWeight = (Decimal.ToInt64(gcbcDetail.totalDryWeight * a) * dec1);
+                            gcDetail.bcTotalWetWeight = (Decimal.ToInt64(gcbcDetail.totalWetWeight * a) * dec1);
+                            gcDetail.bcTotalGcWeight = (Decimal.ToInt64(gcbcDetail.totalGcWeight * a) * dec1);
                             gcDetail.transId = item.transId;
                             gcDetail.houseList = item.houseList;
                             gcDetail.tripNo = item.tripNo;
@@ -162,7 +166,9 @@ namespace ICTSBMCOREAPI.Controllers
                             gcDetail.userId = item.userId;
                             gcDetail.totalNumberOfHouses = item.houseList.Length;
                             gcDetail.totalHours = gcbcDetail.totalHours;
-
+                            gcDetail.USTotalGcWeight = gcbcDetail.totalGcWeight;
+                            gcDetail.USTotalDryWeight = gcbcDetail.totalDryWeight;
+                            gcDetail.USTotalWetWeight = gcbcDetail.totalWetWeight;
                             string time = Convert.ToString(gcbcDetail.totalHours);
                             double seconds = TimeSpan.Parse(time).TotalSeconds;
                             gcDetail.bcThr = Convert.ToInt32(seconds);
@@ -179,7 +185,8 @@ namespace ICTSBMCOREAPI.Controllers
                                 message = detail.message,
                                 dumpId = detail.dumpId,
                                 bcTransId = detail.bcTransId,
-                                gvstatus=detail.gvstatus
+                                gvstatus=detail.gvstatus,
+                                offlineId=item.offlineId
                             });
                         }
                     }

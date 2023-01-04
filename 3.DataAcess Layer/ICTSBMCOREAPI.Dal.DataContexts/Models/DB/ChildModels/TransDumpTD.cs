@@ -29,5 +29,8 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
         public TimeSpan? tHr { get; set; }
         public int? tNh { get; set; }
         public long? bcThr { get; set; }
+        public decimal? UsTotalGcWeight { get; set; }
+        public decimal? UsTotalDryWeight { get; set; }
+        public decimal? UsTotalWetWeight { get; set; }
     }
 }
