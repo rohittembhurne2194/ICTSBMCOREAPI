@@ -6432,6 +6432,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
         public async Task<List<CollectionSyncResult>> SaveQrHPDCollectionsOfflineAsync(List<BigVQRHPDVM> obj, int AppId)
         {
+            string refId = "";
             List<CollectionSyncResult> result = new List<CollectionSyncResult>();
 
             using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
@@ -6442,7 +6443,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     var appdetails = await dbMain.AppDetails.Where(c => c.AppId == AppId).FirstOrDefaultAsync();
                     foreach (var item in obj)
                     {
-
+                        refId = "";
                         coordinates p = new coordinates()
                         {
                             lat = Convert.ToDouble(item.Lat),
@@ -6527,6 +6528,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         status = "success",
                                         message = "Uploaded successfully",
                                         messageMar = "सबमिट यशस्वी",
+                                        referenceID = item.ReferanceId,
                                     });
                                 }
                                 else
@@ -6537,6 +6539,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         status = "error",
                                         message = "Invalid Dump Yard ID",
                                         messageMar = "अवैध डंप यार्ड आयडी ",
+                                        referenceID = item.ReferanceId,
                                     });
                                 }
 
@@ -6602,6 +6605,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         status = "success",
                                         message = "Uploaded successfully",
                                         messageMar = "सबमिट यशस्वी",
+                                        referenceID = item.ReferanceId,
                                     });
                                 }
                                 else
@@ -6612,6 +6616,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         status = "error",
                                         message = "Invalid Dump Yard ID",
                                         messageMar = "अवैध डंप यार्ड आयडी ",
+                                        referenceID = item.ReferanceId,
                                     });
                                 }
 
@@ -6676,6 +6681,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         status = "success",
                                         message = "Uploaded successfully",
                                         messageMar = "सबमिट यशस्वी",
+                                        referenceID = item.ReferanceId,
                                     });
                                 }
                                 else
@@ -6686,6 +6692,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         status = "error",
                                         message = "Invalid Dump Yard ID",
                                         messageMar = "अवैध डंप यार्ड आयडी ",
+                                        referenceID = item.ReferanceId,
                                     });
                                 }
 
@@ -6747,6 +6754,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         status = "success",
                                         message = "Uploaded successfully",
                                         messageMar = "सबमिट यशस्वी",
+                                        referenceID = item.ReferanceId,
                                     });
                                 }
                                 else
@@ -6757,6 +6765,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         status = "error",
                                         message = "Invalid Garbage Point ID",
                                         messageMar = "अवैध कचरा पॉइंट आयडी",
+                                        referenceID = item.ReferanceId,
                                     });
                                 }
                             }
@@ -6764,6 +6773,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             if (item.gcType == 1)
                             {
                                 string houseid1 = item.ReferanceId;
+                                refId = item.ReferanceId;
                                 string[] houseList = houseid1.Split(',');
 
                                 if (houseList.Length > 1)
@@ -6842,6 +6852,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         status = "success",
                                         message = "Uploaded successfully",
                                         messageMar = "सबमिट यशस्वी",
+                                        referenceID= item.ReferanceId,
                                     });
 
 
@@ -7037,6 +7048,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         status = "error",
                                         message = "Invalid House ID",
                                         messageMar = "अवैध घर आयडी",
+                                        referenceID = item.ReferanceId,
                                     });
                                 }
 
@@ -7049,7 +7061,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 ID = Convert.ToInt32(item.OfflineId),
                                 status = "Error",
                                 message = "Your outside the area,please go to inside the area.. ",
-                                messageMar = "तुम्ही क्षेत्राबाहेर आहात.कृपया परिसरात जा.."
+                                messageMar = "तुम्ही क्षेत्राबाहेर आहात.कृपया परिसरात जा..",
+                                referenceID = item.ReferanceId,
                             });
                         }
 
@@ -7065,9 +7078,11 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     result.Add(new CollectionSyncResult()
                     {
                         ID = 0,
-                        message = "Something is wrong,Try Again.. ",
+                        //  message = "Something is wrong,Try Again.. ",
+                        message = ex.Message,
                         messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..",
                         status = "error",
+                        referenceID= refId,
                     });
                     return result;
                 }
