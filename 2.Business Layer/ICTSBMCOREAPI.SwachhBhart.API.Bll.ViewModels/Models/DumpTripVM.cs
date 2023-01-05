@@ -39,5 +39,9 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public TimeSpan? totalHours { get; set; }
 
         public Nullable<long> bcThr { get; set; }
+
+        public decimal USTotalGcWeight { get; set; }
+        public decimal USTotalDryWeight { get; set; }
+        public decimal USTotalWetWeight { get; set; }
     }
 }

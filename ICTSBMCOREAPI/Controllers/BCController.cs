@@ -155,9 +155,9 @@ namespace ICTSBMCOREAPI.Controllers
                             gcDetail.totalGcWeight = item.totalGcWeight;
                             Int64 dec1 = 9071858188;
                             Int64 a = 100000000;
-                            gcDetail.bcTotalDryWeight = (Decimal.ToInt64(item.totalDryWeight * a) * dec1);
-                            gcDetail.bcTotalWetWeight = (Decimal.ToInt64(item.totalWetWeight * a) * dec1);
-                            gcDetail.bcTotalGcWeight = (Decimal.ToInt64(item.totalGcWeight * a) * dec1);
+                            gcDetail.bcTotalDryWeight = (Decimal.ToInt64(gcbcDetail.totalDryWeight * a) * dec1);
+                            gcDetail.bcTotalWetWeight = (Decimal.ToInt64(gcbcDetail.totalWetWeight * a) * dec1);
+                            gcDetail.bcTotalGcWeight = (Decimal.ToInt64(gcbcDetail.totalGcWeight * a) * dec1);
                             gcDetail.transId = item.transId;
                             gcDetail.houseList = item.houseList;
                             gcDetail.tripNo = item.tripNo;
@@ -166,7 +166,9 @@ namespace ICTSBMCOREAPI.Controllers
                             gcDetail.userId = item.userId;
                             gcDetail.totalNumberOfHouses = item.houseList.Length;
                             gcDetail.totalHours = gcbcDetail.totalHours;
-
+                            gcDetail.USTotalGcWeight = gcbcDetail.totalGcWeight;
+                            gcDetail.USTotalDryWeight = gcbcDetail.totalDryWeight;
+                            gcDetail.USTotalWetWeight = gcbcDetail.totalWetWeight;
                             string time = Convert.ToString(gcbcDetail.totalHours);
                             double seconds = TimeSpan.Parse(time).TotalSeconds;
                             gcDetail.bcThr = Convert.ToInt32(seconds);
