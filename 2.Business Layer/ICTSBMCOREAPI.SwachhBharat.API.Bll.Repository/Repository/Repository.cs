@@ -34,6 +34,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         private readonly IConfiguration _configuration;
         private readonly ILogger<Repository> _logger;
 
+        private object result;
+
         public Repository(IConfiguration configuration, ILogger<Repository> logger)
         {
             //dbMain = devICTSBMMainEntities;
@@ -6436,7 +6438,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         public async Task<List<CollectionSyncResult>> SaveQrHPDCollectionsOfflineAsync(List<BigVQRHPDVM> obj, int AppId)
         {
             string refId = "";
-            List<CollectionSyncResult> result = new List<CollectionSyncResult>();
+            List<CollectionSyncResult> myresult = new List<CollectionSyncResult>();
 
             using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
             using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
@@ -6525,7 +6527,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                                     await db.SaveChangesAsync();
 
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "success",
@@ -6536,7 +6538,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 }
                                 else
                                 {
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "error",
@@ -6602,7 +6604,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                                     await db.SaveChangesAsync();
 
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "success",
@@ -6613,7 +6615,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 }
                                 else
                                 {
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "error",
@@ -6678,7 +6680,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                                     await db.SaveChangesAsync();
 
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "success",
@@ -6689,7 +6691,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 }
                                 else
                                 {
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "error",
@@ -6751,7 +6753,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                                     await db.SaveChangesAsync();
 
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "success",
@@ -6762,7 +6764,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 }
                                 else
                                 {
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "error",
@@ -6849,7 +6851,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                                     await db.SaveChangesAsync();
 
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "success",
@@ -7013,6 +7015,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                                     });
                                                     objDetail1.gismessage = dynamicobject2.message.ToString();
                                                     objDetail1.giserrorMessages = dynamicobject2.errorMessages.ToString();
+
+                                                    //result = objDetail;
                                                 }
 
                                                 else
@@ -7072,7 +7076,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 }
                                 else
                                 {
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "error",
@@ -7086,7 +7090,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         }
                         else
                         {
-                            result.Add(new CollectionSyncResult()
+                            myresult.Add(new CollectionSyncResult()
                             {
                                 ID = Convert.ToInt32(item.OfflineId),
                                 status = "Error",
@@ -7094,18 +7098,20 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 messageMar = "तुम्ही क्षेत्राबाहेर आहात.कृपया परिसरात जा..",
                                 referenceID = item.ReferanceId,
                             });
+
+                           
                         }
 
                     }
 
-                    return result;
+                    return myresult;
 
 
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex.ToString(), ex);
-                    result.Add(new CollectionSyncResult()
+                    myresult.Add(new CollectionSyncResult()
                     {
                         ID = 0,
                         //  message = "Something is wrong,Try Again.. ",
@@ -7114,7 +7120,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         status = "error",
                         referenceID= refId,
                     });
-                    return result;
+                    return myresult;
                 }
 
 
