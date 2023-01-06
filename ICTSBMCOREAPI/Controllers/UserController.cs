@@ -946,13 +946,14 @@ namespace ICTSBMCOREAPI.Controllers
                                     {
                                         var house = await db.HouseMasters.Where(x => x.houseId == Convert.ToInt32(c.id)).Select(x => new { x.ReferanceId, x.houseId, x.userId, x.houseOwner, x.houseOwnerMobile, x.houseAddress }).FirstOrDefaultAsync();
 
+
                                         var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
                                         var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
 
-
+                                        
                                         var result1 = myresult.Select(i =>
                                         {
-                                            if (i.id == Convert.ToString(house.houseId))
+                                            if (i.id == house.houseId)
                                             {
                                                 //i.ReferanceId = house.ReferanceId;
                                                 //i.HouseOwnerName = house.houseOwner;
@@ -969,9 +970,12 @@ namespace ICTSBMCOREAPI.Controllers
                                                 //    i.UpdateEmployeeName = "";
                                                 //}
 
-                                                var value = new List<HouseProperty> { new HouseProperty { name = "ReferanceId", value = house.ReferanceId, type = "String", Index = 0 },
-                                            new HouseProperty { name = "Create Employee Name", value = EmployeeName.qrEmpName.ToString(), type = "String", Index = 1 },
-                                            new HouseProperty { name = "House Owner Name", value = house.houseOwner, type = "String", Index = 2 } };
+                                                var value = new List<HouseProperty> {
+                                                    new HouseProperty { name = "ReferanceId", value = house.ReferanceId, type = "String", Index = 0 },
+                                                    new HouseProperty { name = "Create Employee Name", value = (EmployeeName == null ? "" : EmployeeName.qrEmpName.ToString()), type = "String", Index = 1 },
+                                                    new HouseProperty { name = "Update Employee Name", value = (Update_EmployeeName == null ? "" : Update_EmployeeName.qrEmpName.ToString()), type = "String", Index = 2 },
+                                                    new HouseProperty { name = "House Owner Name", value = house.houseOwner, type = "String", Index = 3 }
+                                                };
 
 
                                                 i.HouseProperty = value;
@@ -979,7 +983,7 @@ namespace ICTSBMCOREAPI.Controllers
                                             }
                                             return i;
 
-                                        }).Where(i => i.id == Convert.ToString(house.houseId)).ToList();
+                                        }).Where(i => i.id == house.houseId).ToList();
 
                                     }
                                 }
