@@ -91,9 +91,9 @@ namespace ICTSBMCOREAPI.Controllers
                             gcbcDetail.houseList = item.houseList;
                             gcbcDetail.tripNo = item.tripNo;
                             gcbcDetail.vehicleNumber = item.vehicleNumber;
-                            gcbcDetail.totalDryWeight = decimal.Round(USTtotalDryWeight, 4);
-                            gcbcDetail.totalWetWeight = decimal.Round(USTtotalWetWeight, 4);
-                            gcbcDetail.totalGcWeight = decimal.Round(USTtotalGcWeight, 4);
+                            gcbcDetail.totalDryWeight = decimal.Round(USTtotalDryWeight, 7);
+                            gcbcDetail.totalWetWeight = decimal.Round(USTtotalWetWeight, 7);
+                            gcbcDetail.totalGcWeight = decimal.Round(USTtotalGcWeight, 7);
                             gcbcDetail.totalNumberOfHouses = item.houseList.Length;
                             TimeSpan ts = Convert.ToDateTime(item.endDateTime) - Convert.ToDateTime(item.startDateTime);
                             gcbcDetail.totalHours = ts;
