@@ -7004,7 +7004,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                                             objDetail.Add(new DumpTripStatusResult()
                                             {
-                                                code = "",
+                                                code = 404,
                                                 status = "",
                                                 message = "",
                                                 errorMessages = "GIS Connection Are Not Available",
@@ -7018,7 +7018,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     {
                                         objDetail.Add(new DumpTripStatusResult()
                                         {
-                                            code = "",
+                                            code = 400,
                                             status = "",
                                             message = "",
                                             errorMessages = ex.Message.ToString(),

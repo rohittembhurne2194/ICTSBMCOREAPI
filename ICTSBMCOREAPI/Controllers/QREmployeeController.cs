@@ -291,7 +291,7 @@ namespace ICTSBMCOREAPI.Controllers
 
                             objDetail.Add(new DumpTripStatusResult()
                             {
-                                code = "",
+                                code = 404,
                                 status = "",
                                 message = "",
                                 errorMessages = "GIS Connection Are Not Available",
@@ -305,7 +305,7 @@ namespace ICTSBMCOREAPI.Controllers
                     {
                         objDetail.Add(new DumpTripStatusResult()
                         {
-                            code = "",
+                            code = 400,
                             status = "",
                             message = "",
                             errorMessages = ex.Message.ToString(),
