@@ -70,26 +70,19 @@ namespace ICTSBMCOREAPI.Controllers
                         double l = item.houseList.Length;
                         double five = l * 0.875;
 
-                        double fivep = (five / 100)* 5;
+                        double fivep = (five / 100) * 5;
 
-                        double sixp = five + fivep;
+                        double pfp = five + fivep;
 
-                        double sixm = five - fivep;
-
-                        //if (sixm == Convert.ToDouble(totalGcWeightkg))
-                        //{
-                        //    string j = item.totalGcWeight.ToString();
-                        //    decimal n = Convert.ToDecimal(0.0000001);
-                        //    item.totalGcWeight = decimal.Add(item.totalGcWeight , n);
-                        //}
+                        double mfp = five - fivep;
 
                         decimal USTtotalGcWeight = (item.totalGcWeight * Convert.ToDecimal(0.00110231)) * 1000;
-                        decimal USTtotalDryWeight = (item.totalDryWeight * Convert.ToDecimal(0.00110231)) * 1000 ;
+                        decimal USTtotalDryWeight = (item.totalDryWeight * Convert.ToDecimal(0.00110231)) * 1000;
                         decimal USTtotalWetWeight = (item.totalWetWeight * Convert.ToDecimal(0.00110231)) * 1000;
-  
+
                         string USTtotalGcWeight1 = USTtotalGcWeight.ToString().Substring(0, 10);
                         string USTtotalDryWeight1 = USTtotalDryWeight.ToString().Substring(0, 10);
-                        string USTtotalWetWeight1 = USTtotalWetWeight.ToString().Substring(0,10);
+                        string USTtotalWetWeight1 = USTtotalWetWeight.ToString().Substring(0, 10);
                         string[] transList = item.transId.Split('&');
                         int AppIds = Convert.ToInt32(transList[0]);
                         using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppIds))
@@ -116,14 +109,14 @@ namespace ICTSBMCOREAPI.Controllers
                             gcbcDetail.tripNo = item.tripNo;
                             gcbcDetail.vehicleNumber = item.vehicleNumber;
 
-                           
-                                if (sixp <= Convert.ToDouble(totalGcWeightkg))
-                                {
-                                    gcbcDetail.totalDryWeight = decimal.Parse(USTtotalDryWeight1);
-                                    gcbcDetail.totalWetWeight = decimal.Parse(USTtotalWetWeight1);
-                                    gcbcDetail.totalGcWeight = decimal.Parse(USTtotalGcWeight1);
-                                }
-                          else  if (sixm <= Convert.ToDouble(totalGcWeightkg))
+
+                            if (pfp <= Convert.ToDouble(totalGcWeightkg))
+                            {
+                                gcbcDetail.totalDryWeight = decimal.Parse(USTtotalDryWeight1);
+                                gcbcDetail.totalWetWeight = decimal.Parse(USTtotalWetWeight1);
+                                gcbcDetail.totalGcWeight = decimal.Parse(USTtotalGcWeight1);
+                            }
+                            else if (mfp <= Convert.ToDouble(totalGcWeightkg))
                             {
                                 gcbcDetail.totalDryWeight = decimal.Round(USTtotalDryWeight, 7);
                                 gcbcDetail.totalWetWeight = decimal.Round(USTtotalWetWeight, 7);
@@ -231,8 +224,8 @@ namespace ICTSBMCOREAPI.Controllers
                                 message = detail.message,
                                 dumpId = detail.dumpId,
                                 bcTransId = detail.bcTransId,
-                                gvstatus=detail.gvstatus,
-                                offlineId=item.offlineId
+                                gvstatus = detail.gvstatus,
+                                offlineId = item.offlineId
                             });
                         }
                     }
@@ -255,7 +248,7 @@ namespace ICTSBMCOREAPI.Controllers
                 return Unauthorized();
             }
 
-           
+
         }
 
         [HttpGet]
