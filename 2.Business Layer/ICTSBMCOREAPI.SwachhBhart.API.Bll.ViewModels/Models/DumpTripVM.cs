@@ -43,5 +43,9 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public decimal USTotalGcWeight { get; set; }
         public decimal USTotalDryWeight { get; set; }
         public decimal USTotalWetWeight { get; set; }
+
+        public decimal totalGcWeightkg { get; set; }
+        public decimal totalDryWeightkg { get; set; }
+        public decimal totalWetWeightkg { get; set; }
     }
 }

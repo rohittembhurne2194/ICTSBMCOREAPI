@@ -63,9 +63,33 @@ namespace ICTSBMCOREAPI.Controllers
                     foreach (var item in objRaw)
                     {
 
+                        decimal totalGcWeightkg = item.totalGcWeight * 1000;
+                        decimal totalDryWeightkg = item.totalDryWeight * 1000;
+                        decimal totalWetWeightkg = item.totalWetWeight * 1000;
+
+                        double l = item.houseList.Length;
+                        double five = l * 0.875;
+
+                        double fivep = (five / 100)* 5;
+
+                        double sixp = five + fivep;
+
+                        double sixm = five - fivep;
+
+                        //if (sixm == Convert.ToDouble(totalGcWeightkg))
+                        //{
+                        //    string j = item.totalGcWeight.ToString();
+                        //    decimal n = Convert.ToDecimal(0.0000001);
+                        //    item.totalGcWeight = decimal.Add(item.totalGcWeight , n);
+                        //}
+
                         decimal USTtotalGcWeight = (item.totalGcWeight * Convert.ToDecimal(0.00110231)) * 1000;
                         decimal USTtotalDryWeight = (item.totalDryWeight * Convert.ToDecimal(0.00110231)) * 1000 ;
                         decimal USTtotalWetWeight = (item.totalWetWeight * Convert.ToDecimal(0.00110231)) * 1000;
+  
+                        string USTtotalGcWeight1 = USTtotalGcWeight.ToString().Substring(0, 10);
+                        string USTtotalDryWeight1 = USTtotalDryWeight.ToString().Substring(0, 10);
+                        string USTtotalWetWeight1 = USTtotalWetWeight.ToString().Substring(0,10);
                         string[] transList = item.transId.Split('&');
                         int AppIds = Convert.ToInt32(transList[0]);
                         using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppIds))
@@ -91,9 +115,27 @@ namespace ICTSBMCOREAPI.Controllers
                             gcbcDetail.houseList = item.houseList;
                             gcbcDetail.tripNo = item.tripNo;
                             gcbcDetail.vehicleNumber = item.vehicleNumber;
-                            gcbcDetail.totalDryWeight = decimal.Round(USTtotalDryWeight, 7);
-                            gcbcDetail.totalWetWeight = decimal.Round(USTtotalWetWeight, 7);
-                            gcbcDetail.totalGcWeight = decimal.Round(USTtotalGcWeight, 7);
+
+                           
+                                if (sixp <= Convert.ToDouble(totalGcWeightkg))
+                                {
+                                    gcbcDetail.totalDryWeight = decimal.Parse(USTtotalDryWeight1);
+                                    gcbcDetail.totalWetWeight = decimal.Parse(USTtotalWetWeight1);
+                                    gcbcDetail.totalGcWeight = decimal.Parse(USTtotalGcWeight1);
+                                }
+                          else  if (sixm <= Convert.ToDouble(totalGcWeightkg))
+                            {
+                                gcbcDetail.totalDryWeight = decimal.Round(USTtotalDryWeight, 7);
+                                gcbcDetail.totalWetWeight = decimal.Round(USTtotalWetWeight, 7);
+                                gcbcDetail.totalGcWeight = decimal.Round(USTtotalGcWeight, 7);
+                            }
+                            else
+                            {
+                                gcbcDetail.totalDryWeight = decimal.Round(USTtotalDryWeight, 8);
+                                gcbcDetail.totalWetWeight = decimal.Round(USTtotalWetWeight, 8);
+                                gcbcDetail.totalGcWeight = decimal.Round(USTtotalGcWeight, 8);
+
+                            }
                             gcbcDetail.totalNumberOfHouses = item.houseList.Length;
                             TimeSpan ts = Convert.ToDateTime(item.endDateTime) - Convert.ToDateTime(item.startDateTime);
                             gcbcDetail.totalHours = ts;
@@ -141,6 +183,7 @@ namespace ICTSBMCOREAPI.Controllers
                             if (getstatus2 == "FAILED")
                             {
                                 gcDetail.TStatus = false;
+
                             }
                             if (getstatus2 == "SUCCESS")
                             {
@@ -169,6 +212,9 @@ namespace ICTSBMCOREAPI.Controllers
                             gcDetail.USTotalGcWeight = gcbcDetail.totalGcWeight;
                             gcDetail.USTotalDryWeight = gcbcDetail.totalDryWeight;
                             gcDetail.USTotalWetWeight = gcbcDetail.totalWetWeight;
+                            gcDetail.totalDryWeightkg = totalDryWeightkg;
+                            gcDetail.totalWetWeightkg = totalWetWeightkg;
+                            gcDetail.totalGcWeightkg = totalGcWeightkg;
                             string time = Convert.ToString(gcbcDetail.totalHours);
                             double seconds = TimeSpan.Parse(time).TotalSeconds;
                             gcDetail.bcThr = Convert.ToInt32(seconds);

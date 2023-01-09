@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 #nullable disable
 
-namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
+namespace ICTSBMCOREAPI.Models.DB.ChildModels
 {
     public partial class TransDumpTD
     {
