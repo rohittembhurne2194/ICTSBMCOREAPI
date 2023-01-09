@@ -243,55 +243,81 @@ namespace ICTSBMCOREAPI.Controllers
 
                             var response1 = await client1.PostAsync("http://114.143.244.130:9091/house/search", stringContent1);
 
-
-                            var responseString1 = await response1.Content.ReadAsStringAsync();
-                            var jsonParsed1 = JObject.Parse(responseString1);
-                            var dynamicobject1 = JsonConvert.DeserializeObject<dynamic>(responseString1);
-                            var jsonResult1 = jsonParsed1["data"];
-
-                            List<GisResult> result = jsonResult1.ToObject<List<GisResult>>();
-
-                            if (result.Count == 0)
+                            if (response1.IsSuccessStatusCode)
                             {
-                                tn.createUser = obj.userId;
-                                tn.createTs = obj.createTs;
+                                var responseString1 = await response1.Content.ReadAsStringAsync();
+                                var jsonParsed1 = JObject.Parse(responseString1);
+                                var dynamicobject1 = JsonConvert.DeserializeObject<dynamic>(responseString1);
+                                var jsonResult1 = jsonParsed1["data"];
+
+                                List<GisResult> result = jsonResult1.ToObject<List<GisResult>>();
+
+                                if (result.Count == 0)
+                                {
+                                    tn.createUser = obj.userId;
+                                    tn.createTs = obj.createTs;
+                                }
+                                else
+                                {
+                                    tn.updateTs = obj.createTs;
+                                    tn.updateUser = obj.userId;
+                                }
+
+
+
+                                HttpClient client = new HttpClient();
+                                var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                                var stringContent = new StringContent(json);
+                                stringContent.Headers.ContentType.MediaType = "application/json";
+                                stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                                stringContent.Headers.Add("username", gis_username);
+                                stringContent.Headers.Add("password", gis_password);
+                                var response = await client.PostAsync("http://114.143.244.130:9091/house", stringContent);
+
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    var responseString = await response.Content.ReadAsStringAsync();
+                                    var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                                    objDetail.Add(new DumpTripStatusResult()
+                                    {
+                                        code = (int)response.StatusCode,
+                                        status = "Success",
+                                        message = dynamicobject.message.ToString(),
+                                        errorMessages = dynamicobject.errorMessages.ToString(),
+                                        timestamp = DateTime.Now.ToString(),
+                                        data = dynamicobject.data
+                                    });
+                                    objDetail1.gismessage = dynamicobject.message.ToString();
+                                    objDetail1.giserrorMessages = dynamicobject.errorMessages.ToString();
+                                }
+                                else
+                                {
+                                    objDetail.Add(new DumpTripStatusResult()
+                                    {
+                                        code = (int)response.StatusCode,
+                                        status = "Failed",
+                                        message = "",
+                                        timestamp = DateTime.Now.ToString()
+                                    });
+                                }
                             }
                             else
                             {
-                                tn.updateTs = obj.createTs;
-                                tn.updateUser = obj.userId;
+                                objDetail.Add(new DumpTripStatusResult()
+                                {
+                                    code = (int)response1.StatusCode,
+                                    status = "Failed",
+                                    message = "",
+                                    timestamp = DateTime.Now.ToString()
+                                });
                             }
-                            
-
-
-                            HttpClient client = new HttpClient();
-                            var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
-                            var stringContent = new StringContent(json);
-                            stringContent.Headers.ContentType.MediaType = "application/json";
-                            stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
-                            stringContent.Headers.Add("username", gis_username);
-                            stringContent.Headers.Add("password", gis_password);
-                            var response = await client.PostAsync("http://114.143.244.130:9091/house", stringContent);
-                            var responseString = await response.Content.ReadAsStringAsync();
-                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                            objDetail.Add(new DumpTripStatusResult()
-                            {
-                                code = dynamicobject.code.ToString(),
-                                status = dynamicobject.status.ToString(),
-                                message = dynamicobject.message.ToString(),
-                                errorMessages = dynamicobject.errorMessages.ToString(),
-                                timestamp = dynamicobject.timestamp.ToString(),
-                                data = dynamicobject.data.ToString()
-                            });
-                            objDetail1.gismessage = dynamicobject.message.ToString();
-                            objDetail1.giserrorMessages = dynamicobject.errorMessages.ToString();
                         }
                         else
                         {
 
                             objDetail.Add(new DumpTripStatusResult()
                             {
-                                code = "",
+                                code = 404,
                                 status = "",
                                 message = "",
                                 errorMessages = "GIS Connection Are Not Available",
@@ -305,7 +331,7 @@ namespace ICTSBMCOREAPI.Controllers
                     {
                         objDetail.Add(new DumpTripStatusResult()
                         {
-                            code = "",
+                            code = 400,
                             status = "",
                             message = "",
                             errorMessages = ex.Message.ToString(),

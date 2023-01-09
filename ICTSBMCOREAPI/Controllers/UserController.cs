@@ -38,6 +38,8 @@ namespace ICTSBMCOREAPI.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IRepository objRep;
+        private object result;
+
         public UserController(ILogger<UserController> logger, IRepository repository)
         {
             _logger = logger;
@@ -639,33 +641,51 @@ namespace ICTSBMCOREAPI.Controllers
                             stringContent.Headers.Add("username", gis_username);
                             stringContent.Headers.Add("password", gis_password);
                             var response = await client.PostAsync("http://114.143.244.130:9091/garbage-trail", stringContent);
-                            var responseString = await response.Content.ReadAsStringAsync();
-                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                            objDetail.Add(new DumpTripStatusResult()
+
+                            if (response.IsSuccessStatusCode)
                             {
-                                code = dynamicobject.code.ToString(),
-                                status = dynamicobject.status.ToString(),
-                                message = dynamicobject.message.ToString(),
-                                errorMessages = dynamicobject.errorMessages.ToString(),
-                                timestamp = dynamicobject.timestamp.ToString(),
-                                data = dynamicobject.data.ToString()
-                            });
+                                var responseString = await response.Content.ReadAsStringAsync();
+                                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                                objDetail.Add(new DumpTripStatusResult()
+                                {
+                                    code = (int)response.StatusCode,
+                                    status = dynamicobject.status.ToString(),
+                                    message = dynamicobject.message.ToString(),
+                                    errorMessages = dynamicobject.errorMessages.ToString(),
+                                    timestamp = DateTime.Now.ToString(),
+                                    data = dynamicobject.data.ToString()
+                                });
+                            }
+                            else
+                            {
+                                objDetail.Add(new DumpTripStatusResult()
+                                {
+                                    code = (int)response.StatusCode,
+                                    status = "Failed",
+                                    message = "Not Found",
+                                    timestamp = DateTime.Now.ToString()
+                                });
+                            }
                         }
-                        return objDetail;
+                        result = objDetail;
+                        return Ok(result);
                     }
                     else
                     {
 
                         objDetail.Add(new DumpTripStatusResult()
                         {
-                            code = "",
-                            status = "",
-                            message = "",
-                            errorMessages = "GIS Connection Are Not Available",
-                            timestamp = "",
+                            code = 404,
+                            status = "Failed",
+                            message = "GIS Connection Are Not Available",
+                            timestamp = DateTime.Now.ToString(),
                             data = ""
                         });
-                        return objDetail;
+                        result = objDetail;
+
+                    return NotFound(result);
+
+                  
                     }
                 }
 
@@ -675,21 +695,30 @@ namespace ICTSBMCOREAPI.Controllers
 
                     objDetail.Add(new DumpTripStatusResult()
                     {
-                        code = "",
-                        status = "",
-                        message = "",
+                        code = 400,
+                        status = "Failed",
+                        message = ex.Message.ToString(),
                         errorMessages = ex.Message.ToString(),
-                        timestamp = "",
+                        timestamp = DateTime.Now.ToString(),
                         data = ""
                     });
-                    return objDetail;
+                    result = objDetail;
 
                 }
-                return objDetail;
+                return BadRequest(result);
             }
             else
             {
-                return Unauthorized();
+                objDetail.Add(new DumpTripStatusResult()
+                {
+                    code = 401,
+                    status = "Failed",
+                    message = "Unauthorized",
+                    timestamp = DateTime.Now.ToString(),
+                });
+           
+                result = objDetail;
+                return Unauthorized(result);
             }
            
         }
@@ -749,54 +778,77 @@ namespace ICTSBMCOREAPI.Controllers
                             stringContent.Headers.Add("password", gis_password);
 
                             var response = await client.PostAsync("http://114.143.244.130:9091/house-trail", stringContent);
-                            var responseString = await response.Content.ReadAsStringAsync();
-                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                            objDetail.Add(new DumpTripStatusResult()
+
+                            if (response.IsSuccessStatusCode)
                             {
-                                code = dynamicobject.code.ToString(),
-                                status = dynamicobject.status.ToString(),
-                                message = dynamicobject.message.ToString(),
-                                errorMessages = dynamicobject.errorMessages.ToString(),
-                                timestamp = dynamicobject.timestamp.ToString(),
-                                data = dynamicobject.data.ToString()
-                            });
+                                var responseString = await response.Content.ReadAsStringAsync();
+                                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                                objDetail.Add(new DumpTripStatusResult()
+                                {
+                                    code = (int)response.StatusCode,
+                                    status = dynamicobject.status.ToString(),
+                                    message = dynamicobject.message.ToString(),
+                                    errorMessages = dynamicobject.errorMessages.ToString(),
+                                    timestamp = dynamicobject.timestamp.ToString(),
+                                    data = dynamicobject.data.ToString()
+                                });
+                            }
+                            else
+                            {
+                                objDetail.Add(new DumpTripStatusResult()
+                                {
+                                    code = (int)response.StatusCode,
+                                    status = "Failed",
+                                    message = response.RequestMessage.ToString(),
+                                    timestamp = DateTime.Now.ToString(),
+                                });
+                            }
                         }
-                        return objDetail;
+                        result =  objDetail;
+                        return Ok(result);
                     }
                     else
                     {
 
                         objDetail.Add(new DumpTripStatusResult()
                         {
-                            code = "",
-                            status = "",
-                            message = "",
-                            errorMessages = "GIS Connection Are Not Available",
-                            timestamp = "",
+                            code = 404,
+                            status = "Failed",
+                            message = "GIS Connection Are Not Available",
+                            timestamp = DateTime.Now.ToString(),
                             data = ""
                         });
-                        return objDetail;
+                        result = objDetail;
+                        return NotFound(result);
                     }
                 }
                 catch (Exception ex)
                 {
                     objDetail.Add(new DumpTripStatusResult()
                     {
-                        code = "",
-                        status = "",
-                        message = "",
-                        errorMessages = ex.Message.ToString(),
-                        timestamp = "",
+                        code = 400,
+                        status = "Failed",
+                        message = ex.Message.ToString(),
+                        timestamp = DateTime.Now.ToString(),
                         data = ""
                     });
-                    return objDetail;
+                    result = objDetail;
                 }
 
-                return objDetail;
+                return BadRequest(result);
             }
             else
             {
-                return Unauthorized();
+                objDetail.Add(new DumpTripStatusResult()
+                {
+                    code = 401,
+                    status = "Failed",
+                    message = "Unauthorized",
+                    timestamp = DateTime.Now.ToString(),
+                });
+
+                result = objDetail;
+                return Unauthorized(result);
             }
            
         }
@@ -881,53 +933,61 @@ namespace ICTSBMCOREAPI.Controllers
                             //Response.Headers.Add("Access-Control-Allow-Methods", "GET");
                             //Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
 
-                            List<GisResult> result = jsonResult.ToObject<List<GisResult>>();
+                            List<GisResult> myresult = jsonResult.ToObject<List<GisResult>>();
 
                             List<HouseGisDetails> obj = new List<HouseGisDetails>();
                            
                             using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
                             {
-
-                                foreach (var c in result)
-                                { 
-                                var house = await db.HouseMasters.Where(x=>x.houseId==Convert.ToInt32(c.id)).Select(x => new { x.ReferanceId, x.houseId, x.userId , x.houseOwner, x.houseOwnerMobile, x.houseAddress}).FirstOrDefaultAsync();
-
-                                var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
-                                var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
-
-                                 
-                                var result1 = result.Select(i =>
-                                {
-                                    if (i.id == Convert.ToString(house.houseId))
-                                    {
-                                        //i.ReferanceId = house.ReferanceId;
-                                        //i.HouseOwnerName = house.houseOwner;
-                                        //i.HouseOwnerMobileNo = house.houseOwnerMobile;
-                                        //i.HouseAddress = house.houseAddress;
-                                        //i.CreateEmployeeName = EmployeeName.qrEmpName.ToString();
-                                        //if(Update_EmployeeName != null)
-                                        //{
-                                        //    i.UpdateEmployeeName = Update_EmployeeName.qrEmpName.ToString();
-
-                                        //}
-                                        //else
-                                        //{
-                                        //    i.UpdateEmployeeName = "";
-                                        //}
-                                      
-                                        var value = new List<HouseProperty> { new HouseProperty { name = "ReferanceId", value = house.ReferanceId, type = "String", Index = 0 },
-                                            new HouseProperty { name = "Create Employee Name", value = EmployeeName.qrEmpName.ToString(), type = "String", Index = 1 },
-                                            new HouseProperty { name = "House Owner Name", value = house.houseOwner, type = "String", Index = 2 } };
-                                      
-
-                                        i.HouseProperty = value;
-                                        return i;
-                                    }
-                                    return i;
-
-                                }).Where(i=>i.id==Convert.ToString(house.houseId)).ToList();
                               
+                                foreach (var c in myresult)
+                                { 
+                                    if(Convert.ToInt32(c.id) != 0)
+                                    {
+                                        var house = await db.HouseMasters.Where(x => x.houseId == Convert.ToInt32(c.id)).Select(x => new { x.ReferanceId, x.houseId, x.userId, x.houseOwner, x.houseOwnerMobile, x.houseAddress }).FirstOrDefaultAsync();
+
+
+                                        var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
+                                        var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
+
+                                        
+                                        var result1 = myresult.Select(i =>
+                                        {
+                                            if (i.id == house.houseId)
+                                            {
+                                                //i.ReferanceId = house.ReferanceId;
+                                                //i.HouseOwnerName = house.houseOwner;
+                                                //i.HouseOwnerMobileNo = house.houseOwnerMobile;
+                                                //i.HouseAddress = house.houseAddress;
+                                                //i.CreateEmployeeName = EmployeeName.qrEmpName.ToString();
+                                                //if(Update_EmployeeName != null)
+                                                //{
+                                                //    i.UpdateEmployeeName = Update_EmployeeName.qrEmpName.ToString();
+
+                                                //}
+                                                //else
+                                                //{
+                                                //    i.UpdateEmployeeName = "";
+                                                //}
+
+                                                var value = new List<HouseProperty> {
+                                                    new HouseProperty { name = "ReferanceId", value = house.ReferanceId, type = "String", Index = 0 },
+                                                    new HouseProperty { name = "Create Employee Name", value = (EmployeeName == null ? "" : EmployeeName.qrEmpName.ToString()), type = "String", Index = 1 },
+                                                    new HouseProperty { name = "Update Employee Name", value = (Update_EmployeeName == null ? "" : Update_EmployeeName.qrEmpName.ToString()), type = "String", Index = 2 },
+                                                    new HouseProperty { name = "House Owner Name", value = house.houseOwner, type = "String", Index = 3 }
+                                                };
+
+
+                                                i.HouseProperty = value;
+                                                return i;
+                                            }
+                                            return i;
+
+                                        }).Where(i => i.id == house.houseId).ToList();
+
+                                    }
                                 }
+                                
                                
 
                             }
@@ -942,17 +1002,25 @@ namespace ICTSBMCOREAPI.Controllers
                             //    data = result
                             //});
 
-                            objDetail.code = dynamicobject.code.ToString();
+                            objDetail.code = (int)response.StatusCode;
                             objDetail.status = dynamicobject.status.ToString();
                             objDetail.message = dynamicobject.message.ToString();
-                            objDetail.timestamp = dynamicobject.timestamp.ToString();
-                            objDetail.data = result;
-                            return objDetail;
+                            objDetail.timestamp = DateTime.Now.ToString();
+                            objDetail.data = myresult;
+
+                            result = objDetail;
+                            return Ok(result);
 
                         }
                         else
                         {
-                            return null;
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Failed";
+                            objDetail.message = "";
+                            objDetail.timestamp = DateTime.Now.ToString();
+
+                            result = objDetail;
+                            return NotFound(result);
                         }
                     }
                     else
@@ -967,12 +1035,13 @@ namespace ICTSBMCOREAPI.Controllers
                         //    timestamp = "",
                         //    data = ""
                         //});
-                        objDetail.code = "";
-                        objDetail.status = "";
+                        objDetail.code = 401;
+                        objDetail.status = "Failed";
                         objDetail.message = "GIS Connection Are Not Available";
                         objDetail.timestamp = DateTime.Now.ToString();
-                        objDetail.data = "";
-                        return objDetail;
+
+                        result = objDetail;
+                        return NotFound(result);
                     }
                 }
                 catch (Exception ex)
@@ -987,19 +1056,27 @@ namespace ICTSBMCOREAPI.Controllers
                     //    data = ""
                     //});
 
-                    objDetail.code = "";
-                    objDetail.status = "";
+                    objDetail.code = 400;
+                    objDetail.status = "Failed";
                     objDetail.message = ex.Message.ToString();
                     objDetail.timestamp = DateTime.Now.ToString();
-                    objDetail.data = "";
-                  
-                    return objDetail;
+
+                    result = objDetail;
+                    return BadRequest(result);
                 }
                //return objDetail;
             }
             else
             {
-                return Unauthorized();
+
+                objDetail.code = 401;
+                objDetail.status = "Failed";
+                objDetail.message = "Unauthorized";
+                objDetail.timestamp = DateTime.Now.ToString();
+               
+
+                result = objDetail;
+                return Unauthorized(result);
             }
            
             
@@ -1074,54 +1151,68 @@ namespace ICTSBMCOREAPI.Controllers
                                 var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
                                 var jsonResult = jsonParsed["data"];
 
-                                List<GisResult> result = jsonResult.ToObject<List<GisResult>>();
+                                List<GisResult> myresult = jsonResult.ToObject<List<GisResult>>();
 
 
+                                objDetail.code = (int)response.StatusCode;
+                                objDetail.status = "Success";
+                                objDetail.message = "Data Found";
+                                objDetail.timestamp = DateTime.Now.ToString();
+                                objDetail.data = myresult;
 
-                                objDetail.code = dynamicobject.code.ToString();
-                                objDetail.status = dynamicobject.status.ToString();
-                                objDetail.message = dynamicobject.message.ToString();
-                                objDetail.timestamp = dynamicobject.timestamp.ToString();
-                                objDetail.data = result;
-                               
-
+                                result = objDetail;
+                                return Ok(result);
                             }
                             else
                             {
-                                return null;
+                                objDetail.code = (int)response.StatusCode;
+                                objDetail.status = "Failed";
+                                objDetail.message = "";
+                                objDetail.timestamp = DateTime.Now.ToString();
+
+                                result = objDetail;
+                                return NotFound(result);
                             }
  
                         }
 
-                        return objDetail;
+                        return Ok(result);
                     }
                     else
                     {
 
-                        objDetail.code = "";
-                        objDetail.status = "";
+                        objDetail.code = 404;
+                        objDetail.status = "Failed";
                         objDetail.message = "GIS Connection Are Not Available";
                         objDetail.timestamp = DateTime.Now.ToString();
-                        objDetail.data = "";
-                        return objDetail;
+
+                        result = objDetail;
+                        return NotFound(result);
                     }
                 }
                 catch (Exception ex)
                 {
 
-                    objDetail.code = "";
-                    objDetail.status = "";
+                    objDetail.code = 400;
+                    objDetail.status = "Failed";
                     objDetail.message = ex.Message.ToString();
                     objDetail.timestamp = DateTime.Now.ToString();
-                    objDetail.data = "";
 
-                    return objDetail;
+                    result = objDetail;
+                    return BadRequest(result);
                 }
                
             }
             else
             {
-                return Unauthorized();
+                objDetail.code = 401;
+                objDetail.status = "Failed";
+                objDetail.message = "Unauthorized";
+                objDetail.timestamp = DateTime.Now.ToString();
+
+
+                result = objDetail;
+                return Unauthorized(result);
             }
         }
 
@@ -1189,20 +1280,27 @@ namespace ICTSBMCOREAPI.Controllers
                             var jsonResult = jsonParsed["data"];
 
 
-                            List<GisTrailResult> result = jsonResult.ToObject<List<GisTrailResult>>();
+                            List<GisTrailResult> myresult = jsonResult.ToObject<List<GisTrailResult>>();
 
-                            objDetail.code = dynamicobject.code.ToString();
-                            objDetail.status = dynamicobject.status.ToString();
-                            objDetail.message = dynamicobject.message.ToString();
-                            objDetail.timestamp = dynamicobject.timestamp.ToString();
-                            objDetail.data = result;
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Success";
+                            objDetail.message = "Data Found";
+                            objDetail.timestamp = DateTime.Now.ToString();
+                            objDetail.data = myresult;
 
-                            return objDetail;
+                            result = objDetail;
+                            return Ok(result);
 
                         }
                         else
                         {
-                            return null;
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Failed";
+                            objDetail.message = "";
+                            objDetail.timestamp = DateTime.Now.ToString();
+
+                            result = objDetail;
+                            return NotFound(result);
                         }
 
                       
@@ -1210,13 +1308,14 @@ namespace ICTSBMCOREAPI.Controllers
                     else
                     {
 
-                        objDetail.code = "";
-                        objDetail.status = "";
+                        objDetail.code = 404;
+                        objDetail.status = "Failed";
                         objDetail.message = "GIS Connection Are Not Available";
                         objDetail.timestamp = DateTime.Now.ToString();
-                        objDetail.data = "";
 
-                        return objDetail;
+                        result = objDetail;
+
+                        return NotFound(result);
                     }
                 }
                 catch (Exception ex)
@@ -1231,18 +1330,26 @@ namespace ICTSBMCOREAPI.Controllers
                     //    data = ""
                     //});
 
-                    objDetail.code = "";
-                    objDetail.status = "";
+                    objDetail.code = 400;
+                    objDetail.status = "Failed";
                     objDetail.message = ex.Message.ToString();
                     objDetail.timestamp = DateTime.Now.ToString();
-                    objDetail.data = "";
-                    return objDetail;
+
+                    result = objDetail;
+                    return BadRequest(result);
                 }
                
             }
             else
             {
-                return Unauthorized();
+                objDetail.code = 401;
+                objDetail.status = "Failed";
+                objDetail.message = "Unauthorized";
+                objDetail.timestamp = DateTime.Now.ToString();
+
+
+                result = objDetail;
+                return Unauthorized(result);
             }
           
         }
@@ -1306,13 +1413,13 @@ namespace ICTSBMCOREAPI.Controllers
                                 var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
                                 var jsonResult = jsonParsed["data"];
 
-                                List<GisTrailResult> result = jsonResult.ToObject<List<GisTrailResult>>();
+                                List<GisTrailResult> myresult = jsonResult.ToObject<List<GisTrailResult>>();
 
 
                                 using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
                                 {
 
-                                    foreach (var c in result)
+                                    foreach (var c in myresult)
                                     {
 
                                         //var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) && x.gcDate >= Convert.ToDateTime(tn.startTs) && x.gcDate <= Convert.ToDateTime(tn.endTs)).Select(x => new { x.houseId, x.userId, x.gcDate, houselat = x.Lat, houselong = x.Long  }).ToListAsync();
@@ -1345,7 +1452,7 @@ namespace ICTSBMCOREAPI.Controllers
                                             var output = serializer.Serialize(query);
                                             var housedatalist = new JavaScriptSerializer().Deserialize<GisHouseList[]>(output);
 
-                                            var result1 = result.Select(i =>
+                                            var result1 = myresult.Select(i =>
                                             {
                                                 i.HouseList = housedatalist;
 
@@ -1363,16 +1470,25 @@ namespace ICTSBMCOREAPI.Controllers
 
                                 }
 
-                                objDetail.code = dynamicobject.code.ToString();
-                                objDetail.status = dynamicobject.status.ToString();
-                                objDetail.message = dynamicobject.message.ToString();
-                                objDetail.timestamp = dynamicobject.timestamp.ToString();
-                                objDetail.data = result;
+                                objDetail.code = (int)response.StatusCode;
+                                objDetail.status = "Success";
+                                objDetail.message = "Data Found";
+                                objDetail.timestamp = DateTime.Now.ToString();
+                                objDetail.data = myresult;
+
+                                result = objDetail;
+                                return Ok(result);
 
                             }
                             else
                             {
-                                return null;
+                                objDetail.code = (int)response.StatusCode;
+                                objDetail.status = "Failed";
+                                objDetail.message = "";
+                                objDetail.timestamp = DateTime.Now.ToString();
+
+                                result = objDetail;
+                                return NotFound(result);
                             }
 
                         }
@@ -1382,30 +1498,38 @@ namespace ICTSBMCOREAPI.Controllers
                     else
                     {
 
-                        objDetail.code = "";
-                        objDetail.status = "";
+                        objDetail.code = 404;
+                        objDetail.status = "Failed";
                         objDetail.message = "GIS Connection Are Not Available";
                         objDetail.timestamp = DateTime.Now.ToString();
-                        objDetail.data = "";
-                        return objDetail;
+
+                        result = objDetail;
+                        return NotFound(result);
                     }
                 }
                 catch (Exception ex)
                 {
 
-                    objDetail.code = "";
-                    objDetail.status = "";
+                    objDetail.code = 400;
+                    objDetail.status = "Failed";
                     objDetail.message = ex.Message.ToString();
                     objDetail.timestamp = DateTime.Now.ToString();
-                    objDetail.data = "";
 
-                    return objDetail;
+                    result = objDetail;
+                    return BadRequest(result);
                 }
 
             }
             else
             {
-                return Unauthorized();
+                objDetail.code = 401;
+                objDetail.status = "Failed";
+                objDetail.message = "Unauthorized";
+                objDetail.timestamp = DateTime.Now.ToString();
+
+
+                result = objDetail;
+                return Unauthorized(result);
             }
         }
 
@@ -1474,7 +1598,7 @@ namespace ICTSBMCOREAPI.Controllers
                             var jsonResult = jsonParsed["data"];
 
 
-                            List<GisTrailResult> result = jsonResult.ToObject<List<GisTrailResult>>();
+                            List<GisTrailResult> myresult = jsonResult.ToObject<List<GisTrailResult>>();
 
                             //objDetail.Add(new TrailsDetails()
                             //{
@@ -1485,18 +1609,25 @@ namespace ICTSBMCOREAPI.Controllers
                             //    data = result
                             //});
 
-                            objDetail.code = dynamicobject.code.ToString();
-                            objDetail.status = dynamicobject.status.ToString();
-                            objDetail.message = dynamicobject.message.ToString();
-                            objDetail.timestamp = dynamicobject.timestamp.ToString();
-                            objDetail.data = result;
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Success";
+                            objDetail.message = "Data Found";
+                            objDetail.timestamp = DateTime.Now.ToString();
+                            objDetail.data = myresult;
 
-                            return objDetail;
+                            result = objDetail;
+                            return Ok(result);
 
                         }
                         else
                         {
-                            return null;
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Failed";
+                            objDetail.message = "Not Found";
+                            objDetail.timestamp = DateTime.Now.ToString();
+
+                            result = objDetail;
+                            return NotFound(result);
                         }
 
 
@@ -1514,12 +1645,14 @@ namespace ICTSBMCOREAPI.Controllers
                         //    data = ""
                         //});
 
-                        objDetail.code = "";
-                        objDetail.status = "";
+                        objDetail.code = 404;
+                        objDetail.status = "Failed";
                         objDetail.message = "GIS Connection Are Not Available";
                         objDetail.timestamp = DateTime.Now.ToString();
-                        objDetail.data = "";
-                        return objDetail;
+
+                        result = objDetail;
+
+                        return NotFound(result);
                     }
                 }
                 catch (Exception ex)
@@ -1534,18 +1667,26 @@ namespace ICTSBMCOREAPI.Controllers
                     //    data = ""
                     //});
 
-                    objDetail.code = "";
-                    objDetail.status = "";
+                    objDetail.code = 400;
+                    objDetail.status = "Failed";
                     objDetail.message = ex.Message.ToString();
                     objDetail.timestamp = DateTime.Now.ToString();
-                    objDetail.data = "";
-                    return objDetail;
+
+                    result = objDetail;
+                    return NotFound(result);
                 }
                 //return objDetail;
             }
             else
             {
-                return Unauthorized();
+                objDetail.code = 401;
+                objDetail.status = "Failed";
+                objDetail.message = "Unauthorized";
+                objDetail.timestamp = DateTime.Now.ToString();
+
+
+                result = objDetail;
+                return Unauthorized(result);
             }
            
         }
@@ -1619,21 +1760,30 @@ namespace ICTSBMCOREAPI.Controllers
                                 var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
                                 var jsonResult = jsonParsed["data"];
 
-                                List<GisTrailResult> result = jsonResult.ToObject<List<GisTrailResult>>();
+                                List<GisTrailResult> myresult = jsonResult.ToObject<List<GisTrailResult>>();
 
 
 
-                                objDetail.code = dynamicobject.code.ToString();
-                                objDetail.status = dynamicobject.status.ToString();
-                                objDetail.message = dynamicobject.message.ToString();
-                                objDetail.timestamp = dynamicobject.timestamp.ToString();
-                                objDetail.data = result;
+                                objDetail.code = (int)response.StatusCode;
+                                objDetail.status = "Success";
+                                objDetail.message = "Data Found";
+                                objDetail.timestamp = DateTime.Now.ToString();
+                                objDetail.data = myresult;
 
+                                result = objDetail;
 
+                                return Ok(result);
                             }
                             else
                             {
-                                return null;
+                                objDetail.code = (int)response.StatusCode;
+                                objDetail.status = "Failed";
+                                objDetail.message = "Not Found";
+                                objDetail.timestamp = DateTime.Now.ToString();
+
+                                result = objDetail;
+
+                                return NotFound(result);
                             }
 
                         }
@@ -1643,30 +1793,39 @@ namespace ICTSBMCOREAPI.Controllers
                     else
                     {
 
-                        objDetail.code = "";
-                        objDetail.status = "";
+                        objDetail.code = 404;
+                        objDetail.status = "Failed";
                         objDetail.message = "GIS Connection Are Not Available";
                         objDetail.timestamp = DateTime.Now.ToString();
-                        objDetail.data = "";
-                        return objDetail;
+
+                        result = objDetail;
+                        return NotFound(result);
                     }
                 }
                 catch (Exception ex)
                 {
 
-                    objDetail.code = "";
-                    objDetail.status = "";
+                    objDetail.code = 400;
+                    objDetail.status = "Failed";
                     objDetail.message = ex.Message.ToString();
                     objDetail.timestamp = DateTime.Now.ToString();
-                    objDetail.data = "";
 
-                    return objDetail;
+                    result = objDetail;
+
+                    return NotFound(result);
                 }
 
             }
             else
             {
-                return Unauthorized();
+                objDetail.code = 401;
+                objDetail.status = "Failed";
+                objDetail.message = "Unauthorized";
+                objDetail.timestamp = DateTime.Now.ToString();
+
+
+                result = objDetail;
+                return Unauthorized(result);
             }
         }
 
@@ -1821,43 +1980,273 @@ namespace ICTSBMCOREAPI.Controllers
                             }
 
                             //Create the Command Object
+                            objDetail.code = 200;
+                            objDetail.status = "Success";
+                            if(houseLocation.Count > 0)
+                            {
+                                objDetail.message = "Data Found";
+
+                            }
+                            else
+                            {
+                                objDetail.message = "Data Not Available";
+                            }
                             objDetail.data = houseLocation;
 
 
                         }
-
-                        return objDetail;
+                        result = objDetail;
+                        return Ok(result);
                     }
                     else
                     {
 
-                        objDetail.code = "";
-                        objDetail.status = "";
+                        objDetail.code = 404;
+                        objDetail.status = "Failed";
                         objDetail.message = "GIS Connection Are Not Available";
                         objDetail.timestamp = DateTime.Now.ToString();
-                        objDetail.data = "";
-                        return objDetail;
+
+                        result = objDetail;
+                        return NotFound(result);
                     }
                 }
                 catch (Exception ex)
                 {
 
-                    objDetail.code = "";
-                    objDetail.status = "";
+                    objDetail.code = 400;
+                    objDetail.status = "Failed";
                     objDetail.message = ex.Message.ToString();
                     objDetail.timestamp = DateTime.Now.ToString();
-                    objDetail.data = "";
 
-                    return objDetail;
+                    result = objDetail;
+
+                    return NotFound(result);
                 }
 
             }
             else
             {
-                return Unauthorized();
+                objDetail.code = 401;
+                objDetail.status = "Failed";
+                objDetail.message = "Unauthorized";
+                objDetail.timestamp = DateTime.Now.ToString();
+
+
+                result = objDetail;
+                return Unauthorized(result);
             }
         }
 
+
+        [HttpPost]
+        [Route("GisHouseOnMapNew/all")]
+        [EnableCors("MyCorsPolicy")]
+        public IActionResult HouseOnMapGis ([FromHeader] string authorization, [FromHeader] int AppId, HouseOnMapSearch obj)
+        {
+            using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
+            GisReturnObject objDetail = new GisReturnObject();
+            List<HouseOnMapVM> houseLocation = new List<HouseOnMapVM>();
+
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                try
+                {
+                    var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                    if (GIS_CON != null)
+                    {
+                        var gis_url = GIS_CON.DataSource;
+                        var gis_DBName = GIS_CON.InitialCatalog;
+                        var gis_username = GIS_CON.UserId;
+                        var gis_password = GIS_CON.Password;
+
+                        HttpClient client = new HttpClient();
+
+                        int user;
+                        int area;
+                        int ward;
+                        int? GarbageType;
+                        int FilterType;
+                        var zoneId = 0;
+                        if (obj.userid == null)
+                        {
+                            user = 0;
+                        }
+                        else
+                        {
+                            user = Convert.ToInt32(obj.userid);
+                        }
+
+                        if (obj.areaId == null)
+                        {
+                            area = 0;
+                        }
+                        else
+                        {
+                            area = Convert.ToInt32(obj.areaId);
+                        }
+                        if (obj.wardNo == null)
+                        {
+                            ward = 0;
+                        }
+                        else
+                        {
+                            ward = Convert.ToInt32(obj.wardNo);
+                        }
+                        if (obj.garbageType == null)
+                        {
+                            GarbageType = null;
+                        }
+                        else
+                        {
+                            GarbageType = Convert.ToInt32(obj.garbageType);
+                        }
+                        if (obj.filterType == null)
+                        {
+                            FilterType = 0;
+                        }
+                        else
+                        {
+                            FilterType = Convert.ToInt32(obj.filterType);
+                        }
+                        if (obj.date == null || obj.date == "")
+                        {
+                            obj.date = DateTime.Now.ToShortDateString();
+                        }
+
+
+
+                        using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                        using (SqlConnection connection = new SqlConnection(db.Database.GetDbConnection().ConnectionString))
+                        {
+                            connection.Open();
+
+                            var command = connection.CreateCommand();
+
+                            const string CheckIfTableExistsStatement = "SELECT * FROM sys.objects WHERE name = N'SP_HouseOnMapDetails'";
+                            command.CommandText = CheckIfTableExistsStatement;
+                            var executeScalar = command.ExecuteScalar();
+                            if (executeScalar != null)
+                            {
+                                CultureInfo culture = new CultureInfo("en-US");
+
+                                DateTime dt2 = Convert.ToDateTime(obj.date, culture);
+
+                                List<SqlParameter> parms = new List<SqlParameter>
+                                                {
+                                                    // Create parameter(s)    
+                                                    new SqlParameter { ParameterName = "@gcDate", Value = dt2 },
+                                                    new SqlParameter { ParameterName = "@UserId", Value = user },
+                                                    new SqlParameter { ParameterName = "@ZoneId", Value = zoneId },
+                                                    new SqlParameter { ParameterName = "@AreaId", Value = area },
+                                                    new SqlParameter { ParameterName = "@WardNo", Value = ward },
+                                                    new SqlParameter { ParameterName = "@GarbageType", Value = GarbageType == null ? DBNull.Value : GarbageType },
+                                                    new SqlParameter { ParameterName = "@FilterType", Value = FilterType },
+                                                };
+                                var data =  db.SP_HouseOnMapDetails_Results.FromSqlRaw<SP_HouseOnMapDetails_Result>("EXEC SP_HouseOnMapDetails @gcDate,@UserId,@ZoneId,@AreaId,@WardNo,@GarbageType,@FilterType", parms.ToArray()).ToList();
+
+                                foreach (var x in data)
+                                {
+
+                                    DateTime dt = DateTime.Parse(x.gcDate == null ? DateTime.Now.ToString() : x.gcDate.ToString());
+                                    //string gcTime = x.gcDate.ToString();
+                                    houseLocation.Add(new HouseOnMapVM()
+                                    {
+                                        //dyid = Convert.ToInt32(x.dyid),
+                                        //ssid = Convert.ToInt32(x.ssid),
+                                        //lwid = Convert.ToInt32(x.lwid),
+                                        houseId = Convert.ToInt32(x.houseId),
+                                        ReferanceId = x.ReferanceId,
+                                        houseOwner = (x.houseOwner == null ? "" : x.houseOwner),
+                                        houseOwnerMobile = (x.houseOwnerMobile == null ? "" : x.houseOwnerMobile),
+                                        // houseAddress = checkNull(x.houseAddress).Replace("Unnamed Road, ", ""),
+                                        gcDate = dt.ToString("dd-MM-yyyy"),
+                                        gcTime = dt.ToString("h:mm tt"), // 7:00 AM // 12 hour clock
+                                                                         //string gcTime = x.gcDate.ToString(),
+                                                                         //gcTime = x.gcDate.ToString("hh:mm tt"),
+                                                                         //myDateTime.ToString("HH:mm:ss")
+                                        ///date = Convert.ToDateTime(x.datt).ToString("dd/MM/yyyy"),
+                                        //time = Convert.ToDateTime(x.datt).ToString("hh:mm:ss tt"),
+                                        houseLat = x.houseLat,
+                                        houseLong = x.houseLong,
+                                        // address = x.houseAddress,
+                                        //vehcileNumber = x.v,
+                                        //userMobile = x.mobile,
+                                        garbageType = x.garbageType,
+                                    });
+                                }
+                                objDetail.code = 200;
+                                if(data.Count > 0)
+                                {
+                                    objDetail.message = "Data Found";
+                                }
+                                else
+                                {
+                                    objDetail.message = "Data Not Available";
+                                }
+                                objDetail.status = "Success";
+                                objDetail.timestamp = DateTime.Now.ToString();
+                                objDetail.data = houseLocation;
+                                result = objDetail;
+                            }
+
+                            //Create the Command Object
+                           // objDetail.data = data;
+
+
+                        }
+
+                        return  Ok(result);
+                    }
+                    else
+                    {
+
+                        objDetail.code = 404;
+                        objDetail.status = "Failed";
+                        objDetail.message = "GIS Connection Are Not Available";
+                        objDetail.timestamp = DateTime.Now.ToString();
+                        objDetail.data = "";
+                        result = objDetail;
+
+                        return NotFound(result);
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    objDetail.code = 400;
+                    objDetail.status = "Failed";
+                    objDetail.message = ex.Message.ToString();
+                    objDetail.timestamp = DateTime.Now.ToString();
+                    result = objDetail;
+
+                    return BadRequest(result);
+                }
+
+            }
+            else
+            {
+                objDetail.code = 401;
+                objDetail.status = "Failed";
+                objDetail.message = "Unauthorized";
+                objDetail.timestamp = DateTime.Now.ToString();
+                objDetail.data = "";
+                result = objDetail;
+                return Unauthorized(result);
+            }
+
+           // return Ok();
+        }
         private object checkNull(string str)
         {
             string result = "";

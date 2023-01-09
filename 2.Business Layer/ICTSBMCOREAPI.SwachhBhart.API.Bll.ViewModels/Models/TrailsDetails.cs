@@ -6,7 +6,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
 {
    public class TrailsDetails
     {
-        public string code { get; set; }
+        public int code { get; set; }
         public string status { get; set; }
         public string message { get; set; }
        // public string errorMessages { get; set; }

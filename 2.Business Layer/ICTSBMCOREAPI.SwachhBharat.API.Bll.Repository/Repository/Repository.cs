@@ -34,6 +34,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         private readonly IConfiguration _configuration;
         private readonly ILogger<Repository> _logger;
 
+        private object result;
+
         public Repository(IConfiguration configuration, ILogger<Repository> logger)
         {
             //dbMain = devICTSBMMainEntities;
@@ -6439,7 +6441,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         public async Task<List<CollectionSyncResult>> SaveQrHPDCollectionsOfflineAsync(List<BigVQRHPDVM> obj, int AppId)
         {
             string refId = "";
-            List<CollectionSyncResult> result = new List<CollectionSyncResult>();
+            List<CollectionSyncResult> myresult = new List<CollectionSyncResult>();
 
             using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
             using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
@@ -6528,7 +6530,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                                     await db.SaveChangesAsync();
 
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "success",
@@ -6539,7 +6541,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 }
                                 else
                                 {
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "error",
@@ -6605,7 +6607,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                                     await db.SaveChangesAsync();
 
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "success",
@@ -6616,7 +6618,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 }
                                 else
                                 {
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "error",
@@ -6681,7 +6683,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                                     await db.SaveChangesAsync();
 
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "success",
@@ -6692,7 +6694,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 }
                                 else
                                 {
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "error",
@@ -6754,7 +6756,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                                     await db.SaveChangesAsync();
 
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "success",
@@ -6765,7 +6767,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 }
                                 else
                                 {
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "error",
@@ -6852,7 +6854,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                                     await db.SaveChangesAsync();
 
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "success",
@@ -6970,55 +6972,84 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                                             var response1 = await client1.PostAsync("http://114.143.244.130:9091/house/search", stringContent1);
 
-
-                                            var responseString1 = await response1.Content.ReadAsStringAsync();
-                                            var jsonParsed1 = JObject.Parse(responseString1);
-                                            var dynamicobject1 = JsonConvert.DeserializeObject<dynamic>(responseString1);
-                                            var jsonResult1 = jsonParsed1["data"];
-
-                                            List<GisResult> getresult = jsonResult1.ToObject<List<GisResult>>();
-
-                                            if (getresult.Count == 0)
+                                            if (response1.IsSuccessStatusCode)
                                             {
-                                                tn.createUser = item.userId;
-                                                tn.createTs = item.createTs;
+                                                var responseString1 = await response1.Content.ReadAsStringAsync();
+                                                var jsonParsed1 = JObject.Parse(responseString1);
+                                                var dynamicobject1 = JsonConvert.DeserializeObject<dynamic>(responseString1);
+                                                var jsonResult1 = jsonParsed1["data"];
+
+                                                List<GisResult> getresult = jsonResult1.ToObject<List<GisResult>>();
+
+                                                if (getresult.Count == 0)
+                                                {
+                                                    tn.createUser = item.userId;
+                                                    tn.createTs = item.createTs;
+                                                }
+                                                else
+                                                {
+                                                    tn.updateTs = item.createTs;
+                                                    tn.updateUser = item.userId;
+                                                }
+
+
+
+                                                HttpClient client = new HttpClient();
+                                                var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                                                var stringContent = new StringContent(json);
+                                                stringContent.Headers.ContentType.MediaType = "application/json";
+                                                stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                                                stringContent.Headers.Add("username", gis_username);
+                                                stringContent.Headers.Add("password", gis_password);
+                                                var response = await client.PostAsync("http://114.143.244.130:9091/house", stringContent);
+
+                                                if (response.IsSuccessStatusCode)
+                                                {
+                                                    var responseString = await response.Content.ReadAsStringAsync();
+                                                    var dynamicobject2 = JsonConvert.DeserializeObject<dynamic>(responseString);
+                                                    objDetail.Add(new DumpTripStatusResult()
+                                                    {
+                                                        code = (int)response.StatusCode,
+                                                        status = "Success",
+                                                        message = "Created",
+                                                        errorMessages = dynamicobject2.errorMessages.ToString(),
+                                                        timestamp = dynamicobject2.timestamp.ToString(),
+                                                        data = dynamicobject2.data.ToString()
+                                                    });
+                                                    objDetail1.gismessage = dynamicobject2.message.ToString();
+                                                    objDetail1.giserrorMessages = dynamicobject2.errorMessages.ToString();
+
+                                                    //result = objDetail;
+                                                }
+
+                                                else
+                                                {
+                                                    objDetail.Add(new DumpTripStatusResult()
+                                                    {
+                                                        code = (int)response.StatusCode,
+                                                        status = "Failed",
+                                                        message = "Failed",
+                                                        timestamp = DateTime.Now.ToString()
+                                                    });
+                                                }
                                             }
                                             else
                                             {
-                                                tn.updateTs = item.createTs;
-                                                tn.updateUser = item.userId;
+                                                objDetail.Add(new DumpTripStatusResult()
+                                                {
+                                                    code = (int)response1.StatusCode,
+                                                    status = "Failed",
+                                                    message = "Failed",
+                                                    timestamp = DateTime.Now.ToString()
+                                                });
                                             }
-
-
-
-                                            HttpClient client = new HttpClient();
-                                            var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
-                                            var stringContent = new StringContent(json);
-                                            stringContent.Headers.ContentType.MediaType = "application/json";
-                                            stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
-                                            stringContent.Headers.Add("username", gis_username);
-                                            stringContent.Headers.Add("password", gis_password);
-                                            var response = await client.PostAsync("http://114.143.244.130:9091/house", stringContent);
-                                            var responseString = await response.Content.ReadAsStringAsync();
-                                            var dynamicobject2 = JsonConvert.DeserializeObject<dynamic>(responseString);
-                                            objDetail.Add(new DumpTripStatusResult()
-                                            {
-                                                code = dynamicobject2.code.ToString(),
-                                                status = dynamicobject2.status.ToString(),
-                                                message = dynamicobject2.message.ToString(),
-                                                errorMessages = dynamicobject2.errorMessages.ToString(),
-                                                timestamp = dynamicobject2.timestamp.ToString(),
-                                                data = dynamicobject2.data.ToString()
-                                            });
-                                            objDetail1.gismessage = dynamicobject2.message.ToString();
-                                            objDetail1.giserrorMessages = dynamicobject2.errorMessages.ToString();
                                         }
                                         else
                                         {
 
                                             objDetail.Add(new DumpTripStatusResult()
                                             {
-                                                code = "",
+                                                code = 404,
                                                 status = "",
                                                 message = "",
                                                 errorMessages = "GIS Connection Are Not Available",
@@ -7032,7 +7063,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     {
                                         objDetail.Add(new DumpTripStatusResult()
                                         {
-                                            code = "",
+                                            code = 400,
                                             status = "",
                                             message = "",
                                             errorMessages = ex.Message.ToString(),
@@ -7048,7 +7079,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 }
                                 else
                                 {
-                                    result.Add(new CollectionSyncResult()
+                                    myresult.Add(new CollectionSyncResult()
                                     {
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "error",
@@ -7062,7 +7093,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         }
                         else
                         {
-                            result.Add(new CollectionSyncResult()
+                            myresult.Add(new CollectionSyncResult()
                             {
                                 ID = Convert.ToInt32(item.OfflineId),
                                 status = "Error",
@@ -7070,18 +7101,20 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 messageMar = "तुम्ही क्षेत्राबाहेर आहात.कृपया परिसरात जा..",
                                 referenceID = item.ReferanceId,
                             });
+
+                           
                         }
 
                     }
 
-                    return result;
+                    return myresult;
 
 
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex.ToString(), ex);
-                    result.Add(new CollectionSyncResult()
+                    myresult.Add(new CollectionSyncResult()
                     {
                         ID = 0,
                         //  message = "Something is wrong,Try Again.. ",
@@ -7090,7 +7123,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         status = "error",
                         referenceID= refId,
                     });
-                    return result;
+                    return myresult;
                 }
 
 
