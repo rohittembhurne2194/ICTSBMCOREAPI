@@ -1762,7 +1762,55 @@ namespace ICTSBMCOREAPI.Controllers
 
                                 List<GisTrailResult> myresult = jsonResult.ToObject<List<GisTrailResult>>();
 
+                                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                                {
 
+                                    foreach (var c in myresult)
+                                    {
+
+                                        //var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) && x.gcDate >= Convert.ToDateTime(tn.startTs) && x.gcDate <= Convert.ToDateTime(tn.endTs)).Select(x => new { x.houseId, x.userId, x.gcDate, houselat = x.Lat, houselong = x.Long  }).ToListAsync();
+
+                                        var query = (from hm in db.HouseMasters
+                                                     from em in db.QrEmployeeMasters
+                                                     where hm.userId == em.qrEmpId
+                                                     where hm.userId == Convert.ToInt32(c.createUser) && hm.modified >= Convert.ToDateTime(tn.startTs) && hm.modified <= Convert.ToDateTime(tn.endTs)
+                                                     select new
+                                                     {
+                                                         houseId = hm.houseId,
+                                                         userId = em.qrEmpId,
+                                                         gcDate = hm.modified,
+                                                         ReferanceId = hm.ReferanceId,
+                                                         houseOwner = hm.houseOwner,
+                                                         houseOwnerMobile = hm.houseOwnerMobile,
+                                                         houseAddress = hm.houseAddress,
+                                                         employeename = em.qrEmpName
+                                                     }).ToList();
+
+
+
+                                        if (query.Count > 0)
+                                        {
+                                            JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                            var output = serializer.Serialize(query);
+                                            var housedatalist = new JavaScriptSerializer().Deserialize<GisHouseList[]>(output);
+
+                                            var result1 = myresult.Select(i =>
+                                            {
+                                                i.HouseList = housedatalist;
+
+                                                return i;
+
+                                            }).ToList();
+
+                                            var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
+                                            var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
+
+
+                                        }
+
+                                    }
+
+                                }
 
                                 objDetail.code = (int)response.StatusCode;
                                 objDetail.status = "Success";
@@ -1894,7 +1942,7 @@ namespace ICTSBMCOREAPI.Controllers
                         {
                             ward = Convert.ToInt32(obj.wardNo);
                         }
-                        if (obj.garbageType == null)
+                        if (obj.garbageType == null || obj.garbageType == 0)
                         {
                             GarbageType = null;
                         }
@@ -1969,8 +2017,8 @@ namespace ICTSBMCOREAPI.Controllers
                                                                          //myDateTime.ToString("HH:mm:ss")
                                         ///date = Convert.ToDateTime(x.datt).ToString("dd/MM/yyyy"),
                                         //time = Convert.ToDateTime(x.datt).ToString("hh:mm:ss tt"),
-                                        houseLat = x.houseLat,
-                                        houseLong = x.houseLong,
+                                        //houseLat = x.houseLat,
+                                        //houseLong = x.houseLong,
                                         // address = x.houseAddress,
                                         //vehcileNumber = x.v,
                                         //userMobile = x.mobile,
@@ -2038,215 +2086,7 @@ namespace ICTSBMCOREAPI.Controllers
         }
 
 
-        [HttpPost]
-        [Route("GisHouseOnMapNew/all")]
-        [EnableCors("MyCorsPolicy")]
-        public IActionResult HouseOnMapGis ([FromHeader] string authorization, [FromHeader] int AppId, HouseOnMapSearch obj)
-        {
-            using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
-            GisReturnObject objDetail = new GisReturnObject();
-            List<HouseOnMapVM> houseLocation = new List<HouseOnMapVM>();
-
-            var stream = authorization.Replace("Bearer ", string.Empty);
-            var handler = new JwtSecurityTokenHandler();
-            var jsonToken = handler.ReadToken(stream);
-            var tokenS = jsonToken as JwtSecurityToken;
-
-            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
-
-
-            var Auth_AppId = Convert.ToInt32(jti);
-
-            if (Auth_AppId == AppId)
-            {
-                try
-                {
-                    var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
-
-                    if (GIS_CON != null)
-                    {
-                        var gis_url = GIS_CON.DataSource;
-                        var gis_DBName = GIS_CON.InitialCatalog;
-                        var gis_username = GIS_CON.UserId;
-                        var gis_password = GIS_CON.Password;
-
-                        HttpClient client = new HttpClient();
-
-                        int user;
-                        int area;
-                        int ward;
-                        int? GarbageType;
-                        int FilterType;
-                        var zoneId = 0;
-                        if (obj.userid == null)
-                        {
-                            user = 0;
-                        }
-                        else
-                        {
-                            user = Convert.ToInt32(obj.userid);
-                        }
-
-                        if (obj.areaId == null)
-                        {
-                            area = 0;
-                        }
-                        else
-                        {
-                            area = Convert.ToInt32(obj.areaId);
-                        }
-                        if (obj.wardNo == null)
-                        {
-                            ward = 0;
-                        }
-                        else
-                        {
-                            ward = Convert.ToInt32(obj.wardNo);
-                        }
-                        if (obj.garbageType == null)
-                        {
-                            GarbageType = null;
-                        }
-                        else
-                        {
-                            GarbageType = Convert.ToInt32(obj.garbageType);
-                        }
-                        if (obj.filterType == null)
-                        {
-                            FilterType = 0;
-                        }
-                        else
-                        {
-                            FilterType = Convert.ToInt32(obj.filterType);
-                        }
-                        if (obj.date == null || obj.date == "")
-                        {
-                            obj.date = DateTime.Now.ToShortDateString();
-                        }
-
-
-
-                        using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
-                        using (SqlConnection connection = new SqlConnection(db.Database.GetDbConnection().ConnectionString))
-                        {
-                            connection.Open();
-
-                            var command = connection.CreateCommand();
-
-                            const string CheckIfTableExistsStatement = "SELECT * FROM sys.objects WHERE name = N'SP_HouseOnMapDetails'";
-                            command.CommandText = CheckIfTableExistsStatement;
-                            var executeScalar = command.ExecuteScalar();
-                            if (executeScalar != null)
-                            {
-                                CultureInfo culture = new CultureInfo("en-US");
-
-                                DateTime dt2 = Convert.ToDateTime(obj.date, culture);
-
-                                List<SqlParameter> parms = new List<SqlParameter>
-                                                {
-                                                    // Create parameter(s)    
-                                                    new SqlParameter { ParameterName = "@gcDate", Value = dt2 },
-                                                    new SqlParameter { ParameterName = "@UserId", Value = user },
-                                                    new SqlParameter { ParameterName = "@ZoneId", Value = zoneId },
-                                                    new SqlParameter { ParameterName = "@AreaId", Value = area },
-                                                    new SqlParameter { ParameterName = "@WardNo", Value = ward },
-                                                    new SqlParameter { ParameterName = "@GarbageType", Value = GarbageType == null ? DBNull.Value : GarbageType },
-                                                    new SqlParameter { ParameterName = "@FilterType", Value = FilterType },
-                                                };
-                                var data =  db.SP_HouseOnMapDetails_Results.FromSqlRaw<SP_HouseOnMapDetails_Result>("EXEC SP_HouseOnMapDetails @gcDate,@UserId,@ZoneId,@AreaId,@WardNo,@GarbageType,@FilterType", parms.ToArray()).ToList();
-
-                                foreach (var x in data)
-                                {
-
-                                    DateTime dt = DateTime.Parse(x.gcDate == null ? DateTime.Now.ToString() : x.gcDate.ToString());
-                                    //string gcTime = x.gcDate.ToString();
-                                    houseLocation.Add(new HouseOnMapVM()
-                                    {
-                                        //dyid = Convert.ToInt32(x.dyid),
-                                        //ssid = Convert.ToInt32(x.ssid),
-                                        //lwid = Convert.ToInt32(x.lwid),
-                                        houseId = Convert.ToInt32(x.houseId),
-                                        ReferanceId = x.ReferanceId,
-                                        houseOwner = (x.houseOwner == null ? "" : x.houseOwner),
-                                        houseOwnerMobile = (x.houseOwnerMobile == null ? "" : x.houseOwnerMobile),
-                                        // houseAddress = checkNull(x.houseAddress).Replace("Unnamed Road, ", ""),
-                                        gcDate = dt.ToString("dd-MM-yyyy"),
-                                        gcTime = dt.ToString("h:mm tt"), // 7:00 AM // 12 hour clock
-                                                                         //string gcTime = x.gcDate.ToString(),
-                                                                         //gcTime = x.gcDate.ToString("hh:mm tt"),
-                                                                         //myDateTime.ToString("HH:mm:ss")
-                                        ///date = Convert.ToDateTime(x.datt).ToString("dd/MM/yyyy"),
-                                        //time = Convert.ToDateTime(x.datt).ToString("hh:mm:ss tt"),
-                                        houseLat = x.houseLat,
-                                        houseLong = x.houseLong,
-                                        // address = x.houseAddress,
-                                        //vehcileNumber = x.v,
-                                        //userMobile = x.mobile,
-                                        garbageType = x.garbageType,
-                                    });
-                                }
-                                objDetail.code = 200;
-                                if(data.Count > 0)
-                                {
-                                    objDetail.message = "Data Found";
-                                }
-                                else
-                                {
-                                    objDetail.message = "Data Not Available";
-                                }
-                                objDetail.status = "Success";
-                                objDetail.timestamp = DateTime.Now.ToString();
-                                objDetail.data = houseLocation;
-                                result = objDetail;
-                            }
-
-                            //Create the Command Object
-                           // objDetail.data = data;
-
-
-                        }
-
-                        return  Ok(result);
-                    }
-                    else
-                    {
-
-                        objDetail.code = 404;
-                        objDetail.status = "Failed";
-                        objDetail.message = "GIS Connection Are Not Available";
-                        objDetail.timestamp = DateTime.Now.ToString();
-                        objDetail.data = "";
-                        result = objDetail;
-
-                        return NotFound(result);
-                    }
-                }
-                catch (Exception ex)
-                {
-
-                    objDetail.code = 400;
-                    objDetail.status = "Failed";
-                    objDetail.message = ex.Message.ToString();
-                    objDetail.timestamp = DateTime.Now.ToString();
-                    result = objDetail;
-
-                    return BadRequest(result);
-                }
-
-            }
-            else
-            {
-                objDetail.code = 401;
-                objDetail.status = "Failed";
-                objDetail.message = "Unauthorized";
-                objDetail.timestamp = DateTime.Now.ToString();
-                objDetail.data = "";
-                result = objDetail;
-                return Unauthorized(result);
-            }
-
-           // return Ok();
-        }
+  
         private object checkNull(string str)
         {
             string result = "";
