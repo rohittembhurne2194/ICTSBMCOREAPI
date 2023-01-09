@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
-namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
+namespace ICTSBMCOREAPI.Models.DB.ChildModels
 {
     public partial class DevSwachhBharatNagpurEntities : DbContext
     {

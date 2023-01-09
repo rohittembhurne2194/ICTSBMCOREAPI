@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+
+#nullable disable
+
+namespace ICTSBMCOREAPI.Models.DB.ChildModels
+{
+    public partial class GamePlayerDetail
+    {
+        public int ID { get; set; }
+        public string PlayerId { get; set; }
+        public string Name { get; set; }
+        public string Mobile { get; set; }
+        public int? Score { get; set; }
+        public string DeviceId { get; set; }
+        public DateTime? Created { get; set; }
+        public int? GameId { get; set; }
+    }
+}

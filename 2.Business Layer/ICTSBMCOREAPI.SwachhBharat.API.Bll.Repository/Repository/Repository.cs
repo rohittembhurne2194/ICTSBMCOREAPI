@@ -1184,6 +1184,9 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     objTransDumpTD.UsTotalDryWeight = obj.USTotalDryWeight;
                     objTransDumpTD.UsTotalGcWeight = obj.USTotalGcWeight;
                     objTransDumpTD.UsTotalWetWeight = obj.USTotalWetWeight;
+                    objTransDumpTD.TotalDryWeightKg =obj.totalDryWeightkg;
+                    objTransDumpTD.TotalWetWeightKg = obj.totalWetWeightkg;
+                    objTransDumpTD.TotalGcWeightKg = obj.totalGcWeightkg;
                     db.TransDumpTDs.Add(objTransDumpTD);
                     db.SaveChanges();
                     result.message = "Dump Yard Trip Transaction Save Successfully!!";
