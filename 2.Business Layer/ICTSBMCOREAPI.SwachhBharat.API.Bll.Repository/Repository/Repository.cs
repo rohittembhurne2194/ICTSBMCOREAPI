@@ -21,6 +21,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -5963,8 +5965,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
             {
                 var distCount = "";
-                double New_Lat = 0;
-                double New_Long = 0;
+               // double New_Lat = 0;
+                //double New_Long = 0;
                 try
                 {
 
@@ -6963,14 +6965,27 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                                             HttpClient client1 = new HttpClient();
 
-                                            var json1 = JsonConvert.SerializeObject(stn, Formatting.Indented);
-                                            var stringContent1 = new StringContent(json1);
-                                            stringContent1.Headers.ContentType.MediaType = "application/json";
-                                            stringContent1.Headers.Add("url", gis_url + "/" + gis_DBName);
-                                            stringContent1.Headers.Add("username", gis_username);
-                                            stringContent1.Headers.Add("password", gis_password);
+                                            //Start Old Code
+                                            //var json1 = JsonConvert.SerializeObject(stn, Formatting.Indented);
+                                            //var stringContent1 = new StringContent(json1);
+                                            //stringContent1.Headers.ContentType.MediaType = "application/json";
+                                            //stringContent1.Headers.Add("url", gis_url + "/" + gis_DBName);
+                                            //stringContent1.Headers.Add("username", gis_username);
+                                            //stringContent1.Headers.Add("password", gis_password);
 
-                                            var response1 = await client1.PostAsync("http://114.143.244.130:9091/house/search", stringContent1);
+                                            //var response1 = await client1.PostAsync("http://114.143.244.130:9091/house/search", stringContent1);
+                                            //End Old Code
+
+
+                                            //Start New Code
+                                            client1.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                                            //client1.DefaultRequestHeaders.Accept.Clear();
+                                            client1.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                                            client1.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                                            client1.DefaultRequestHeaders.Add("username", gis_username);
+                                            client1.DefaultRequestHeaders.Add("password", gis_password);
+                                            HttpResponseMessage response1 = await client1.PostAsJsonAsync("house/search", stn);
+                                            //End New Code
 
                                             if (response1.IsSuccessStatusCode)
                                             {
@@ -6994,14 +7009,28 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
 
 
-                                                HttpClient client = new HttpClient();
-                                                var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
-                                                var stringContent = new StringContent(json);
-                                                stringContent.Headers.ContentType.MediaType = "application/json";
-                                                stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
-                                                stringContent.Headers.Add("username", gis_username);
-                                                stringContent.Headers.Add("password", gis_password);
-                                                var response = await client.PostAsync("http://114.143.244.130:9091/house", stringContent);
+                                                HttpClient client = new();
+
+                                                //Start Old Code
+                                                //var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                                                //var stringContent = new StringContent(json);
+                                                //stringContent.Headers.ContentType.MediaType = "application/json";
+                                                //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                                                //stringContent.Headers.Add("username", gis_username);
+                                                //stringContent.Headers.Add("password", gis_password);
+                                                //var response = await client.PostAsync("http://114.143.244.130:9091/house", stringContent);
+                                                //End Old Code
+
+
+                                                //Start New Code
+                                                client.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                                                //client.DefaultRequestHeaders.Accept.Clear();
+                                                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                                                client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                                                client.DefaultRequestHeaders.Add("username", gis_username);
+                                                client.DefaultRequestHeaders.Add("password", gis_password);
+                                                HttpResponseMessage response = await client1.PostAsJsonAsync("house", tn);
+                                                //End New Code
 
                                                 if (response.IsSuccessStatusCode)
                                                 {
@@ -7013,11 +7042,11 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                                         status = "Success",
                                                         message = "Created",
                                                         errorMessages = dynamicobject2.errorMessages.ToString(),
-                                                        timestamp = dynamicobject2.timestamp.ToString(),
-                                                        data = dynamicobject2.data.ToString()
+                                                        timestamp = DateTime.Now.ToString(),
+                                                        data = dynamicobject2.data
                                                     });
-                                                    objDetail1.gismessage = dynamicobject2.message.ToString();
-                                                    objDetail1.giserrorMessages = dynamicobject2.errorMessages.ToString();
+                                                    //objDetail1.gismessage = dynamicobject2.message.ToString();
+                                                    //objDetail1.giserrorMessages = dynamicobject2.errorMessages.ToString();
 
                                                     //result = objDetail;
                                                 }
@@ -7050,13 +7079,11 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                             objDetail.Add(new DumpTripStatusResult()
                                             {
                                                 code = 404,
-                                                status = "",
-                                                message = "",
-                                                errorMessages = "GIS Connection Are Not Available",
-                                                timestamp = "",
-                                                data = ""
+                                                status = "Failed",
+                                                message = "GIS Connection Are Not Available",
+                                                timestamp = DateTime.Now.ToString()
                                             });
-                                            objDetail1.gismessage = "GIS Connection Are Not Available";
+                                            //objDetail1.gismessage = "GIS Connection Are Not Available";
                                         }
                                     }
                                     catch (Exception ex)
@@ -7064,13 +7091,11 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         objDetail.Add(new DumpTripStatusResult()
                                         {
                                             code = 400,
-                                            status = "",
-                                            message = "",
-                                            errorMessages = ex.Message.ToString(),
-                                            timestamp = "",
-                                            data = ""
+                                            status = "Failed",
+                                            message = ex.Message.ToString(),
+                                            timestamp = DateTime.Now.ToString()
                                         });
-                                        objDetail1.giserrorMessages = ex.Message.ToString();
+                                        //objDetail1.giserrorMessages = ex.Message.ToString();
                                     }
                                     //GIS Code End
 
