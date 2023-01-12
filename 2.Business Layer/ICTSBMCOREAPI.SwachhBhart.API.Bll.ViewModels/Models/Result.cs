@@ -20,5 +20,6 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
 
         public int houseid { get; set; }
         public bool IsExixts { get; set; }
+        public string referenceID { get; set; }
     }
 }

@@ -24,7 +24,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public int zoneId { get; set; }
         public int wardNo { get; set; }
         public string mobileno { get; set; }
-        public string OfflineId { get; set; }
+        public int OfflineId { get; set; }
 
         public string wastetype { get; set; }
 

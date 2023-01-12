@@ -6365,6 +6365,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                                     if ((string.IsNullOrEmpty(obj.QRCodeImage)) == false)
                                     {
+                                       // house.BinaryQrCodeImage = Convert.FromBase64String(obj.QRCodeImage.Substring(obj.QRCodeImage.LastIndexOf(',') + 1));
                                         obj.QRCodeImage = obj.QRCodeImage.Replace("data:image/jpeg;base64,", "");
                                         house.BinaryQrCodeImage = Convert.FromBase64String(obj.QRCodeImage);
                                     }
