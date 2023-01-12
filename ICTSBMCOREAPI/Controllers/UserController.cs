@@ -2223,7 +2223,16 @@ namespace ICTSBMCOREAPI.Controllers
                             //stringContent.Headers.Add("password", gis_password);
                             //var response = await client.PostAsync("http://114.143.244.130:9091/house", stringContent);
                             //End Old Code
+                            if(obj.updateTs == null)
+                            {
+                                obj.updateTs = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffffff");
 
+                               
+                            }
+                            if(obj.updateUser == null)
+                            {
+                                obj.updateUser = 0;
+                            }
 
                             //Start New Code
                             client.BaseAddress = new Uri("http://114.143.244.130:9091/");
