@@ -2225,7 +2225,7 @@ namespace ICTSBMCOREAPI.Controllers
                             //End Old Code
                             if(obj.updateTs == null)
                             {
-                                obj.updateTs = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fffffff");
+                                obj.updateTs = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fff");
 
                                
                             }
