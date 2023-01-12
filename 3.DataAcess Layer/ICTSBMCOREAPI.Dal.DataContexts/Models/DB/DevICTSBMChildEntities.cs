@@ -35,7 +35,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB
                 }
                 else
                 {
-                    optionsBuilder.UseSqlServer("data source=202.65.157.253;initial catalog=LIVEAdvanceEtapalliGhantaGadi;persist security info=True;user id=appynitty;password=BigV$Telecom;MultipleActiveResultSets=True;App=EntityFramework");
+                    optionsBuilder.UseSqlServer("data source=202.65.157.253;initial catalog=LIVEAdvanceEtapalliGhantaGadi;persist security info=True;user id=sa;password=sa@123;MultipleActiveResultSets=True;App=EntityFramework");
 
                 }
 
