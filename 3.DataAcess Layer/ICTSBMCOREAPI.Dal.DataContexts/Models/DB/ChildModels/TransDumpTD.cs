@@ -32,5 +32,8 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
         public decimal? UsTotalGcWeight { get; set; }
         public decimal? UsTotalDryWeight { get; set; }
         public decimal? UsTotalWetWeight { get; set; }
+        public decimal? TotalGcWeightKg { get; set; }
+        public decimal? TotalDryWeightKg { get; set; }
+        public decimal? TotalWetWeightKg { get; set; }
     }
 }

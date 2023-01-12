@@ -878,6 +878,12 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
 
                 entity.ToTable("TransDumpTD");
 
+                entity.Property(e => e.TotalDryWeightKg).HasColumnType("decimal(18, 10)");
+
+                entity.Property(e => e.TotalGcWeightKg).HasColumnType("decimal(18, 10)");
+
+                entity.Property(e => e.TotalWetWeightKg).HasColumnType("decimal(18, 10)");
+
                 entity.Property(e => e.UsTotalDryWeight).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.UsTotalGcWeight).HasColumnType("decimal(18, 4)");

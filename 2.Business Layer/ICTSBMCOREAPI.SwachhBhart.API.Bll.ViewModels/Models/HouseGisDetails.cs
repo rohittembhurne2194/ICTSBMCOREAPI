@@ -8,7 +8,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
    public class HouseGisDetails
     {
       
-        public string code { get; set; }
+        public int code { get; set; }
      
         public string status { get; set; }
      
