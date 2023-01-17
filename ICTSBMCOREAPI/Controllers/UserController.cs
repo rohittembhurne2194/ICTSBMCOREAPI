@@ -2002,7 +2002,7 @@ namespace ICTSBMCOREAPI.Controllers
                         {
                             ward = Convert.ToInt32(obj.wardNo);
                         }
-                        if (obj.garbageType == null || obj.garbageType == 0)
+                        if (obj.garbageType == null || obj.garbageType == -1)
                         {
                             GarbageType = null;
                         }
@@ -2054,42 +2054,46 @@ namespace ICTSBMCOREAPI.Controllers
                                                 };
                                 var data = await db.SP_HouseOnMapDetails_Results.FromSqlRaw<SP_HouseOnMapDetails_Result>("EXEC SP_HouseOnMapDetails @gcDate,@UserId,@ZoneId,@AreaId,@WardNo,@GarbageType,@FilterType", parms.ToArray()).ToListAsync();
 
-
+                                
                                 foreach (var x in data)
                                 {
-
-                                    DateTime dt = DateTime.Parse(x.gcDate == null ? DateTime.Now.ToString() : x.gcDate.ToString());
-                                    //string gcTime = x.gcDate.ToString();
-                                    houseLocation.Add(new HouseOnMapVM()
+                                    if(x.houseId > 0)
                                     {
-                                        //dyid = Convert.ToInt32(x.dyid),
-                                        //ssid = Convert.ToInt32(x.ssid),
-                                        //lwid = Convert.ToInt32(x.lwid),
-                                        houseId = Convert.ToInt32(x.houseId),
-                                        ReferanceId = x.ReferanceId,
-                                        houseOwner = (x.houseOwner ?? ""),
-                                        houseOwnerMobile = (x.houseOwnerMobile ?? ""),
-                                       // houseAddress = checkNull(x.houseAddress).Replace("Unnamed Road, ", ""),
-                                        gcDate = dt.ToString("dd-MM-yyyy"),
-                                        gcTime = dt.ToString("h:mm tt"), // 7:00 AM // 12 hour clock
-                                                                         //string gcTime = x.gcDate.ToString(),
-                                                                         //gcTime = x.gcDate.ToString("hh:mm tt"),
-                                                                         //myDateTime.ToString("HH:mm:ss")
-                                        ///date = Convert.ToDateTime(x.datt).ToString("dd/MM/yyyy"),
-                                        //time = Convert.ToDateTime(x.datt).ToString("hh:mm:ss tt"),
-                                        //houseLat = x.houseLat,
-                                        //houseLong = x.houseLong,
-                                        // address = x.houseAddress,
-                                        //vehcileNumber = x.v,
-                                        //userMobile = x.mobile,
-                                        garbageType = x.garbageType,
-                                    });
+                                        DateTime dt = DateTime.Parse(x.gcDate == null ? DateTime.Now.ToString() : x.gcDate.ToString());
+                                        //string gcTime = x.gcDate.ToString();
+                                        houseLocation.Add(new HouseOnMapVM()
+                                        {
+                                            //dyid = Convert.ToInt32(x.dyid),
+                                            //ssid = Convert.ToInt32(x.ssid),
+                                            //lwid = Convert.ToInt32(x.lwid),
+                                            houseId = Convert.ToInt32(x.houseId),
+                                            ReferanceId = x.ReferanceId,
+                                            houseOwner = (x.houseOwner ?? ""),
+                                            houseOwnerMobile = (x.houseOwnerMobile ?? ""),
+                                            // houseAddress = checkNull(x.houseAddress).Replace("Unnamed Road, ", ""),
+                                            gcDate = dt.ToString("dd-MM-yyyy"),
+                                            gcTime = dt.ToString("h:mm tt"), // 7:00 AM // 12 hour clock
+                                                                             //string gcTime = x.gcDate.ToString(),
+                                                                             //gcTime = x.gcDate.ToString("hh:mm tt"),
+                                                                             //myDateTime.ToString("HH:mm:ss")
+                                            ///date = Convert.ToDateTime(x.datt).ToString("dd/MM/yyyy"),
+                                            //time = Convert.ToDateTime(x.datt).ToString("hh:mm:ss tt"),
+                                            //houseLat = x.houseLat,
+                                            //houseLong = x.houseLong,
+                                            // address = x.houseAddress,
+                                            //vehcileNumber = x.v,
+                                            //userMobile = x.mobile,
+                                            garbageType = x.garbageType,
+                                        });
+                                    }
+                                   
                                 }
                             }
 
                             //Create the Command Object
                             objDetail.code = 200;
                             objDetail.status = "Success";
+                            objDetail.timestamp = DateTime.Now.ToString();
                             if(houseLocation.Count > 0)
                             {
                                 objDetail.message = "Data Found";
