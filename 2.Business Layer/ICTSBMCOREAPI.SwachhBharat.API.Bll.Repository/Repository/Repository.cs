@@ -6374,7 +6374,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     {
                                        // house.BinaryQrCodeImage = Convert.FromBase64String(obj.QRCodeImage.Substring(obj.QRCodeImage.LastIndexOf(',') + 1));
                                         obj.QRCodeImage = obj.QRCodeImage.Replace("data:image/jpeg;base64,", "");
-                                        house.BinaryQrCodeImage = Convert.FromBase64String(obj.QRCodeImage);
+                                        house.BinaryQrCodeImage = ConvertFromBase64String(obj.QRCodeImage);
                                     }
                                     house.New_Construction = obj.new_const;
                                     //////////////////////////////////////////////////////////////////
@@ -6438,6 +6438,25 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 }
             }
             //}
+        }
+
+
+        private static byte[] ConvertFromBase64String(string input)
+        {
+            if (String.IsNullOrWhiteSpace(input)) return null;
+            try
+            {
+                string working = input.Replace('-', '+').Replace('_', '/'); ;
+                while (working.Length % 4 != 0)
+                {
+                    working += '=';
+                }
+                return Convert.FromBase64String(working);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
 
 
