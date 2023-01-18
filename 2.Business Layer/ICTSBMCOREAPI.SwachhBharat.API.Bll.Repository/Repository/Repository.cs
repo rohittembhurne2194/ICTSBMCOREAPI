@@ -3837,7 +3837,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         span = newTime.Subtract(oldTime);
                     }
 
-                    if (gcd == null || span.Minutes >= 10)
+                    if (gcd == null || span.TotalMinutes >= 10)
                     {
                         GarbageCollectionDetail objdata = new GarbageCollectionDetail();
                         objdata.userId = obj.userId;
