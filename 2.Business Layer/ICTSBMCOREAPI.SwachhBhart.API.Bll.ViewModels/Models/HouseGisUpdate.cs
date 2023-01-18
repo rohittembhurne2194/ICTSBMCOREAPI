@@ -8,7 +8,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
 {
     public class HouseGisUpdate
     {
-        public string id { get; set; }
+        public int id { get; set; }
         public int? updateUser { get; set; }
         public string geom { get; set; }
 
