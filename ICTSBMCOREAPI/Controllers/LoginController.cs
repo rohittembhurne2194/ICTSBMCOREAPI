@@ -78,6 +78,7 @@ namespace ICTSBMCOREAPI.Controllers
             }
             else
             {
+                _logger.LogError("Error : Invalid AppId="+ AppId+" / Correct AppId="+ Auth_AppId);
                 return Unauthorized();
             }
           

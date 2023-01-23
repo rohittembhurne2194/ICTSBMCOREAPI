@@ -25,6 +25,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -6372,9 +6373,11 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                                     if ((string.IsNullOrEmpty(obj.QRCodeImage)) == false)
                                     {
-                                       // house.BinaryQrCodeImage = Convert.FromBase64String(obj.QRCodeImage.Substring(obj.QRCodeImage.LastIndexOf(',') + 1));
-                                        obj.QRCodeImage = obj.QRCodeImage.Replace("data:image/jpeg;base64,", "");
-                                        house.BinaryQrCodeImage = ConvertFromBase64String(obj.QRCodeImage);
+                                        // house.BinaryQrCodeImage = Convert.FromBase64String(obj.QRCodeImage.Substring(obj.QRCodeImage.LastIndexOf(',') + 1));
+                                        Regex regex = new Regex(@"^[\w/\:.-]+;base64,");
+                                        obj.QRCodeImage = regex.Replace(obj.QRCodeImage, string.Empty);
+                                        obj.QRCodeImage = obj.QRCodeImage.Replace("data:image/jpeg;base64,", String.Empty);
+                                        house.BinaryQrCodeImage = Convert.FromBase64String(obj.QRCodeImage);
                                     }
                                     house.New_Construction = obj.new_const;
                                     //////////////////////////////////////////////////////////////////
@@ -6446,7 +6449,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             if (String.IsNullOrWhiteSpace(input)) return null;
             try
             {
-                string working = input.Replace('-', '+').Replace('_', '/'); ;
+                string working = input.Replace('-', '+').Replace('_', '/');
                 while (working.Length % 4 != 0)
                 {
                     working += '=';
@@ -9599,6 +9602,29 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             }
             return obj;
         }
+
+        public async Task<List<LatLongD>> GetLatLong(int appId, int userid, DateTime date)
+        {
+            List<LatLongD> obj = new List<LatLongD>();
+            using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(appId))
+            {
+                var data =await db.HouseMasters.Where(c => c.userId == userid && EF.Functions.DateDiffDay(c.modified, date) == 0).OrderByDescending(c => c.modified).ToListAsync();
+                foreach (var x in data)
+                {
+
+                    obj.Add(new LatLongD()
+                    {
+                        RefferenceId = x.ReferanceId,
+                        Lat = x.houseLat,
+                        Long = x.houseLong
+                    });
+                }
+
+            }
+            return obj;
+        }
+
+
         public async Task<List<SBWorkDetails>> GetUserWorkForNormalAsync(int userId, int year, int month, int appId)
         {
             List<SBWorkDetails> obj = new List<SBWorkDetails>();

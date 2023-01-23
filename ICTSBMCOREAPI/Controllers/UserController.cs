@@ -73,7 +73,7 @@ namespace ICTSBMCOREAPI.Controllers
             {
                 return Unauthorized();
             }
-                
+
         }
 
         [HttpPost]
@@ -81,7 +81,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         public async Task<ActionResult<Result>> SaveUserAttendenceOut([FromHeader] string authorization, [FromHeader] int AppId, [FromHeader] string batteryStatus, SBUserAttendence obj)
         {
-           
+
 
             var stream = authorization.Replace("Bearer ", string.Empty);
             var handler = new JwtSecurityTokenHandler();
@@ -110,7 +110,7 @@ namespace ICTSBMCOREAPI.Controllers
         public async Task<ActionResult<List<SyncResult>>> SaveUserLocation([FromHeader] string authorization, [FromHeader] int AppId, [FromHeader] string batteryStatus, [FromHeader] int typeId, [FromHeader] string EmpType, [FromBody] List<SBUserLocation> obj)
         {
 
-         
+
             var stream = authorization.Replace("Bearer ", string.Empty);
             var handler = new JwtSecurityTokenHandler();
             var jsonToken = handler.ReadToken(stream);
@@ -269,6 +269,33 @@ namespace ICTSBMCOREAPI.Controllers
                 return Unauthorized();
             }
         }
+
+        [HttpGet]
+        [Route("Get/GetLatLongD")]
+        public async Task<ActionResult<List<LatLongD>>> GetLatLong([FromHeader] string authorization, [FromHeader] int AppId, [FromHeader] int userId, [FromHeader] DateTime fdate)
+        {
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                List<LatLongD> objDetail = new List<LatLongD>();
+                objDetail = await objRep.GetLatLong(AppId, userId, fdate);
+                return objDetail.OrderByDescending(c => c.RefferenceId).ToList(); ;
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
+
 
         [HttpGet]
         [Route("Get/WorkHistory/Details")]
@@ -635,47 +662,47 @@ namespace ICTSBMCOREAPI.Controllers
                         //    tn.updateUser = item.updateUser;
 
 
-                            //var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
-                            //var stringContent = new StringContent(json);
-                            //stringContent.Headers.ContentType.MediaType = "application/json";
-                            //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
-                            //stringContent.Headers.Add("username", gis_username);
-                            //stringContent.Headers.Add("password", gis_password);
-                            //var response = await client.PostAsync("http://114.143.244.130:9091/garbage-trail", stringContent);
+                        //var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                        //var stringContent = new StringContent(json);
+                        //stringContent.Headers.ContentType.MediaType = "application/json";
+                        //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                        //stringContent.Headers.Add("username", gis_username);
+                        //stringContent.Headers.Add("password", gis_password);
+                        //var response = await client.PostAsync("http://114.143.244.130:9091/garbage-trail", stringContent);
 
 
-                            client.BaseAddress = new Uri("http://114.143.244.130:9091/");
-                            //client.DefaultRequestHeaders.Accept.Clear();
-                            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                            client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
-                            client.DefaultRequestHeaders.Add("username", gis_username);
-                            client.DefaultRequestHeaders.Add("password", gis_password);
-                            var response = await client.PostAsJsonAsync("garbage-trail", obj);
+                        client.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                        //client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                        client.DefaultRequestHeaders.Add("username", gis_username);
+                        client.DefaultRequestHeaders.Add("password", gis_password);
+                        var response = await client.PostAsJsonAsync("garbage-trail", obj);
 
-                            if (response.IsSuccessStatusCode)
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var responseString = await response.Content.ReadAsStringAsync();
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                            objDetail.Add(new DumpTripStatusResult()
                             {
-                                var responseString = await response.Content.ReadAsStringAsync();
-                                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                                objDetail.Add(new DumpTripStatusResult()
-                                {
-                                    code = (int)response.StatusCode,
-                                    status = dynamicobject.status.ToString(),
-                                    message = dynamicobject.message.ToString(),
-                                    errorMessages = dynamicobject.errorMessages.ToString(),
-                                    timestamp = DateTime.Now.ToString(),
-                                    data = dynamicobject.data.ToString()
-                                });
-                            }
-                            else
+                                code = (int)response.StatusCode,
+                                status = dynamicobject.status.ToString(),
+                                message = dynamicobject.message.ToString(),
+                                errorMessages = dynamicobject.errorMessages.ToString(),
+                                timestamp = DateTime.Now.ToString(),
+                                data = dynamicobject.data.ToString()
+                            });
+                        }
+                        else
+                        {
+                            objDetail.Add(new DumpTripStatusResult()
                             {
-                                objDetail.Add(new DumpTripStatusResult()
-                                {
-                                    code = (int)response.StatusCode,
-                                    status = "Failed",
-                                    message = "Not Found",
-                                    timestamp = DateTime.Now.ToString()
-                                });
-                            }
+                                code = (int)response.StatusCode,
+                                status = "Failed",
+                                message = "Not Found",
+                                timestamp = DateTime.Now.ToString()
+                            });
+                        }
                         //}
                         result = objDetail;
                         return Ok(result);
@@ -779,49 +806,49 @@ namespace ICTSBMCOREAPI.Controllers
                         //    tn.updateTs = item.updateTs;
                         //    tn.updateUser = item.updateUser;
 
-                            //var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
-                            //var stringContent = new StringContent(json);
-                            //stringContent.Headers.ContentType.MediaType = "application/json";
-                            //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
-                            //stringContent.Headers.Add("username", gis_username);
-                            //stringContent.Headers.Add("password", gis_password);
+                        //var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                        //var stringContent = new StringContent(json);
+                        //stringContent.Headers.ContentType.MediaType = "application/json";
+                        //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                        //stringContent.Headers.Add("username", gis_username);
+                        //stringContent.Headers.Add("password", gis_password);
 
-                            //var response = await client.PostAsync("http://114.143.244.130:9091/house-trail", stringContent);
+                        //var response = await client.PostAsync("http://114.143.244.130:9091/house-trail", stringContent);
 
 
-                         
-                            client.BaseAddress = new Uri("http://114.143.244.130:9091/");
-                            //client.DefaultRequestHeaders.Accept.Clear();
-                            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                            client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
-                            client.DefaultRequestHeaders.Add("username", gis_username);
-                            client.DefaultRequestHeaders.Add("password", gis_password);
-                            var response = await client.PostAsJsonAsync("house-trail", obj);
 
-                            if (response.IsSuccessStatusCode)
+                        client.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                        //client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                        client.DefaultRequestHeaders.Add("username", gis_username);
+                        client.DefaultRequestHeaders.Add("password", gis_password);
+                        var response = await client.PostAsJsonAsync("house-trail", obj);
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var responseString = await response.Content.ReadAsStringAsync();
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                            objDetail.Add(new DumpTripStatusResult()
                             {
-                                var responseString = await response.Content.ReadAsStringAsync();
-                                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                                objDetail.Add(new DumpTripStatusResult()
-                                {
-                                    code = (int)response.StatusCode,
-                                    status = dynamicobject.status.ToString(),
-                                    message = dynamicobject.message.ToString(),
-                                    errorMessages = dynamicobject.errorMessages.ToString(),
-                                    timestamp = dynamicobject.timestamp.ToString(),
-                                    data = dynamicobject.data.ToString()
-                                });
-                            }
-                            else
+                                code = (int)response.StatusCode,
+                                status = dynamicobject.status.ToString(),
+                                message = dynamicobject.message.ToString(),
+                                errorMessages = dynamicobject.errorMessages.ToString(),
+                                timestamp = dynamicobject.timestamp.ToString(),
+                                data = dynamicobject.data.ToString()
+                            });
+                        }
+                        else
+                        {
+                            objDetail.Add(new DumpTripStatusResult()
                             {
-                                objDetail.Add(new DumpTripStatusResult()
-                                {
-                                    code = (int)response.StatusCode,
-                                    status = "Failed",
-                                    message = response.RequestMessage.ToString(),
-                                    timestamp = DateTime.Now.ToString(),
-                                });
-                            }
+                                code = (int)response.StatusCode,
+                                status = "Failed",
+                                message = response.RequestMessage.ToString(),
+                                timestamp = DateTime.Now.ToString(),
+                            });
+                        }
                         //}
                         result = objDetail;
                         return Ok(result);
@@ -877,7 +904,7 @@ namespace ICTSBMCOREAPI.Controllers
         [EnableCors("MyCorsPolicy")]
         public async Task<ActionResult<HouseGisDetails>> HouseGisDetailsAll([FromHeader] string authorization, [FromHeader] int AppId)
         {
-            
+
             //var message = "";
 
             using DevICTSBMMainEntities dbMain = new();
@@ -955,13 +982,13 @@ namespace ICTSBMCOREAPI.Controllers
                             List<GisResult> myresult = jsonResult.ToObject<List<GisResult>>();
 
                             List<HouseGisDetails> obj = new();
-                           
+
                             using (DevICTSBMChildEntities db = new(AppId))
                             {
-                              
+
                                 foreach (var c in myresult)
-                                { 
-                                    if(Convert.ToInt32(c.id) != 0)
+                                {
+                                    if (Convert.ToInt32(c.id) != 0)
                                     {
                                         var house = await db.HouseMasters.Where(x => x.houseId == Convert.ToInt32(c.id)).Select(x => new { x.ReferanceId, x.houseId, x.userId, x.houseOwner, x.houseOwnerMobile, x.houseAddress }).FirstOrDefaultAsync();
 
@@ -969,7 +996,7 @@ namespace ICTSBMCOREAPI.Controllers
                                         var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
                                         var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
 
-                                        
+
                                         var result1 = myresult.Select(i =>
                                         {
                                             if (i.id == house.houseId)
@@ -1006,12 +1033,12 @@ namespace ICTSBMCOREAPI.Controllers
 
                                     }
                                 }
-                                
-                               
+
+
 
                             }
                             // return objDetail;
-                          
+
                             //objDetail.Add(new HouseGisDetails()
                             //{
                             //    code = dynamicobject.code.ToString(),
@@ -1083,7 +1110,7 @@ namespace ICTSBMCOREAPI.Controllers
                     result = objDetail;
                     return BadRequest(result);
                 }
-               //return objDetail;
+                //return objDetail;
             }
             else
             {
@@ -1092,13 +1119,13 @@ namespace ICTSBMCOREAPI.Controllers
                 objDetail.status = "Failed";
                 objDetail.message = "Unauthorized";
                 objDetail.timestamp = DateTime.Now.ToString();
-               
+
 
                 result = objDetail;
                 return Unauthorized(result);
             }
-           
-            
+
+
         }
 
         [HttpPost]
@@ -1160,19 +1187,19 @@ namespace ICTSBMCOREAPI.Controllers
 
 
                         if (response.IsSuccessStatusCode)
-                            {
-                                var responseString = await response.Content.ReadAsStringAsync();
+                        {
+                            var responseString = await response.Content.ReadAsStringAsync();
 
                             //result = await response.Content.ReadFromJsonAsync<DumpTripStatusResult>();
 
                             var jsonParsed = JObject.Parse(responseString);
-                                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                                var jsonResult = jsonParsed["data"];
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                            var jsonResult = jsonParsed["data"];
 
-                                List<GisResult> myresult = jsonResult.ToObject<List<GisResult>>();
-                          
+                            List<GisResult> myresult = jsonResult.ToObject<List<GisResult>>();
 
-                           
+
+
                             using (DevICTSBMChildEntities db = new(AppId))
                             {
 
@@ -1191,7 +1218,7 @@ namespace ICTSBMCOREAPI.Controllers
                                         {
                                             if (i.id == house.houseId)
                                             {
-                                                
+
 
                                                 var value = new List<HouseProperty> {
                                                     new HouseProperty { name = "ReferanceId", value = house.ReferanceId, type = "String", Index = 0 },
@@ -1214,27 +1241,27 @@ namespace ICTSBMCOREAPI.Controllers
 
 
                             }
-                                objDetail.code = (int)response.StatusCode;
-                                objDetail.status = "Success";
-                                objDetail.message = "Data Found";
-                                objDetail.timestamp = DateTime.Now.ToString();
-                                objDetail.data = myresult;
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Success";
+                            objDetail.message = "Data Found";
+                            objDetail.timestamp = DateTime.Now.ToString();
+                            objDetail.data = myresult;
 
-                                result = objDetail;
-                                return Ok(result);
-                            }
-                            else
-                            {
-                                objDetail.code = (int)response.StatusCode;
-                                objDetail.status = "Failed";
-                                objDetail.message = "";
-                                objDetail.timestamp = DateTime.Now.ToString();
+                            result = objDetail;
+                            return Ok(result);
+                        }
+                        else
+                        {
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Failed";
+                            objDetail.message = "";
+                            objDetail.timestamp = DateTime.Now.ToString();
 
-                                result = objDetail;
-                                return NotFound(result);
-                            }
- 
-                      
+                            result = objDetail;
+                            return NotFound(result);
+                        }
+
+
                     }
                     else
                     {
@@ -1259,7 +1286,7 @@ namespace ICTSBMCOREAPI.Controllers
                     result = objDetail;
                     return BadRequest(result);
                 }
-               
+
             }
             else
             {
@@ -1361,7 +1388,7 @@ namespace ICTSBMCOREAPI.Controllers
                             return NotFound(result);
                         }
 
-                      
+
                     }
                     else
                     {
@@ -1396,7 +1423,7 @@ namespace ICTSBMCOREAPI.Controllers
                     result = objDetail;
                     return BadRequest(result);
                 }
-               
+
             }
             else
             {
@@ -1409,7 +1436,7 @@ namespace ICTSBMCOREAPI.Controllers
                 result = objDetail;
                 return Unauthorized(result);
             }
-          
+
         }
 
         [HttpPost]
@@ -1444,17 +1471,17 @@ namespace ICTSBMCOREAPI.Controllers
                         var gis_password = GIS_CON.Password;
 
                         HttpClient client = new();
-                       
+
 
                         //Start Old Code
-                            //var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
-                            //var stringContent = new StringContent(json);
-                            //stringContent.Headers.ContentType.MediaType = "application/json";
-                            //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
-                            //stringContent.Headers.Add("username", gis_username);
-                            //stringContent.Headers.Add("password", gis_password);
+                        //var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+                        //var stringContent = new StringContent(json);
+                        //stringContent.Headers.ContentType.MediaType = "application/json";
+                        //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                        //stringContent.Headers.Add("username", gis_username);
+                        //stringContent.Headers.Add("password", gis_password);
 
-                            //var response = await client.PostAsync("http://114.143.244.130:9091/garbage-trail/search", stringContent);
+                        //var response = await client.PostAsync("http://114.143.244.130:9091/garbage-trail/search", stringContent);
                         //End Old Code
 
                         //Start New Code
@@ -1464,95 +1491,95 @@ namespace ICTSBMCOREAPI.Controllers
                         client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
                         client.DefaultRequestHeaders.Add("username", gis_username);
                         client.DefaultRequestHeaders.Add("password", gis_password);
-                        HttpResponseMessage response = await client.PostAsJsonAsync("garbage-trail/search",obj);
+                        HttpResponseMessage response = await client.PostAsJsonAsync("garbage-trail/search", obj);
                         //End New Code
 
                         if (response.IsSuccessStatusCode)
+                        {
+                            var responseString = await response.Content.ReadAsStringAsync();
+                            var jsonParsed = JObject.Parse(responseString);
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                            var jsonResult = jsonParsed["data"];
+
+                            List<GisTrailResult> myresult = jsonResult.ToObject<List<GisTrailResult>>();
+
+
+                            using (DevICTSBMChildEntities db = new(AppId))
                             {
-                                var responseString = await response.Content.ReadAsStringAsync();
-                                var jsonParsed = JObject.Parse(responseString);
-                                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                                var jsonResult = jsonParsed["data"];
 
-                                List<GisTrailResult> myresult = jsonResult.ToObject<List<GisTrailResult>>();
-
-
-                                using (DevICTSBMChildEntities db = new(AppId))
+                                foreach (var c in myresult)
                                 {
 
-                                    foreach (var c in myresult)
+                                    //var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) && x.gcDate >= Convert.ToDateTime(tn.startTs) && x.gcDate <= Convert.ToDateTime(tn.endTs)).Select(x => new { x.houseId, x.userId, x.gcDate, houselat = x.Lat, houselong = x.Long  }).ToListAsync();
+
+                                    var query = (from s in db.GarbageCollectionDetails
+                                                 from cs in db.HouseMasters
+                                                 from um in db.UserMasters
+                                                 where s.houseId == cs.houseId
+                                                 where s.userId == um.userId
+                                                 where s.userId == Convert.ToInt32(c.createUser) && s.gcDate >= Convert.ToDateTime(obj.startTs) && s.gcDate <= Convert.ToDateTime(obj.endTs)
+                                                 select new
+                                                 {
+                                                     houseId = s.houseId,
+                                                     userId = s.userId,
+                                                     gcDate = s.gcDate,
+                                                     //houselat = s.Lat,
+                                                     //houselong = s.Long,
+                                                     ReferanceId = cs.ReferanceId,
+                                                     houseOwner = cs.houseOwner,
+                                                     houseOwnerMobile = cs.houseOwnerMobile,
+                                                     houseAddress = cs.houseAddress,
+                                                     employeename = um.userName
+                                                 }).ToList();
+
+
+
+                                    if (query.Count > 0)
                                     {
+                                        JavaScriptSerializer serializer = new();
+                                        var output = serializer.Serialize(query);
+                                        var housedatalist = new JavaScriptSerializer().Deserialize<GisHouseList[]>(output);
 
-                                        //var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) && x.gcDate >= Convert.ToDateTime(tn.startTs) && x.gcDate <= Convert.ToDateTime(tn.endTs)).Select(x => new { x.houseId, x.userId, x.gcDate, houselat = x.Lat, houselong = x.Long  }).ToListAsync();
-
-                                        var query = (from s in db.GarbageCollectionDetails
-                                                     from cs in db.HouseMasters
-                                                     from um in db.UserMasters
-                                                     where s.houseId == cs.houseId
-                                                     where s.userId == um.userId
-                                                     where s.userId == Convert.ToInt32(c.createUser) && s.gcDate >= Convert.ToDateTime(obj.startTs) && s.gcDate <= Convert.ToDateTime(obj.endTs)
-                                                     select new
-                                                     {
-                                                         houseId = s.houseId,
-                                                         userId = s.userId,
-                                                         gcDate = s.gcDate,
-                                                         //houselat = s.Lat,
-                                                         //houselong = s.Long,
-                                                         ReferanceId = cs.ReferanceId,
-                                                         houseOwner = cs.houseOwner,
-                                                         houseOwnerMobile = cs.houseOwnerMobile,
-                                                         houseAddress = cs.houseAddress,
-                                                         employeename = um.userName
-                                                     }).ToList();
-
-                                        
-
-                                        if (query.Count > 0)
+                                        var result1 = myresult.Select(i =>
                                         {
-                                            JavaScriptSerializer serializer = new();
-                                            var output = serializer.Serialize(query);
-                                            var housedatalist = new JavaScriptSerializer().Deserialize<GisHouseList[]>(output);
+                                            i.HouseList = housedatalist;
 
-                                            var result1 = myresult.Select(i =>
-                                            {
-                                                i.HouseList = housedatalist;
+                                            return i;
 
-                                                return i;
+                                        }).ToList();
 
-                                            }).ToList();
+                                        var EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.createUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
+                                        var Update_EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.updateUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
 
-                                            var EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.createUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
-                                            var Update_EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.updateUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
-
-
-                                        }
 
                                     }
 
                                 }
 
-                                objDetail.code = (int)response.StatusCode;
-                                objDetail.status = "Success";
-                                objDetail.message = "Data Found";
-                                objDetail.timestamp = DateTime.Now.ToString();
-                                objDetail.data = myresult;
-
-                                result = objDetail;
-                                return Ok(result);
-
-                            }
-                            else
-                            {
-                                objDetail.code = (int)response.StatusCode;
-                                objDetail.status = "Failed";
-                                objDetail.message = "";
-                                objDetail.timestamp = DateTime.Now.ToString();
-
-                                result = objDetail;
-                                return NotFound(result);
                             }
 
-                        
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Success";
+                            objDetail.message = "Data Found";
+                            objDetail.timestamp = DateTime.Now.ToString();
+                            objDetail.data = myresult;
+
+                            result = objDetail;
+                            return Ok(result);
+
+                        }
+                        else
+                        {
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Failed";
+                            objDetail.message = "";
+                            objDetail.timestamp = DateTime.Now.ToString();
+
+                            result = objDetail;
+                            return NotFound(result);
+                        }
+
+
                     }
                     else
                     {
@@ -1613,7 +1640,7 @@ namespace ICTSBMCOREAPI.Controllers
 
             var Auth_AppId = Convert.ToInt32(jti);
 
-            if(Auth_AppId == AppId)
+            if (Auth_AppId == AppId)
             {
                 try
                 {
@@ -1751,7 +1778,7 @@ namespace ICTSBMCOREAPI.Controllers
                 result = objDetail;
                 return Unauthorized(result);
             }
-           
+
         }
 
         [HttpPost]
@@ -1786,16 +1813,16 @@ namespace ICTSBMCOREAPI.Controllers
                         var gis_password = GIS_CON.Password;
 
                         HttpClient client = new();
-                        
-                        //Start Old Code
-                            //var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
-                            //var stringContent = new StringContent(json);
-                            //stringContent.Headers.ContentType.MediaType = "application/json";
-                            //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
-                            //stringContent.Headers.Add("username", gis_username);
-                            //stringContent.Headers.Add("password", gis_password);
 
-                            //var response = await client.PostAsync("http://114.143.244.130:9091/house-trail/search", stringContent);
+                        //Start Old Code
+                        //var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+                        //var stringContent = new StringContent(json);
+                        //stringContent.Headers.ContentType.MediaType = "application/json";
+                        //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                        //stringContent.Headers.Add("username", gis_username);
+                        //stringContent.Headers.Add("password", gis_password);
+
+                        //var response = await client.PostAsync("http://114.143.244.130:9091/house-trail/search", stringContent);
                         //End Old Code
 
                         //Start New Code
@@ -1805,98 +1832,98 @@ namespace ICTSBMCOREAPI.Controllers
                         client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
                         client.DefaultRequestHeaders.Add("username", gis_username);
                         client.DefaultRequestHeaders.Add("password", gis_password);
-                        HttpResponseMessage response = await client.PostAsJsonAsync("house-trail/search",obj);
+                        HttpResponseMessage response = await client.PostAsJsonAsync("house-trail/search", obj);
                         //End New Code
 
                         if (response.IsSuccessStatusCode)
+                        {
+                            var responseString = await response.Content.ReadAsStringAsync();
+                            var jsonParsed = JObject.Parse(responseString);
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                            var jsonResult = jsonParsed["data"];
+
+                            List<GisTrailResult> myresult = jsonResult.ToObject<List<GisTrailResult>>();
+
+                            using (DevICTSBMChildEntities db = new(AppId))
                             {
-                                var responseString = await response.Content.ReadAsStringAsync();
-                                var jsonParsed = JObject.Parse(responseString);
-                                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                                var jsonResult = jsonParsed["data"];
 
-                                List<GisTrailResult> myresult = jsonResult.ToObject<List<GisTrailResult>>();
-
-                                using (DevICTSBMChildEntities db = new(AppId))
+                                foreach (var c in myresult)
                                 {
 
-                                    foreach (var c in myresult)
+                                    //var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) && x.gcDate >= Convert.ToDateTime(tn.startTs) && x.gcDate <= Convert.ToDateTime(tn.endTs)).Select(x => new { x.houseId, x.userId, x.gcDate, houselat = x.Lat, houselong = x.Long  }).ToListAsync();
+
+                                    var query = (from hm in db.HouseMasters
+                                                 from em in db.QrEmployeeMasters
+                                                 where hm.userId == em.qrEmpId
+                                                 where hm.userId == Convert.ToInt32(c.createUser) && hm.modified >= Convert.ToDateTime(obj.startTs) && hm.modified <= Convert.ToDateTime(obj.endTs)
+                                                 select new
+                                                 {
+                                                     houseId = hm.houseId,
+                                                     userId = em.qrEmpId,
+                                                     gcDate = hm.modified,
+                                                     ReferanceId = hm.ReferanceId,
+                                                     houseOwner = hm.houseOwner,
+                                                     houseOwnerMobile = hm.houseOwnerMobile,
+                                                     houseAddress = hm.houseAddress,
+                                                     employeename = em.qrEmpName
+                                                 }).ToList();
+
+
+
+                                    if (query.Count > 0)
                                     {
+                                        JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                        var output = serializer.Serialize(query);
+                                        var housedatalist = new JavaScriptSerializer().Deserialize<GisHouseList[]>(output);
 
-                                        //var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) && x.gcDate >= Convert.ToDateTime(tn.startTs) && x.gcDate <= Convert.ToDateTime(tn.endTs)).Select(x => new { x.houseId, x.userId, x.gcDate, houselat = x.Lat, houselong = x.Long  }).ToListAsync();
-
-                                        var query = (from hm in db.HouseMasters
-                                                     from em in db.QrEmployeeMasters
-                                                     where hm.userId == em.qrEmpId
-                                                     where hm.userId == Convert.ToInt32(c.createUser) && hm.modified >= Convert.ToDateTime(obj.startTs) && hm.modified <= Convert.ToDateTime(obj.endTs)
-                                                     select new
-                                                     {
-                                                         houseId = hm.houseId,
-                                                         userId = em.qrEmpId,
-                                                         gcDate = hm.modified,
-                                                         ReferanceId = hm.ReferanceId,
-                                                         houseOwner = hm.houseOwner,
-                                                         houseOwnerMobile = hm.houseOwnerMobile,
-                                                         houseAddress = hm.houseAddress,
-                                                         employeename = em.qrEmpName
-                                                     }).ToList();
-
-
-
-                                        if (query.Count > 0)
+                                        var result1 = myresult.Select(i =>
                                         {
-                                            JavaScriptSerializer serializer = new JavaScriptSerializer();
-                                            var output = serializer.Serialize(query);
-                                            var housedatalist = new JavaScriptSerializer().Deserialize<GisHouseList[]>(output);
+                                            i.HouseList = housedatalist;
 
-                                            var result1 = myresult.Select(i =>
-                                            {
-                                                i.HouseList = housedatalist;
+                                            return i;
 
-                                                return i;
+                                        }).ToList();
 
-                                            }).ToList();
+                                        var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
+                                        var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
 
-                                            var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
-                                            var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
-
-
-                                        }
 
                                     }
 
                                 }
 
-                                objDetail.code = (int)response.StatusCode;
-                                objDetail.status = "Success";
-                                if(myresult.Count > 0)
-                                {
-                                    objDetail.message = "Data Found";
-                                }
-                                else
-                                {
-                                    objDetail.message = "Data Not Found";
-                                }
-                                objDetail.timestamp = DateTime.Now.ToString();
-                                objDetail.data = myresult;
+                            }
 
-                                result = objDetail;
-
-                                return Ok(result);
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Success";
+                            if (myresult.Count > 0)
+                            {
+                                objDetail.message = "Data Found";
                             }
                             else
                             {
-                                objDetail.code = (int)response.StatusCode;
-                                objDetail.status = "Failed";
-                                objDetail.message = "Not Found";
-                                objDetail.timestamp = DateTime.Now.ToString();
-
-                                result = objDetail;
-
-                                return objDetail.code == 400 ? BadRequest(result) : NotFound(result);
+                                objDetail.message = "Data Not Found";
                             }
+                            objDetail.timestamp = DateTime.Now.ToString();
+                            objDetail.data = myresult;
 
-                        
+                            result = objDetail;
+
+                            return Ok(result);
+                        }
+                        else
+                        {
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Failed";
+                            objDetail.message = "Not Found";
+                            objDetail.timestamp = DateTime.Now.ToString();
+
+                            result = objDetail;
+
+                            return objDetail.code == 400 ? BadRequest(result) : NotFound(result);
+                        }
+
+
                     }
                     else
                     {
@@ -1941,7 +1968,7 @@ namespace ICTSBMCOREAPI.Controllers
         [Route("GisHouseOnMap/all")]
         [EnableCors("MyCorsPolicy")]
 
-        public async Task<ActionResult<HouseGisDetails>> HouseOnMapGisAsync([FromHeader] string authorization, [FromHeader] int AppId,HouseOnMapSearch obj)
+        public async Task<ActionResult<HouseGisDetails>> HouseOnMapGisAsync([FromHeader] string authorization, [FromHeader] int AppId, HouseOnMapSearch obj)
         {
             using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
             HouseGisDetails objDetail = new HouseGisDetails();
@@ -2038,9 +2065,9 @@ namespace ICTSBMCOREAPI.Controllers
                             if (executeScalar != null)
                             {
                                 CultureInfo culture = new CultureInfo("en-US");
-                               
+
                                 DateTime dt2 = Convert.ToDateTime(obj.date, culture);
-                               
+
                                 List<SqlParameter> parms = new List<SqlParameter>
                                                 {
                                                     // Create parameter(s)    
@@ -2054,10 +2081,10 @@ namespace ICTSBMCOREAPI.Controllers
                                                 };
                                 var data = await db.SP_HouseOnMapDetails_Results.FromSqlRaw<SP_HouseOnMapDetails_Result>("EXEC SP_HouseOnMapDetails @gcDate,@UserId,@ZoneId,@AreaId,@WardNo,@GarbageType,@FilterType", parms.ToArray()).ToListAsync();
 
-                                
+
                                 foreach (var x in data)
                                 {
-                                    if(x.houseId > 0)
+                                    if (x.houseId > 0)
                                     {
                                         DateTime dt = DateTime.Parse(x.gcDate == null ? DateTime.Now.ToString() : x.gcDate.ToString());
                                         //string gcTime = x.gcDate.ToString();
@@ -2086,7 +2113,7 @@ namespace ICTSBMCOREAPI.Controllers
                                             garbageType = x.garbageType,
                                         });
                                     }
-                                   
+
                                 }
                             }
 
@@ -2094,7 +2121,7 @@ namespace ICTSBMCOREAPI.Controllers
                             objDetail.code = 200;
                             objDetail.status = "Success";
                             objDetail.timestamp = DateTime.Now.ToString();
-                            if(houseLocation.Count > 0)
+                            if (houseLocation.Count > 0)
                             {
                                 objDetail.message = "Data Found";
 
@@ -2198,7 +2225,7 @@ namespace ICTSBMCOREAPI.Controllers
                         client1.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
                         client1.DefaultRequestHeaders.Add("username", gis_username);
                         client1.DefaultRequestHeaders.Add("password", gis_password);
-                        HttpResponseMessage response1 = await client1.PostAsJsonAsync("house/search",stn);
+                        HttpResponseMessage response1 = await client1.PostAsJsonAsync("house/search", stn);
 
                         if (response1.IsSuccessStatusCode)
                         {
@@ -2213,13 +2240,13 @@ namespace ICTSBMCOREAPI.Controllers
                             //stringContent.Headers.Add("password", gis_password);
                             //var response = await client.PostAsync("http://114.143.244.130:9091/house", stringContent);
                             //End Old Code
-                            if(obj.updateTs == null)
+                            if (obj.updateTs == null)
                             {
                                 obj.updateTs = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fff");
 
-                               
+
                             }
-                            if(obj.updateUser == null)
+                            if (obj.updateUser == null)
                             {
                                 obj.updateUser = 0;
                             }
@@ -2310,7 +2337,7 @@ namespace ICTSBMCOREAPI.Controllers
                 result = objDetail;
                 return Unauthorized(result);
             }
-          
+
         }
         private object checkNull(string str)
         {
