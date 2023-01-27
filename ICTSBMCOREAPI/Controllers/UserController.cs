@@ -2326,6 +2326,299 @@ namespace ICTSBMCOREAPI.Controllers
                 return result;
             }
         }
+
+        [HttpPost]
+        [Route("EmployeeList")]
+        public async Task<ActionResult<HouseGisDetails>> EmployeeList([FromHeader] string authorization, [FromHeader] int AppId)
+        {
+            using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
+            HouseGisDetails objDetail = new HouseGisDetails();
+            List<EmployeeList> EmpList = new List<EmployeeList>();
+
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                try
+                {
+                    var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                    if (GIS_CON != null)
+                    {
+                        var gis_url = GIS_CON.DataSource;
+                        var gis_DBName = GIS_CON.InitialCatalog;
+                        var gis_username = GIS_CON.UserId;
+                        var gis_password = GIS_CON.Password;
+
+                        HttpClient client = new HttpClient();
+
+                        using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                        {
+                            var EmployeeList = await db.UserMasters.Select(x => new { x.userId, x.userName }).ToListAsync();
+
+                            //foreach (var x in EmployeeList)
+                            //{
+                            //    if (x.userId > 0)
+                            //    {
+
+                            //        EmpList.Add(new EmployeeList()
+                            //        {
+                            //            Userid = x.userId,
+                            //            Empname = x.userName,
+                            //        });
+                            //    }
+
+                            //}
+
+                            objDetail.code = 200;
+                            objDetail.status = "Success";
+                            objDetail.timestamp = DateTime.Now.ToString();
+                            if (EmployeeList.Count > 0)
+                            {
+                                objDetail.message = "Data Found";
+
+                            }
+                            else
+                            {
+                                objDetail.message = "Data Not Available";
+                            }
+                            objDetail.data = EmployeeList;
+                        }
+
+                        result = objDetail;
+                        return Ok(result);
+                    }
+                    else
+                    {
+
+                        objDetail.code = 404;
+                        objDetail.status = "Failed";
+                        objDetail.message = "GIS Connection Are Not Available";
+                        objDetail.timestamp = DateTime.Now.ToString();
+
+                        result = objDetail;
+                        return NotFound(result);
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    objDetail.code = 400;
+                    objDetail.status = "Failed";
+                    objDetail.message = ex.Message.ToString();
+                    objDetail.timestamp = DateTime.Now.ToString();
+
+                    result = objDetail;
+
+                    return NotFound(result);
+                }
+            }
+            else
+            {
+                objDetail.code = 401;
+                objDetail.status = "Failed";
+                objDetail.message = "Unauthorized";
+                objDetail.timestamp = DateTime.Now.ToString();
+
+
+                result = objDetail;
+                return Unauthorized(result);
+            }
+        }
+
+        [HttpPost]
+        [Route("WardList")]
+        public async Task<ActionResult<HouseGisDetails>> WardList([FromHeader] string authorization, [FromHeader] int AppId)
+        {
+            using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
+            HouseGisDetails objDetail = new HouseGisDetails();
+
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                try
+                {
+                    var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                    if (GIS_CON != null)
+                    {
+                        var gis_url = GIS_CON.DataSource;
+                        var gis_DBName = GIS_CON.InitialCatalog;
+                        var gis_username = GIS_CON.UserId;
+                        var gis_password = GIS_CON.Password;
+
+                        HttpClient client = new HttpClient();
+
+                        using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                        {
+                            var WardList = await db.WardNumbers.Select(x => new { x.Id, x.WardNo }).ToListAsync();
+
+
+                            objDetail.code = 200;
+                            objDetail.status = "Success";
+                            objDetail.timestamp = DateTime.Now.ToString();
+                            if (WardList.Count > 0)
+                            {
+                                objDetail.message = "Data Found";
+
+                            }
+                            else
+                            {
+                                objDetail.message = "Data Not Available";
+                            }
+                            objDetail.data = WardList;
+                        }
+
+                        result = objDetail;
+                        return Ok(result);
+                    }
+                    else
+                    {
+
+                        objDetail.code = 404;
+                        objDetail.status = "Failed";
+                        objDetail.message = "GIS Connection Are Not Available";
+                        objDetail.timestamp = DateTime.Now.ToString();
+
+                        result = objDetail;
+                        return NotFound(result);
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    objDetail.code = 400;
+                    objDetail.status = "Failed";
+                    objDetail.message = ex.Message.ToString();
+                    objDetail.timestamp = DateTime.Now.ToString();
+
+                    result = objDetail;
+
+                    return NotFound(result);
+                }
+            }
+            else
+            {
+                objDetail.code = 401;
+                objDetail.status = "Failed";
+                objDetail.message = "Unauthorized";
+                objDetail.timestamp = DateTime.Now.ToString();
+
+
+                result = objDetail;
+                return Unauthorized(result);
+            }
+        }
+
+
+        [HttpPost]
+        [Route("AreaList")]
+        public async Task<ActionResult<HouseGisDetails>> AreaList([FromHeader] string authorization, [FromHeader] int AppId)
+        {
+            using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
+            HouseGisDetails objDetail = new HouseGisDetails();
+
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                try
+                {
+                    var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                    if (GIS_CON != null)
+                    {
+                        var gis_url = GIS_CON.DataSource;
+                        var gis_DBName = GIS_CON.InitialCatalog;
+                        var gis_username = GIS_CON.UserId;
+                        var gis_password = GIS_CON.Password;
+
+                        HttpClient client = new HttpClient();
+
+                        using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                        {
+                            var AreaList = await db.TeritoryMasters.Select(x => new { x.Id, x.Area }).ToListAsync();
+
+                            objDetail.code = 200;
+                            objDetail.status = "Success";
+                            objDetail.timestamp = DateTime.Now.ToString();
+                            if (AreaList.Count > 0)
+                            {
+                                objDetail.message = "Data Found";
+
+                            }
+                            else
+                            {
+                                objDetail.message = "Data Not Available";
+                            }
+                            objDetail.data = AreaList;
+                        }
+
+                        result = objDetail;
+                        return Ok(result);
+                    }
+                    else
+                    {
+
+                        objDetail.code = 404;
+                        objDetail.status = "Failed";
+                        objDetail.message = "GIS Connection Are Not Available";
+                        objDetail.timestamp = DateTime.Now.ToString();
+
+                        result = objDetail;
+                        return NotFound(result);
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    objDetail.code = 400;
+                    objDetail.status = "Failed";
+                    objDetail.message = ex.Message.ToString();
+                    objDetail.timestamp = DateTime.Now.ToString();
+
+                    result = objDetail;
+
+                    return NotFound(result);
+                }
+            }
+            else
+            {
+                objDetail.code = 401;
+                objDetail.status = "Failed";
+                objDetail.message = "Unauthorized";
+                objDetail.timestamp = DateTime.Now.ToString();
+
+
+                result = objDetail;
+                return Unauthorized(result);
+            }
+        }
     }
 
 }
