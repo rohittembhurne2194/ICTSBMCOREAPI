@@ -52,6 +52,9 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         Task<SBUserView> GetUserAsync(int AppId, int userId, int typeId);
         Task<SyncResult2> GetUserMobileIdentificationAsync(int appId, int userId, bool isSync, int batteryStatus, string imeinos);
         Task<List<SBWorkDetails>> GetUserWorkAsync(int userId, int year, int month, int appId, string EmpType);
+
+        Task<List<LatLongD>> GetLatLong(int appId, int userid, DateTime date);
+
         Task<List<SBWorkDetailsHistory>> GetUserWorkDetailsAsync(DateTime date, int appId, int userId, int languageId);
         Task<List<SBWorkDetails>> GetUserWorkForDumpAsync(int userId, int year, int month, int appId);
         Task<List<SBWorkDetails>> GetUserWorkForLiquidAsync(int userId, int year, int month, int appId);

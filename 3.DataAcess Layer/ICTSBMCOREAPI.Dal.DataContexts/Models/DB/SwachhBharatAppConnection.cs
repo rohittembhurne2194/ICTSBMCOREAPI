@@ -23,7 +23,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB
                 const string MultiSelective_Result = ";multipleactiveresultsets=True;";
                 const string App = "App=EntityFramework";
 
-                using (var context = new DevSwachhBharatMainEntities())
+                using (var context = new DevICTSBMMainEntities())
                 {
                     var RetConnecton = context.AppConnections.Where(x => x.AppId == AppId).FirstOrDefault();
                     StringBuilder buildConnectionString = new StringBuilder();
