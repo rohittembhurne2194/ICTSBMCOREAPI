@@ -6163,6 +6163,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             if (obj.gcType == 3)
                             {
                                 var dump = await db.DumpYardDetails.Where(x => x.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
+                                result.dyId = dump.dyId;
                                 if (dump != null)
                                 {
                                     if ((string.IsNullOrEmpty(obj.name)) == false)
@@ -6716,6 +6717,159 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         messageMar = "सबमिट यशस्वी",
                                         referenceID = item.ReferanceId,
                                     });
+
+                                    //GIS Code Start (28-12-2022)
+
+                                    Result objDetail1 = new Result();
+                                 
+                                    var message = "";
+
+
+                                    //TimeSpan timespan = new TimeSpan(00, 00, 00);
+                                    //DateTime time = DateTime.Now.Add(timespan);
+
+                                    Trial tn = new Trial();
+                                    List<DumpTripStatusResult> objDetail = new List<DumpTripStatusResult>();
+
+                                    try
+                                    {
+                                        var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                                        if (GIS_CON != null)
+                                        {
+                                            var gis_url = GIS_CON.DataSource;
+                                            var gis_DBName = GIS_CON.InitialCatalog;
+                                            var gis_username = GIS_CON.UserId;
+                                            var gis_password = GIS_CON.Password;
+
+                                            //foreach (var item in obj)
+                                            //{
+                                            tn.startTs = item.startTs;
+                                            tn.endTs = item.endTs;
+                                            tn.geom = item.geom;
+
+
+
+                                            GisSearch stn = new GisSearch();
+
+                                            stn.id = dump.dyId.ToString();
+                                            tn.id = dump.dyId.ToString();
+
+
+                                            HttpClient client1 = new HttpClient();
+
+                                            //Start New Code
+                                            client1.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                                            //client1.DefaultRequestHeaders.Accept.Clear();
+                                            client1.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                                            client1.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                                            client1.DefaultRequestHeaders.Add("username", gis_username);
+                                            client1.DefaultRequestHeaders.Add("password", gis_password);
+                                            HttpResponseMessage response1 = await client1.PostAsJsonAsync("dump-yard/search", stn);
+                                            //End New Code
+
+                                            if (response1.IsSuccessStatusCode)
+                                            {
+                                                var responseString1 = await response1.Content.ReadAsStringAsync();
+                                                var jsonParsed1 = JObject.Parse(responseString1);
+                                                var dynamicobject1 = JsonConvert.DeserializeObject<dynamic>(responseString1);
+                                                var jsonResult1 = jsonParsed1["data"];
+
+                                                List<GisResult> getresult = jsonResult1.ToObject<List<GisResult>>();
+
+                                                if (getresult.Count == 0)
+                                                {
+                                                    tn.createUser = item.userId;
+                                                    tn.createTs = item.createTs;
+                                                }
+                                                else
+                                                {
+                                                    tn.updateTs = item.createTs;
+                                                    tn.updateUser = item.userId;
+                                                }
+
+
+
+                                                HttpClient client = new();
+
+                                                //Start New Code
+                                                client.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                                                //client.DefaultRequestHeaders.Accept.Clear();
+                                                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                                                client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                                                client.DefaultRequestHeaders.Add("username", gis_username);
+                                                client.DefaultRequestHeaders.Add("password", gis_password);
+                                                HttpResponseMessage response = await client1.PostAsJsonAsync("dump-yard", tn);
+                                                //End New Code
+
+                                                if (response.IsSuccessStatusCode)
+                                                {
+                                                    var responseString = await response.Content.ReadAsStringAsync();
+                                                    var dynamicobject2 = JsonConvert.DeserializeObject<dynamic>(responseString);
+                                                    objDetail.Add(new DumpTripStatusResult()
+                                                    {
+                                                        code = (int)response.StatusCode,
+                                                        status = "Success",
+                                                        message = "Created",
+                                                        errorMessages = dynamicobject2.errorMessages.ToString(),
+                                                        timestamp = DateTime.Now.ToString(),
+                                                        data = dynamicobject2.data
+                                                    });
+                                                    //objDetail1.gismessage = dynamicobject2.message.ToString();
+                                                    //objDetail1.giserrorMessages = dynamicobject2.errorMessages.ToString();
+
+                                                    //result = objDetail;
+                                                }
+
+                                                else
+                                                {
+                                                    objDetail.Add(new DumpTripStatusResult()
+                                                    {
+                                                        code = (int)response.StatusCode,
+                                                        status = "Failed",
+                                                        message = "Failed",
+                                                        timestamp = DateTime.Now.ToString()
+                                                    });
+                                                }
+                                            }
+                                            else
+                                            {
+                                                objDetail.Add(new DumpTripStatusResult()
+                                                {
+                                                    code = (int)response1.StatusCode,
+                                                    status = "Failed",
+                                                    message = "Failed",
+                                                    timestamp = DateTime.Now.ToString()
+                                                });
+                                            }
+                                        }
+                                        else
+                                        {
+
+                                            objDetail.Add(new DumpTripStatusResult()
+                                            {
+                                                code = 404,
+                                                status = "Failed",
+                                                message = "GIS Connection Are Not Available",
+                                                timestamp = DateTime.Now.ToString()
+                                            });
+                                            //objDetail1.gismessage = "GIS Connection Are Not Available";
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        objDetail.Add(new DumpTripStatusResult()
+                                        {
+                                            code = 400,
+                                            status = "Failed",
+                                            message = ex.Message.ToString(),
+                                            timestamp = DateTime.Now.ToString()
+                                        });
+                                        //objDetail1.giserrorMessages = ex.Message.ToString();
+                                    }
+                                    //GIS Code End
+
+
                                 }
                                 else
                                 {

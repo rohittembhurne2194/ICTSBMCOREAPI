@@ -2339,23 +2339,410 @@ namespace ICTSBMCOREAPI.Controllers
             }
 
         }
-        private object checkNull(string str)
+
+        [HttpGet]
+        [Route("GisDumpYardDetails/all")]
+        [EnableCors("MyCorsPolicy")]
+        public async Task<ActionResult<HouseGisDetails>> DumpYardGisDetailsAll([FromHeader] string authorization, [FromHeader] int AppId)
         {
-            string result = "";
-            if (str == null || str == "")
+
+            //var message = "";
+
+            using DevICTSBMMainEntities dbMain = new();
+            HouseGisDetails objDetail = new();
+
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            //Extract the payload of the JWT
+            //var claims = tokenS.Claims;
+
+            //var jwtPayload = "{";
+            //foreach (Claim c in claims)
+            //{
+            //    jwtPayload += '"' + c.Type + "\":\"" + c.Value + "\",";
+            //}
+            //jwtPayload += "}";
+            //txtJwtOut += "\r\nPayload:\r\n" + JToken.Parse(jwtPayload).ToString(Formatting.Indented);
+
+
+
+            if (Auth_AppId == AppId)
             {
-                result = "";
-                return result;
+                try
+                {
+                    var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                    if (GIS_CON != null)
+                    {
+                        var gis_url = GIS_CON.DataSource;
+                        var gis_DBName = GIS_CON.InitialCatalog;
+                        var gis_username = GIS_CON.UserId;
+                        var gis_password = GIS_CON.Password;
+
+                        HttpClient client = new();
+                        //Trial tn = new Trial();
+
+                        //Start Old Code
+                        //client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                        //client.DefaultRequestHeaders.Add("username", gis_username);
+                        //client.DefaultRequestHeaders.Add("password", gis_password);
+
+                        //var url = "http://114.143.244.130:9091/house/all";
+
+                        //var response = await client.GetAsync(url);
+                        //End Old Code
+
+                        //Start New Code.
+                        client.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                        //client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                        client.DefaultRequestHeaders.Add("username", gis_username);
+                        client.DefaultRequestHeaders.Add("password", gis_password);
+                        var response = await client.GetAsync("dump-yard/all");
+                        //End New Code
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var responseString = await response.Content.ReadAsStringAsync();
+                            var jsonParsed = JObject.Parse(responseString);
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                            var jsonResult = jsonParsed["data"];
+                            //Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                            //Response.Headers.Add("Access-Control-Allow-Methods", "GET");
+                            //Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
+
+                            List<GisResult> myresult = jsonResult.ToObject<List<GisResult>>();
+
+                            List<HouseGisDetails> obj = new();
+
+                            using (DevICTSBMChildEntities db = new(AppId))
+                            {
+
+                                foreach (var c in myresult)
+                                {
+                                    if (Convert.ToInt32(c.id) != 0)
+                                    {
+                                        var house = await db.DumpYardDetails.Where(x => x.dyId == Convert.ToInt32(c.id)).Select(x => new { x.ReferanceId, x.dyId, x.userId, x.dyName, x.dyAddress }).FirstOrDefaultAsync();
+
+
+                                        var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
+                                        var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
+
+
+                                        var result1 = myresult.Select(i =>
+                                        {
+                                            if (i.id == house.dyId)
+                                            {
+                                                //i.ReferanceId = house.ReferanceId;
+                                                //i.HouseOwnerName = house.houseOwner;
+                                                //i.HouseOwnerMobileNo = house.houseOwnerMobile;
+                                                //i.HouseAddress = house.houseAddress;
+                                                //i.CreateEmployeeName = EmployeeName.qrEmpName.ToString();
+                                                //if(Update_EmployeeName != null)
+                                                //{
+                                                //    i.UpdateEmployeeName = Update_EmployeeName.qrEmpName.ToString();
+
+                                                //}
+                                                //else
+                                                //{
+                                                //    i.UpdateEmployeeName = "";
+                                                //}
+
+                                                var value = new List<HouseProperty> {
+                                                    new HouseProperty { name = "ReferanceId", value = house.ReferanceId, type = "String", Index = 0 },
+                                                    new HouseProperty { name = "Create Employee Name", value = (EmployeeName == null ? "" : EmployeeName.qrEmpName.ToString()), type = "String", Index = 1 },
+                                                    new HouseProperty { name = "Update Employee Name", value = (Update_EmployeeName == null ? "" : Update_EmployeeName.qrEmpName.ToString()), type = "String", Index = 2 },
+                                                    new HouseProperty { name = "Dump Yard Address", value = house.dyAddress, type = "String", Index = 3 }
+                                                };
+
+
+                                                i.HouseProperty = value;
+                                                return i;
+                                            }
+                                            return i;
+
+                                        }).Where(i => i.id == house.dyId).ToList();
+
+                                    }
+                                }
+
+
+
+                            }
+                            // return objDetail;
+
+                            //objDetail.Add(new HouseGisDetails()
+                            //{
+                            //    code = dynamicobject.code.ToString(),
+                            //    status = dynamicobject.status.ToString(),
+                            //    message = dynamicobject.message.ToString(),
+                            //    timestamp = dynamicobject.timestamp.ToString(),
+                            //    data = result
+                            //});
+
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = dynamicobject.status.ToString();
+                            objDetail.message = dynamicobject.message.ToString();
+                            objDetail.timestamp = DateTime.Now.ToString();
+                            objDetail.data = myresult;
+
+                            result = objDetail;
+                            return Ok(result);
+
+                        }
+                        else
+                        {
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Failed";
+                            objDetail.message = "";
+                            objDetail.timestamp = DateTime.Now.ToString();
+
+                            result = objDetail;
+                            return NotFound(result);
+                        }
+                    }
+                    else
+                    {
+
+                        //objDetail.Add(new HouseGisDetails()
+                        //{
+                        //    code = "",
+                        //    status = "",
+                        //    message = "GIS Connection Are Not Available",
+                        //   // errorMessages = "GIS Connection Are Not Available",
+                        //    timestamp = "",
+                        //    data = ""
+                        //});
+                        objDetail.code = 401;
+                        objDetail.status = "Failed";
+                        objDetail.message = "GIS Connection Are Not Available";
+                        objDetail.timestamp = DateTime.Now.ToString();
+
+                        result = objDetail;
+                        return NotFound(result);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //objDetail.Add(new HouseGisDetails()
+                    //{
+                    //    code = "",
+                    //    status = "",
+                    //    message = ex.Message.ToString(),
+                    //    //errorMessages = ex.Message.ToString(),
+                    //    timestamp = "",
+                    //    data = ""
+                    //});
+
+                    objDetail.code = 400;
+                    objDetail.status = "Failed";
+                    objDetail.message = ex.Message.ToString();
+                    objDetail.timestamp = DateTime.Now.ToString();
+
+                    result = objDetail;
+                    return BadRequest(result);
+                }
+                //return objDetail;
             }
             else
             {
-                result = str;
-                return result;
+
+                objDetail.code = 401;
+                objDetail.status = "Failed";
+                objDetail.message = "Unauthorized";
+                objDetail.timestamp = DateTime.Now.ToString();
+
+
+                result = objDetail;
+                return Unauthorized(result);
             }
+
+
         }
 
         [HttpPost]
+        [Route("GisDumpYardDetails/search")]
+        [EnableCors("MyCorsPolicy")]
+        public async Task<ActionResult<HouseGisDetails>> DumpYardGisDetailsSearch([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] GisSearch obj)
+        {
+            using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
+            HouseGisDetails objDetail = new HouseGisDetails();
+
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                try
+                {
+                    var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                    if (GIS_CON != null)
+                    {
+                        var gis_url = GIS_CON.DataSource;
+                        var gis_DBName = GIS_CON.InitialCatalog;
+                        var gis_username = GIS_CON.UserId;
+                        var gis_password = GIS_CON.Password;
+
+                        HttpClient client = new();
+
+
+                        //Start New Code.
+                        client.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                        //client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                        client.DefaultRequestHeaders.Add("username", gis_username);
+                        client.DefaultRequestHeaders.Add("password", gis_password);
+                        HttpResponseMessage response = await client.PostAsJsonAsync("dump-yard/search", obj);
+                        //End New Code
+
+
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var responseString = await response.Content.ReadAsStringAsync();
+
+                            //result = await response.Content.ReadFromJsonAsync<DumpTripStatusResult>();
+
+                            var jsonParsed = JObject.Parse(responseString);
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                            var jsonResult = jsonParsed["data"];
+
+                            List<GisResult> myresult = jsonResult.ToObject<List<GisResult>>();
+
+
+
+                            using (DevICTSBMChildEntities db = new(AppId))
+                            {
+
+                                foreach (var c in myresult)
+                                {
+                                    if (Convert.ToInt32(c.id) != 0)
+                                    {
+                                        var house = await db.DumpYardDetails.Where(x => x.dyId == Convert.ToInt32(c.id)).Select(x => new { x.ReferanceId, x.dyId, x.userId, x.dyName, x.dyAddress }).FirstOrDefaultAsync();
+
+
+                                        var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
+                                        var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
+
+
+                                        var result1 = myresult.Select(i =>
+                                        {
+                                            if (i.id == house.dyId)
+                                            {
+
+
+                                                var value = new List<HouseProperty> {
+                                                    new HouseProperty { name = "ReferanceId", value = house.ReferanceId, type = "String", Index = 0 },
+                                                    new HouseProperty { name = "Create Employee Name", value = (EmployeeName == null ? "" : EmployeeName.qrEmpName.ToString()), type = "String", Index = 1 },
+                                                    new HouseProperty { name = "Update Employee Name", value = (Update_EmployeeName == null ? "" : Update_EmployeeName.qrEmpName.ToString()), type = "String", Index = 2 },
+                                                    new HouseProperty { name = "Dump Yard Address", value = house.dyAddress, type = "String", Index = 3 }
+                                                };
+
+
+                                                i.HouseProperty = value;
+                                                return i;
+                                            }
+                                            return i;
+
+                                        }).Where(i => i.id == house.dyId).ToList();
+
+                                    }
+                                }
+
+
+
+                            }
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Success";
+                            if(myresult.Count > 0)
+                            {
+                                objDetail.message = "Data Found";
+                            }
+                            else
+                            {
+                                objDetail.message = "Data Not Found";
+                            }
+                            
+                            objDetail.timestamp = DateTime.Now.ToString();
+                            objDetail.data = myresult;
+
+                            result = objDetail;
+                            return Ok(result);
+                        }
+                        else
+                        {
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Failed";
+                            objDetail.message = "";
+                            objDetail.timestamp = DateTime.Now.ToString();
+
+                            result = objDetail;
+                            return NotFound(result);
+                        }
+
+
+                    }
+                    else
+                    {
+
+                        objDetail.code = 404;
+                        objDetail.status = "Failed";
+                        objDetail.message = "GIS Connection Are Not Available";
+                        objDetail.timestamp = DateTime.Now.ToString();
+
+                        result = objDetail;
+                        return NotFound(result);
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    objDetail.code = 400;
+                    objDetail.status = "Failed";
+                    objDetail.message = ex.Message.ToString();
+                    objDetail.timestamp = DateTime.Now.ToString();
+
+                    result = objDetail;
+                    return BadRequest(result);
+                }
+
+            }
+            else
+            {
+                objDetail.code = 401;
+                objDetail.status = "Failed";
+                objDetail.message = "Unauthorized";
+                objDetail.timestamp = DateTime.Now.ToString();
+
+
+                result = objDetail;
+                return Unauthorized(result);
+            }
+        }
+
+     
+
+        [HttpPost]
         [Route("EmployeeList")]
+        [EnableCors("MyCorsPolicy")]
         public async Task<ActionResult<HouseGisDetails>> EmployeeList([FromHeader] string authorization, [FromHeader] int AppId)
         {
             using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
@@ -2463,6 +2850,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpPost]
         [Route("WardList")]
+        [EnableCors("MyCorsPolicy")]
         public async Task<ActionResult<HouseGisDetails>> WardList([FromHeader] string authorization, [FromHeader] int AppId)
         {
             using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
@@ -2557,6 +2945,7 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpPost]
         [Route("AreaList")]
+        [EnableCors("MyCorsPolicy")]
         public async Task<ActionResult<HouseGisDetails>> AreaList([FromHeader] string authorization, [FromHeader] int AppId)
         {
             using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
@@ -2644,6 +3033,22 @@ namespace ICTSBMCOREAPI.Controllers
 
                 result = objDetail;
                 return Unauthorized(result);
+            }
+        }
+
+
+        private object checkNull(string str)
+        {
+            string result = "";
+            if (str == null || str == "")
+            {
+                result = "";
+                return result;
+            }
+            else
+            {
+                result = str;
+                return result;
             }
         }
     }
