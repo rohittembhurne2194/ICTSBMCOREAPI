@@ -1498,7 +1498,10 @@ namespace ICTSBMCOREAPI.Controllers
                         {
                             var responseString = await response.Content.ReadAsStringAsync();
                             var jsonParsed = JObject.Parse(responseString);
-                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                            //var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
+
                             var jsonResult = jsonParsed["data"];
 
                             List<GisTrailResult> myresult = jsonResult.ToObject<List<GisTrailResult>>();
