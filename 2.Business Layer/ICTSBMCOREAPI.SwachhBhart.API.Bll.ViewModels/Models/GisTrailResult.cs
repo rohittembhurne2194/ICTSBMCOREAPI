@@ -11,19 +11,22 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string id { get; set; }
 
         [JsonProperty("createUser")]
-        public string createUser { get; set; }
+        public int createUser { get; set; }
 
         [JsonProperty("createTs")]
         public string createTs { get; set; }
         [JsonProperty("updateUser")]
-        public string updateUser { get; set; }
+        public int? updateUser { get; set; }
         [JsonProperty("updateTs")]
-        public string updateTs { get; set; }
+        public string? updateTs { get; set; }
         [JsonProperty("geom")]
         public geomt? geom { get; set; }
         [JsonProperty("Housegeom")]
-
          public  dynamic HouseList { get; set; }
+        [JsonProperty("startTs")]
+        public DateTime? startTs { get; set; }
+        [JsonProperty("endTs")]
+        public DateTime? endTs { get; set; }
         //public int? houseid { get; set; }
         //public IList<string> Categories { get; set; }
     }

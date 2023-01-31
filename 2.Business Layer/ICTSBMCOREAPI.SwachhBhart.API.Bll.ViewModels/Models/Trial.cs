@@ -8,8 +8,8 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
     {
         public string id { get; set; }
         public int houseid { get; set; }
-        public string startTs { get; set; }
-        public string endTs { get; set; }
+        public string startDate { get; set; }
+        public string endDate { get; set; }
         public int createUser { get; set; }
 
         public int updateUser { get; set; }

@@ -6744,8 +6744,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                                             //foreach (var item in obj)
                                             //{
-                                            tn.startTs = item.startTs;
-                                            tn.endTs = item.endTs;
+                                            tn.startDate = item.startTs;
+                                            tn.endDate = item.endTs;
                                             tn.geom = item.geom;
 
 
@@ -7128,8 +7128,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                                             //foreach (var item in obj)
                                             //{
-                                            tn.startTs = item.startTs;
-                                            tn.endTs = item.endTs;
+                                            tn.startDate = item.startTs;
+                                            tn.endDate = item.endTs;
                                             tn.geom = item.geom;
 
 
