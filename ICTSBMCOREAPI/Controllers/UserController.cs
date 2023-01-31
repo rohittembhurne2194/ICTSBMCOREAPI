@@ -1839,8 +1839,11 @@ namespace ICTSBMCOREAPI.Controllers
                         {
                             var responseString = await response.Content.ReadAsStringAsync();
                             var jsonParsed = JObject.Parse(responseString);
-                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                            var jsonResult = jsonParsed["data"];
+                            //var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
+
+                            var jsonResult = dynamicobject["data"];
 
                             List<GisTrailResult> myresult = jsonResult.ToObject<List<GisTrailResult>>();
 
@@ -1855,7 +1858,7 @@ namespace ICTSBMCOREAPI.Controllers
                                     var query = (from hm in db.HouseMasters
                                                  from em in db.QrEmployeeMasters
                                                  where hm.userId == em.qrEmpId
-                                                 where hm.userId == Convert.ToInt32(c.createUser) && hm.modified >= c.startTs && hm.modified <= c.endTs
+                                                 where hm.userId == Convert.ToInt32(c.createUser) && hm.modified >= Convert.ToDateTime(c.startTs) && hm.modified <= Convert.ToDateTime(c.endTs)
                                                  select new
                                                  {
                                                      houseId = hm.houseId,

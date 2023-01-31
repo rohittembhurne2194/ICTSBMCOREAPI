@@ -24,9 +24,9 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         [JsonProperty("Housegeom")]
          public  dynamic HouseList { get; set; }
         [JsonProperty("startTs")]
-        public DateTime? startTs { get; set; }
+        public string startTs { get; set; }
         [JsonProperty("endTs")]
-        public DateTime? endTs { get; set; }
+        public string endTs { get; set; }
         //public int? houseid { get; set; }
         //public IList<string> Categories { get; set; }
     }
