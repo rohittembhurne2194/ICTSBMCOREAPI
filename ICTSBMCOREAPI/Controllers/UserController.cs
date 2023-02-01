@@ -972,9 +972,10 @@ namespace ICTSBMCOREAPI.Controllers
                         if (response.IsSuccessStatusCode)
                         {
                             var responseString = await response.Content.ReadAsStringAsync();
-                            var jsonParsed = JObject.Parse(responseString);
-                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                            var jsonResult = jsonParsed["data"];
+                            //var jsonParsed = JObject.Parse(responseString);
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
+
+                            var jsonResult = dynamicobject["data"];
                             //Response.Headers.Add("Access-Control-Allow-Origin", "*");
                             //Response.Headers.Add("Access-Control-Allow-Methods", "GET");
                             //Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
@@ -1192,9 +1193,10 @@ namespace ICTSBMCOREAPI.Controllers
 
                             //result = await response.Content.ReadFromJsonAsync<DumpTripStatusResult>();
 
-                            var jsonParsed = JObject.Parse(responseString);
-                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                            var jsonResult = jsonParsed["data"];
+                            //var jsonParsed = JObject.Parse(responseString);
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
+
+                            var jsonResult = dynamicobject["data"];
 
                             List<GisResult> myresult = jsonResult.ToObject<List<GisResult>>();
 
@@ -1360,9 +1362,10 @@ namespace ICTSBMCOREAPI.Controllers
                         if (response.IsSuccessStatusCode)
                         {
                             var responseString = await response.Content.ReadAsStringAsync();
-                            var jsonParsed = JObject.Parse(responseString);
-                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                            var jsonResult = jsonParsed["data"];
+                            //var jsonParsed = JObject.Parse(responseString);
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
+
+                            var jsonResult = dynamicobject["data"];
 
 
                             List<GisTrailResult> myresult = jsonResult.ToObject<List<GisTrailResult>>();
@@ -1497,12 +1500,12 @@ namespace ICTSBMCOREAPI.Controllers
                         if (response.IsSuccessStatusCode)
                         {
                             var responseString = await response.Content.ReadAsStringAsync();
-                            var jsonParsed = JObject.Parse(responseString);
+                            //var jsonParsed = JObject.Parse(responseString);
                             //var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
 
                             var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
 
-                            var jsonResult = jsonParsed["data"];
+                            var jsonResult = dynamicobject["data"];
 
                             List<GisTrailResult> myresult = jsonResult.ToObject<List<GisTrailResult>>();
 
@@ -1686,9 +1689,10 @@ namespace ICTSBMCOREAPI.Controllers
                         if (response.IsSuccessStatusCode)
                         {
                             var responseString = await response.Content.ReadAsStringAsync();
-                            var jsonParsed = JObject.Parse(responseString);
-                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                            var jsonResult = jsonParsed["data"];
+                            //var jsonParsed = JObject.Parse(responseString);
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
+
+                            var jsonResult = dynamicobject["data"];
 
 
                             List<GisTrailResult> myresult = jsonResult.ToObject<List<GisTrailResult>>();
@@ -1841,7 +1845,7 @@ namespace ICTSBMCOREAPI.Controllers
                         if (response.IsSuccessStatusCode)
                         {
                             var responseString = await response.Content.ReadAsStringAsync();
-                            var jsonParsed = JObject.Parse(responseString);
+                            //var jsonParsed = JObject.Parse(responseString);
                             //var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
 
                             var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
@@ -2419,9 +2423,10 @@ namespace ICTSBMCOREAPI.Controllers
                         if (response.IsSuccessStatusCode)
                         {
                             var responseString = await response.Content.ReadAsStringAsync();
-                            var jsonParsed = JObject.Parse(responseString);
-                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                            var jsonResult = jsonParsed["data"];
+                            //var jsonParsed = JObject.Parse(responseString);
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
+
+                            var jsonResult = dynamicobject["data"];
                             //Response.Headers.Add("Access-Control-Allow-Origin", "*");
                             //Response.Headers.Add("Access-Control-Allow-Methods", "GET");
                             //Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
@@ -2627,9 +2632,10 @@ namespace ICTSBMCOREAPI.Controllers
 
                             //result = await response.Content.ReadFromJsonAsync<DumpTripStatusResult>();
 
-                            var jsonParsed = JObject.Parse(responseString);
-                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                            var jsonResult = jsonParsed["data"];
+                            //var jsonParsed = JObject.Parse(responseString);
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
+
+                            var jsonResult = dynamicobject["data"];
 
                             List<GisResult> myresult = jsonResult.ToObject<List<GisResult>>();
 

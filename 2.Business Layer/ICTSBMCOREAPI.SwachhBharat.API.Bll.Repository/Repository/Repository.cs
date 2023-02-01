@@ -6771,9 +6771,13 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                             if (response1.IsSuccessStatusCode)
                                             {
                                                 var responseString1 = await response1.Content.ReadAsStringAsync();
-                                                var jsonParsed1 = JObject.Parse(responseString1);
-                                                var dynamicobject1 = JsonConvert.DeserializeObject<dynamic>(responseString1);
-                                                var jsonResult1 = jsonParsed1["data"];
+                                                //var jsonParsed1 = JObject.Parse(responseString1);
+                                                //var dynamicobject1 = JsonConvert.DeserializeObject<dynamic>(responseString1);
+                                                //var jsonResult1 = jsonParsed1["data"];
+
+                                                var dynamicobject1 = JsonConvert.DeserializeObject<dynamic>(responseString1, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
+
+                                                var jsonResult1 = dynamicobject1["data"];
 
                                                 List<GisResult> getresult = jsonResult1.ToObject<List<GisResult>>();
 
@@ -7167,9 +7171,13 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                             if (response1.IsSuccessStatusCode)
                                             {
                                                 var responseString1 = await response1.Content.ReadAsStringAsync();
-                                                var jsonParsed1 = JObject.Parse(responseString1);
-                                                var dynamicobject1 = JsonConvert.DeserializeObject<dynamic>(responseString1);
-                                                var jsonResult1 = jsonParsed1["data"];
+                                                //var jsonParsed1 = JObject.Parse(responseString1);
+                                                //var dynamicobject1 = JsonConvert.DeserializeObject<dynamic>(responseString1);
+                                                //var jsonResult1 = jsonParsed1["data"];
+
+                                                var dynamicobject1 = JsonConvert.DeserializeObject<dynamic>(responseString1, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
+
+                                                var jsonResult1 = dynamicobject1["data"];
 
                                                 List<GisResult> getresult = jsonResult1.ToObject<List<GisResult>>();
 
