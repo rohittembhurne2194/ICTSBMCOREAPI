@@ -1866,7 +1866,7 @@ namespace ICTSBMCOREAPI.Controllers
                                 {
 
                                     //var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) && x.gcDate >= Convert.ToDateTime(tn.startTs) && x.gcDate <= Convert.ToDateTime(tn.endTs)).Select(x => new { x.houseId, x.userId, x.gcDate, houselat = x.Lat, houselong = x.Long  }).ToListAsync();
-
+                                    var hid = c.id;
                                     string st = c.startTs;
                                     string et = c.endTs;
                                     // performs multiple replacement  
@@ -1897,20 +1897,31 @@ namespace ICTSBMCOREAPI.Controllers
                                         var output = serializer.Serialize(query);
                                         var housedatalist = new JavaScriptSerializer().Deserialize<GisHouseList[]>(output);
 
-                                        var result1 = myresult.Select(i =>
+                                        var result1 = myresult.Where(i=>i.id==c.id).Select(i =>
                                         {
                                             i.HouseList = housedatalist;
 
                                             return i;
 
-                                        }).ToList();
+                                        }).FirstOrDefault();
 
                                         var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
                                         var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
-
+                                        //ArrayList al = new ArrayList();
+                                        //al.Add(result1);
 
                                     }
+                                    //else
+                                    //{
 
+                                    //    var result1 = myresult.Select(i =>
+                                    //    {
+                                    //        i.HouseList = null;
+
+                                    //        return i;
+
+                                    //    }).ToList();
+                                    //}
                                 }
 
                             }
