@@ -1517,13 +1517,18 @@ namespace ICTSBMCOREAPI.Controllers
                                 {
 
                                     //var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) && x.gcDate >= Convert.ToDateTime(tn.startTs) && x.gcDate <= Convert.ToDateTime(tn.endTs)).Select(x => new { x.houseId, x.userId, x.gcDate, houselat = x.Lat, houselong = x.Long  }).ToListAsync();
+                                    string st = c.startTs;
+                                    string et = c.endTs;
+                                    // performs multiple replacement  
+                                    string starttime = st.Replace("T", " ").Replace("+00:00", "");
+                                    string endtime = et.Replace("T", " ").Replace("+00:00", "");
 
                                     var query = (from s in db.GarbageCollectionDetails
                                                  from cs in db.HouseMasters
                                                  from um in db.UserMasters
                                                  where s.houseId == cs.houseId
                                                  where s.userId == um.userId
-                                                 where s.userId == Convert.ToInt32(c.createUser) && s.gcDate >= Convert.ToDateTime(c.startTs) && s.gcDate <= Convert.ToDateTime(c.endTs)
+                                                 where s.userId == Convert.ToInt32(c.createUser) && s.gcDate >= Convert.ToDateTime(starttime) && s.gcDate <= Convert.ToDateTime(endtime)
                                                  select new
                                                  {
                                                      houseId = s.houseId,
@@ -1862,10 +1867,16 @@ namespace ICTSBMCOREAPI.Controllers
 
                                     //var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) && x.gcDate >= Convert.ToDateTime(tn.startTs) && x.gcDate <= Convert.ToDateTime(tn.endTs)).Select(x => new { x.houseId, x.userId, x.gcDate, houselat = x.Lat, houselong = x.Long  }).ToListAsync();
 
+                                    string st = c.startTs;
+                                    string et = c.endTs;
+                                    // performs multiple replacement  
+                                    string starttime = st.Replace("T", " ").Replace("+00:00", "");
+                                    string endtime = et.Replace("T", " ").Replace("+00:00", "");
+
                                     var query = (from hm in db.HouseMasters
                                                  from em in db.QrEmployeeMasters
                                                  where hm.userId == em.qrEmpId
-                                                 where hm.userId == Convert.ToInt32(c.createUser) && hm.modified >= Convert.ToDateTime(c.startTs) && hm.modified <= Convert.ToDateTime(c.endTs)
+                                                 where hm.userId == Convert.ToInt32(c.createUser) && hm.modified >= Convert.ToDateTime(starttime) && hm.modified <= Convert.ToDateTime(endtime)
                                                  select new
                                                  {
                                                      houseId = hm.houseId,
