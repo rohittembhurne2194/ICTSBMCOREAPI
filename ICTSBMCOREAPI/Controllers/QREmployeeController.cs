@@ -222,8 +222,8 @@ namespace ICTSBMCOREAPI.Controllers
 
                             //foreach (var item in obj)
                             //{
-                            tn.startDate = obj.startTs;
-                            tn.endDate = obj.endTs;
+                            tn.startTs = obj.startTs;
+                            tn.endTs = obj.endTs;
                             tn.geom = obj.geom;
 
 
