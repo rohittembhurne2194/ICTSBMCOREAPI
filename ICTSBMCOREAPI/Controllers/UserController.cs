@@ -1551,14 +1551,14 @@ namespace ICTSBMCOREAPI.Controllers
                                         var output = serializer.Serialize(query);
                                         var housedatalist = new JavaScriptSerializer().Deserialize<GisHouseList[]>(output);
 
-                                        var result1 = myresult.Select(i =>
+                                       
+                                        var result1 = myresult.Where(i => i.id == c.id).Select(i =>
                                         {
                                             i.HouseList = housedatalist;
 
                                             return i;
 
-                                        }).ToList();
-
+                                        }).FirstOrDefault();
                                         var EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.createUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
                                         var Update_EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.updateUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
 
