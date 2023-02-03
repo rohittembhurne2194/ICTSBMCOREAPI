@@ -13,5 +13,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.MainModels
         public string InitialCatalog { get; set; }
         public string UserId { get; set; }
         public string Password { get; set; }
+
+        public string url { get; set; }
     }
 }

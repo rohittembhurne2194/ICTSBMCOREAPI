@@ -490,6 +490,11 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.MainModels
                     .IsRequired()
                     .HasMaxLength(255)
                     .IsUnicode(false);
+
+                entity.Property(e => e.url)
+                   .IsRequired()
+                   .HasMaxLength(255)
+                   .IsUnicode(false);
             });
 
             modelBuilder.Entity<GameDetail>(entity =>

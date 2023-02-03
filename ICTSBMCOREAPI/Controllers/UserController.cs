@@ -671,7 +671,7 @@ namespace ICTSBMCOREAPI.Controllers
                         //var response = await client.PostAsync("http://114.143.244.130:9091/garbage-trail", stringContent);
 
 
-                        client.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                        client.BaseAddress = new Uri(GIS_CON.url);
                         //client.DefaultRequestHeaders.Accept.Clear();
                         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                         client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
@@ -817,7 +817,7 @@ namespace ICTSBMCOREAPI.Controllers
 
 
 
-                        client.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                        client.BaseAddress = new Uri(GIS_CON.url);
                         //client.DefaultRequestHeaders.Accept.Clear();
                         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                         client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
@@ -945,6 +945,7 @@ namespace ICTSBMCOREAPI.Controllers
                         var gis_DBName = GIS_CON.InitialCatalog;
                         var gis_username = GIS_CON.UserId;
                         var gis_password = GIS_CON.Password;
+                        //var base_url = GIS_CON.url;
 
                         HttpClient client = new();
                         //Trial tn = new Trial();
@@ -960,7 +961,8 @@ namespace ICTSBMCOREAPI.Controllers
                         //End Old Code
 
                         //Start New Code.
-                        client.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                        //client.BaseAddress = new Uri("http://114.143.244.130:9091/house/all");
+                        client.BaseAddress = new Uri(GIS_CON.url);
                         //client.DefaultRequestHeaders.Accept.Clear();
                         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                         client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
@@ -1176,7 +1178,7 @@ namespace ICTSBMCOREAPI.Controllers
                         //End Old Code
 
                         //Start New Code.
-                        client.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                        client.BaseAddress = new Uri(GIS_CON.url);
                         //client.DefaultRequestHeaders.Accept.Clear();
                         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                         client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
@@ -1350,7 +1352,7 @@ namespace ICTSBMCOREAPI.Controllers
                         //End Old Code
 
                         //Start New Code.
-                        client.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                        client.BaseAddress = new Uri(GIS_CON.url);
                         //client.DefaultRequestHeaders.Accept.Clear();
                         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                         client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
@@ -1488,7 +1490,7 @@ namespace ICTSBMCOREAPI.Controllers
                         //End Old Code
 
                         //Start New Code
-                        client.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                        client.BaseAddress = new Uri(GIS_CON.url);
                         //client.DefaultRequestHeaders.Accept.Clear();
                         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                         client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
@@ -1682,7 +1684,7 @@ namespace ICTSBMCOREAPI.Controllers
 
 
                         //Start New Code
-                        client.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                        client.BaseAddress = new Uri(GIS_CON.url);
                         //client.DefaultRequestHeaders.Accept.Clear();
                         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                         client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
@@ -1838,7 +1840,7 @@ namespace ICTSBMCOREAPI.Controllers
                         //End Old Code
 
                         //Start New Code
-                        client.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                        client.BaseAddress = new Uri(GIS_CON.url);
                         //client.DefaultRequestHeaders.Accept.Clear();
                         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                         client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
@@ -2251,7 +2253,7 @@ namespace ICTSBMCOREAPI.Controllers
                         stn.id = obj.id.ToString();
                         HttpClient client1 = new();
 
-                        client1.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                        client1.BaseAddress = new Uri(GIS_CON.url);
                         //client1.DefaultRequestHeaders.Accept.Clear();
                         client1.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                         client1.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
@@ -2284,7 +2286,7 @@ namespace ICTSBMCOREAPI.Controllers
                             }
 
                             //Start New Code
-                            client.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                            client.BaseAddress = new Uri(GIS_CON.url);
                             //client.DefaultRequestHeaders.Accept.Clear();
                             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                             client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
@@ -2433,7 +2435,7 @@ namespace ICTSBMCOREAPI.Controllers
                         //End Old Code
 
                         //Start New Code.
-                        client.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                        client.BaseAddress = new Uri(GIS_CON.url);
                         //client.DefaultRequestHeaders.Accept.Clear();
                         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                         client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
@@ -2637,7 +2639,7 @@ namespace ICTSBMCOREAPI.Controllers
 
 
                         //Start New Code.
-                        client.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                        client.BaseAddress = new Uri(GIS_CON.url);
                         //client.DefaultRequestHeaders.Accept.Clear();
                         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                         client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
@@ -2814,7 +2816,7 @@ namespace ICTSBMCOREAPI.Controllers
                         stn.id = obj.id.ToString();
                         HttpClient client1 = new();
 
-                        client1.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                        client1.BaseAddress = new Uri(GIS_CON.url);
                         //client1.DefaultRequestHeaders.Accept.Clear();
                         client1.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                         client1.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
@@ -2847,7 +2849,7 @@ namespace ICTSBMCOREAPI.Controllers
                             }
 
                             //Start New Code
-                            client.BaseAddress = new Uri("http://114.143.244.130:9091/");
+                            client.BaseAddress = new Uri(GIS_CON.url);
                             //client.DefaultRequestHeaders.Accept.Clear();
                             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                             client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
