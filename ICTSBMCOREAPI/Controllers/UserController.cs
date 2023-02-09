@@ -617,12 +617,12 @@ namespace ICTSBMCOREAPI.Controllers
 
         [HttpPost]
         [Route("Save/GarbageMapTrail")]
-        public async Task<ActionResult<List<DumpTripStatusResult>>> GarbageMapTrail([FromHeader] string authorization, [FromBody] Trial obj, [FromHeader] int AppId)
+        public async Task<ActionResult<DumpTripStatusResult>> GarbageMapTrail([FromHeader] string authorization, [FromBody] Trial obj, [FromHeader] int AppId)
         {
             var message = "";
 
             using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
-            List<DumpTripStatusResult> objDetail = new List<DumpTripStatusResult>();
+            DumpTripStatusResult objDetail = new ();
 
             var stream = authorization.Replace("Bearer ", string.Empty);
             var handler = new JwtSecurityTokenHandler();
@@ -683,25 +683,37 @@ namespace ICTSBMCOREAPI.Controllers
                         {
                             var responseString = await response.Content.ReadAsStringAsync();
                             var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                            objDetail.Add(new DumpTripStatusResult()
-                            {
-                                code = (int)response.StatusCode,
-                                status = dynamicobject.status.ToString(),
-                                message = dynamicobject.message.ToString(),
-                                errorMessages = dynamicobject.errorMessages.ToString(),
-                                timestamp = DateTime.Now.ToString(),
-                                data = dynamicobject.data.ToString()
-                            });
+                            //objDetail.Add(new DumpTripStatusResult()
+                            //{
+                            //    code = (int)response.StatusCode,
+                            //    status = dynamicobject.status.ToString(),
+                            //    message = dynamicobject.message.ToString(),
+                            //    errorMessages = dynamicobject.errorMessages.ToString(),
+                            //    timestamp = DateTime.Now.ToString(),
+                            //    data = dynamicobject.data.ToString()
+                            //});
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = dynamicobject.status.ToString();
+                            objDetail.message = dynamicobject.message.ToString();
+                            objDetail.errorMessages = dynamicobject.errorMessages.ToString();
+                            objDetail.timestamp = DateTime.Now.ToString();
+                            objDetail.data = dynamicobject.data.ToString();
+                            objDetail.offlineId = obj.offlineId;
                         }
                         else
                         {
-                            objDetail.Add(new DumpTripStatusResult()
-                            {
-                                code = (int)response.StatusCode,
-                                status = "Failed",
-                                message = "Not Found",
-                                timestamp = DateTime.Now.ToString()
-                            });
+                            //objDetail.Add(new DumpTripStatusResult()
+                            //{
+                            //    code = (int)response.StatusCode,
+                            //    status = "Failed",
+                            //    message = "Not Found",
+                            //    timestamp = DateTime.Now.ToString()
+                            //});
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Failed";
+                            objDetail.message = "Not Found";
+                            objDetail.timestamp = DateTime.Now.ToString();
+                            objDetail.offlineId = obj.offlineId;
                         }
                         //}
                         result = objDetail;
@@ -710,14 +722,19 @@ namespace ICTSBMCOREAPI.Controllers
                     else
                     {
 
-                        objDetail.Add(new DumpTripStatusResult()
-                        {
-                            code = 404,
-                            status = "Failed",
-                            message = "GIS Connection Are Not Available",
-                            timestamp = DateTime.Now.ToString(),
-                            data = ""
-                        });
+                        //objDetail.Add(new DumpTripStatusResult()
+                        //{
+                        //    code = 404,
+                        //    status = "Failed",
+                        //    message = "GIS Connection Are Not Available",
+                        //    timestamp = DateTime.Now.ToString()
+                        //});
+                        objDetail.code = 404;
+                        objDetail.status = "Failed";
+                        objDetail.message = "GIS Connection Are Not Available";
+                        objDetail.timestamp = DateTime.Now.ToString();
+                        objDetail.offlineId = obj.offlineId;
+
                         result = objDetail;
 
                         return NotFound(result);
@@ -730,15 +747,21 @@ namespace ICTSBMCOREAPI.Controllers
                 {
                     //_logger.LogError(ex.ToString(), ex);
 
-                    objDetail.Add(new DumpTripStatusResult()
-                    {
-                        code = 400,
-                        status = "Failed",
-                        message = ex.Message.ToString(),
-                        errorMessages = ex.Message.ToString(),
-                        timestamp = DateTime.Now.ToString(),
-                        data = ""
-                    });
+                    //objDetail.Add(new DumpTripStatusResult()
+                    //{
+                    //    code = 400,
+                    //    status = "Failed",
+                    //    message = ex.Message.ToString(),
+                    //    errorMessages = ex.Message.ToString(),
+                    //    timestamp = DateTime.Now.ToString(),
+                    //    data = ""
+                    //});
+                    objDetail.code = 400;
+                    objDetail.status = "Failed";
+                    objDetail.message = ex.Message.ToString();
+                    objDetail.timestamp = DateTime.Now.ToString();
+                    objDetail.offlineId = obj.offlineId;
+
                     result = objDetail;
 
                 }
@@ -746,13 +769,18 @@ namespace ICTSBMCOREAPI.Controllers
             }
             else
             {
-                objDetail.Add(new DumpTripStatusResult()
-                {
-                    code = 401,
-                    status = "Failed",
-                    message = "Unauthorized",
-                    timestamp = DateTime.Now.ToString(),
-                });
+                //objDetail.Add(new DumpTripStatusResult()
+                //{
+                //    code = 401,
+                //    status = "Failed",
+                //    message = "Unauthorized",
+                //    timestamp = DateTime.Now.ToString(),
+                //});
+                objDetail.code = 401;
+                objDetail.status = "Failed";
+                objDetail.message = "Unauthorized";
+                objDetail.timestamp = DateTime.Now.ToString();
+                objDetail.offlineId = obj.offlineId;
 
                 result = objDetail;
                 return Unauthorized(result);
@@ -761,12 +789,12 @@ namespace ICTSBMCOREAPI.Controllers
         }
         [HttpPost]
         [Route("Save/HouseMapTrail")]
-        public async Task<ActionResult<List<DumpTripStatusResult>>> HouseMapTrail([FromHeader] string authorization, [FromBody] Trial obj, [FromHeader] int AppId)
+        public async Task<ActionResult<DumpTripStatusResult>> HouseMapTrail([FromHeader] string authorization, [FromBody] Trial obj, [FromHeader] int AppId)
         {
             var message = "";
 
             using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
-            List<DumpTripStatusResult> objDetail = new List<DumpTripStatusResult>();
+            DumpTripStatusResult objDetail = new ();
 
             var stream = authorization.Replace("Bearer ", string.Empty);
             var handler = new JwtSecurityTokenHandler();
@@ -829,25 +857,38 @@ namespace ICTSBMCOREAPI.Controllers
                         {
                             var responseString = await response.Content.ReadAsStringAsync();
                             var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                            objDetail.Add(new DumpTripStatusResult()
-                            {
-                                code = (int)response.StatusCode,
-                                status = dynamicobject.status.ToString(),
-                                message = dynamicobject.message.ToString(),
-                                errorMessages = dynamicobject.errorMessages.ToString(),
-                                timestamp = dynamicobject.timestamp.ToString(),
-                                data = dynamicobject.data.ToString()
-                            });
+                            //objDetail.Add(new DumpTripStatusResult()
+                            //{
+                            //    code = (int)response.StatusCode,
+                            //    status = dynamicobject.status.ToString(),
+                            //    message = dynamicobject.message.ToString(),
+                            //    errorMessages = dynamicobject.errorMessages.ToString(),
+                            //    timestamp = dynamicobject.timestamp.ToString(),
+                            //    data = dynamicobject.data.ToString()
+                            //});
+
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = dynamicobject.status.ToString();
+                            objDetail.message = dynamicobject.message.ToString();
+                            objDetail.errorMessages = dynamicobject.errorMessages.ToString();
+                            objDetail.timestamp = DateTime.Now.ToString();
+                            objDetail.data = dynamicobject.data.ToString();
+                            objDetail.offlineId = obj.offlineId;
                         }
                         else
                         {
-                            objDetail.Add(new DumpTripStatusResult()
-                            {
-                                code = (int)response.StatusCode,
-                                status = "Failed",
-                                message = response.RequestMessage.ToString(),
-                                timestamp = DateTime.Now.ToString(),
-                            });
+                            //objDetail.Add(new DumpTripStatusResult()
+                            //{
+                            //    code = (int)response.StatusCode,
+                            //    status = "Failed",
+                            //    message = response.RequestMessage.ToString(),
+                            //    timestamp = DateTime.Now.ToString(),
+                            //});
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Failed";
+                            objDetail.message = "Not Found";
+                            objDetail.timestamp = DateTime.Now.ToString();
+                            objDetail.offlineId = obj.offlineId;
                         }
                         //}
                         result = objDetail;
@@ -856,28 +897,40 @@ namespace ICTSBMCOREAPI.Controllers
                     else
                     {
 
-                        objDetail.Add(new DumpTripStatusResult()
-                        {
-                            code = 404,
-                            status = "Failed",
-                            message = "GIS Connection Are Not Available",
-                            timestamp = DateTime.Now.ToString(),
-                            data = ""
-                        });
+                        //objDetail.Add(new DumpTripStatusResult()
+                        //{
+                        //    code = 404,
+                        //    status = "Failed",
+                        //    message = "GIS Connection Are Not Available",
+                        //    timestamp = DateTime.Now.ToString(),
+                        //    data = ""
+                        //});
+                        objDetail.code = 404;
+                        objDetail.status = "Failed";
+                        objDetail.message = "GIS Connection Are Not Available";
+                        objDetail.timestamp = DateTime.Now.ToString();
+                        objDetail.offlineId = obj.offlineId;
+
                         result = objDetail;
                         return NotFound(result);
                     }
                 }
                 catch (Exception ex)
                 {
-                    objDetail.Add(new DumpTripStatusResult()
-                    {
-                        code = 400,
-                        status = "Failed",
-                        message = ex.Message.ToString(),
-                        timestamp = DateTime.Now.ToString(),
-                        data = ""
-                    });
+                    //objDetail.Add(new DumpTripStatusResult()
+                    //{
+                    //    code = 400,
+                    //    status = "Failed",
+                    //    message = ex.Message.ToString(),
+                    //    timestamp = DateTime.Now.ToString(),
+                    //    data = ""
+                    //});
+                    objDetail.code = 400;
+                    objDetail.status = "Failed";
+                    objDetail.message = ex.Message.ToString();
+                    objDetail.timestamp = DateTime.Now.ToString();
+                    objDetail.offlineId = obj.offlineId;
+
                     result = objDetail;
                 }
 
@@ -885,13 +938,18 @@ namespace ICTSBMCOREAPI.Controllers
             }
             else
             {
-                objDetail.Add(new DumpTripStatusResult()
-                {
-                    code = 401,
-                    status = "Failed",
-                    message = "Unauthorized",
-                    timestamp = DateTime.Now.ToString(),
-                });
+                //objDetail.Add(new DumpTripStatusResult()
+                //{
+                //    code = 401,
+                //    status = "Failed",
+                //    message = "Unauthorized",
+                //    timestamp = DateTime.Now.ToString(),
+                //});
+                objDetail.code = 401;
+                objDetail.status = "Failed";
+                objDetail.message = "Unauthorized";
+                objDetail.timestamp = DateTime.Now.ToString();
+                objDetail.offlineId = obj.offlineId;
 
                 result = objDetail;
                 return Unauthorized(result);

@@ -17,5 +17,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
 
         public string createTs { get; set; }
         public string updateTs { get; set; }
+
+        public string? offlineId { get; set; }
     }
 }
