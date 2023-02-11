@@ -823,6 +823,12 @@ namespace ICTSBMCOREAPI.Controllers
                         HttpClient client = new HttpClient();
                         Trial tn = new Trial();
 
+
+                        Result objDetail1 = new();
+
+
+                        objDetail1 = await objRep.SaveHouseTrail(obj, AppId);
+
                         //foreach (var item in obj)
                         //{
                         //    tn.id = item.id;
