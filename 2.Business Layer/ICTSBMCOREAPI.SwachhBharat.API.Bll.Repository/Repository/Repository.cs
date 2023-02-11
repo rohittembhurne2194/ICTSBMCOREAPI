@@ -5288,14 +5288,14 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             result.ID = obj.OfflineID;
                             result.status = "success";
                             result.message = "Street Sweeping Completed Successfully";
-                            result.messageMar = "सबमिट यशस्वी";
+                            result.messageMar = "मार्गाची सफाई यशस्वीरित्या पूर्ण झाली";
                         }
                         else
                         {
                             result.ID = obj.OfflineID;
                             result.status = "success";
                             result.message = "Street Sweeping Partially Completed";
-                            result.messageMar = "सबमिट यशस्वी";
+                            result.messageMar = "मार्गाची सफाई अर्धवट पूर्ण झाली";
                         }
 
                     }
