@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Data.Entity.Spatial;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
@@ -24,6 +25,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Claims;
+
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -6453,6 +6455,112 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             //}
         }
 
+        public async Task<Result> SaveHouseTrail(Trial obj, int AppId)
+        {
+            Result result = new Result();
+
+           
+            using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+            using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
+            {
+                try
+                {
+                    var appdetails = await dbMain.AppDetails.Where(c => c.AppId == AppId).FirstOrDefaultAsync();
+                    DateTime Dateeee = DateTime.Now;
+                    var atten = await db.Qr_Employee_Daily_Attendances.Where(c => c.qrEmpId == obj.createUser && EF.Functions.DateDiffDay(c.startDate, Dateeee) == 0).FirstOrDefaultAsync();
+                    var Activeuser = await db.QrEmployeeMasters.Where(c => c.qrEmpId == obj.createUser).FirstOrDefaultAsync();
+                    if (Activeuser.isActive == false)
+                    {
+                        result.message = "Contact To Administrator";
+                        result.messageMar = "प्रशासकाशी संपर्क साधा.";
+                        result.status = "error";
+                        return result;
+                    }
+                    else if (atten != null)
+                    {
+                        using (SqlConnection connection = new SqlConnection(db.Database.GetDbConnection().ConnectionString))
+                        {
+                            connection.Open();
+
+                            var command = connection.CreateCommand();
+
+                            const string CheckIfTableExistsStatement = "SELECT * FROM sys.objects WHERE name = N'HouseTrail_Insert'";
+                            command.CommandText = CheckIfTableExistsStatement;
+                            var executeScalar = command.ExecuteScalar();
+                            if (executeScalar != null)
+                            {
+                                CultureInfo culture = new CultureInfo("en-US");
+
+                                DateTime sts = Convert.ToDateTime(obj.startTs, culture);
+                                DateTime ets = Convert.ToDateTime(obj.endTs, culture);
+                                DateTime cts = Convert.ToDateTime(obj.createTs, culture);
+                                DateTime uts = Convert.ToDateTime(obj.updateTs, culture);
+
+                             
+
+                                using (SqlConnection con = new SqlConnection(db.Database.GetDbConnection().ConnectionString))
+                                {
+                                    using (SqlCommand cmd = new SqlCommand("HouseTrail_Insert", con))
+                                    {
+                                        cmd.CommandType = CommandType.StoredProcedure;
+
+                                        cmd.Parameters.Add("@Id", SqlDbType.NVarChar).Value = obj.id;
+                                        cmd.Parameters.Add("@Start_ts", SqlDbType.DateTime).Value = sts;
+                                        cmd.Parameters.Add("@End_ts", SqlDbType.DateTime).Value = ets;
+                                        cmd.Parameters.Add("@Create_user", SqlDbType.Int).Value = obj.createUser;
+                                        cmd.Parameters.Add("@Create_ts", SqlDbType.DateTime).Value = cts;
+                                        cmd.Parameters.Add("@Update_user", SqlDbType.Int).Value = obj.updateUser;
+                                        cmd.Parameters.Add("@Update_ts", SqlDbType.DateTime).Value = uts;
+                                        cmd.Parameters.Add("@geom", SqlDbType.NVarChar).Value = obj.geom;
+
+                                        con.Open();
+                                        int rowsAffected = cmd.ExecuteNonQuery();
+
+                                        con.Close();
+                                    }
+                                }
+                                //var data = await db.HouseTrail_Insert_Results.FromSqlRaw<HouseTrail_Insert_Result>("EXEC HouseTrail_Insert @Id,@Start_ts,@End_ts,@Create_user,@Create_ts,@Update_user,@Update_ts,@geom", parms.ToArray()).ToListAsync();
+
+                            }
+                            connection.Close();
+                        }
+
+                   
+                }
+                    else
+                {
+                    result.message = "Your duty is currently off, please start again.. ";
+                    result.messageMar = "आपली ड्यूटी सध्या बंद आहे, कृपया पुन्हा सुरू करा..";
+                    result.status = "error";
+                    return result;
+                }
+                return result;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString(), ex);
+                    result.message = "Something is wrong,Try Again.. ";
+                    result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
+                    //result.name = "";
+                    result.status = "error";
+                    return result;
+                }
+            }
+        }
+
+        //private TrailHouse FillHouseTrailDataModel(Trial obj)
+        //{
+        //    TrailHouse model = new TrailHouse();
+        //    model.Id = obj.id;
+        //    model.StartTs = Convert.ToDateTime(obj.startTs);
+        //    model.EndTs = Convert.ToDateTime(obj.endTs);
+        //    model.CreateUser = obj.createUser;
+        //    model.CreateTs = Convert.ToDateTime(obj.createTs);
+        //    model.UpdateUser = obj.updateUser;
+        //    model.UpdateTs = Convert.ToDateTime(obj.updateTs);
+        //    model.geom = DbGeography.FromText(obj.geom);
+        //    return model;
+        //}
 
         private static byte[] ConvertFromBase64String(string input)
         {

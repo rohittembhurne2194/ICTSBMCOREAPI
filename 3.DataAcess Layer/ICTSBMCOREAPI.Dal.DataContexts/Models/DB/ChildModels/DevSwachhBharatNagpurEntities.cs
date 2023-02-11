@@ -85,6 +85,9 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
         public virtual DbSet<view_Location> view_Locations { get; set; }
         public virtual DbSet<view_SLocation> view_SLocations { get; set; }
 
+        public virtual DbSet<TrailHouse> TrailHouses { get; set; }
+
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -94,9 +97,12 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
             }
         }
 
+       
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
+
+            modelBuilder.Entity<TrailHouse>().HasNoKey();
 
             modelBuilder.Entity<AspNetRole>(entity =>
             {

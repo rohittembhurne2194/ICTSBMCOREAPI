@@ -64,6 +64,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB
 
         public DbSet<calculateDistance_Result> calculateDistance_Results { get; set; }
         public DbSet<SP_HouseOnMapDetails_Result> SP_HouseOnMapDetails_Results { get; set; }
+        public DbSet<HouseTrail_Insert_Result> HouseTrail_Insert_Results { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
