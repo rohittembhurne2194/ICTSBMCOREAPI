@@ -985,6 +985,15 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         {
             Result result = new Result();
 
+            if (obj.daDate.ToString("yyyy-MM-dd") != DateTime.Now.ToString("yyyy-MM-dd"))
+            {
+                result.status = "error";
+                result.message = "Invalid Date";
+                result.messageMar = "अवैध तारीख";
+                result.emptype = obj.EmpType;
+                return result;
+            }
+
             if ((string.IsNullOrEmpty(obj.EmpType)) == true)
             {
                 result.status = "error";
