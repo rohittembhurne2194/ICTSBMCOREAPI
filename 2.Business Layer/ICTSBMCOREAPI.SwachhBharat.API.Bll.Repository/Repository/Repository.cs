@@ -987,6 +987,24 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         {
             Result result = new Result();
 
+            if (obj.daDate.ToString("yyyy-MM-dd") != DateTime.Now.ToString("yyyy-MM-dd") && type==0)
+            {
+                result.status = "error";
+                result.message = "Invalid Date";
+                result.messageMar = "अवैध तारीख";
+                result.emptype = obj.EmpType;
+                return result;
+            }
+
+            if (obj.daEndDate.ToString("yyyy-MM-dd") != DateTime.Now.ToString("yyyy-MM-dd") && type == 1)
+            {
+                result.status = "error";
+                result.message = "Invalid Date";
+                result.messageMar = "अवैध तारीख";
+                result.emptype = obj.EmpType;
+                return result;
+            }
+
             if ((string.IsNullOrEmpty(obj.EmpType)) == true)
             {
                 result.status = "error";
@@ -1191,7 +1209,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     objTransDumpTD.UsTotalDryWeight = obj.USTotalDryWeight;
                     objTransDumpTD.UsTotalGcWeight = obj.USTotalGcWeight;
                     objTransDumpTD.UsTotalWetWeight = obj.USTotalWetWeight;
-                    objTransDumpTD.TotalDryWeightKg =obj.totalDryWeightkg;
+                    objTransDumpTD.TotalDryWeightKg = obj.totalDryWeightkg;
                     objTransDumpTD.TotalWetWeightKg = obj.totalWetWeightkg;
                     objTransDumpTD.TotalGcWeightKg = obj.totalGcWeightkg;
                     db.TransDumpTDs.Add(objTransDumpTD);
@@ -5260,33 +5278,36 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     var gc = await db.GarbageCollectionDetails.Where(c => c.userId == obj.userId && c.SSId == dydetails.SSId && EF.Functions.DateDiffDay(c.gcDate, Dateeee) == 0).OrderByDescending(c => c.gcDate).FirstOrDefaultAsync();
                     var sd = await db.StreetSweepingDetails.Where(x => x.SSId == gc.SSId).FirstOrDefaultAsync();
                     var sbeatcount = await db.StreetSweepingBeats.Where(x => x.ReferanceId1 == sd.ReferanceId || x.ReferanceId2 == sd.ReferanceId || x.ReferanceId3 == sd.ReferanceId || x.ReferanceId4 == sd.ReferanceId || x.ReferanceId5 == sd.ReferanceId).FirstOrDefaultAsync();
-                    var beatcount = await db.Vw_BitCounts.Where(x => x.BeatId == sbeatcount.BeatId).FirstOrDefaultAsync();
-                    var sd1 = await db.StreetSweepingDetails.Where(z => z.ReferanceId == sbeatcount.ReferanceId1 || z.ReferanceId == sbeatcount.ReferanceId2 || z.ReferanceId == sbeatcount.ReferanceId3 || z.ReferanceId == sbeatcount.ReferanceId4 || z.ReferanceId == sbeatcount.ReferanceId5).ToListAsync();
-                    foreach (var x in sd1)
+                    if (sbeatcount != null)
                     {
-                        var sgcd = await db.GarbageCollectionDetails.Where(c => c.userId == obj.userId && c.SSId == x.SSId && EF.Functions.DateDiffDay(c.gcDate, Dateeee) == 0).OrderByDescending(c => c.gcDate).FirstOrDefaultAsync();
-                        if (sgcd != null)
+                        var beatcount = await db.Vw_BitCounts.Where(x => x.BeatId == sbeatcount.BeatId).FirstOrDefaultAsync();
+                        var sd1 = await db.StreetSweepingDetails.Where(z => z.ReferanceId == sbeatcount.ReferanceId1 || z.ReferanceId == sbeatcount.ReferanceId2 || z.ReferanceId == sbeatcount.ReferanceId3 || z.ReferanceId == sbeatcount.ReferanceId4 || z.ReferanceId == sbeatcount.ReferanceId5).ToListAsync();
+                        foreach (var x in sd1)
                         {
-                            i++;
+                            var sgcd = await db.GarbageCollectionDetails.Where(c => c.userId == obj.userId && c.SSId == x.SSId && EF.Functions.DateDiffDay(c.gcDate, Dateeee) == 0).OrderByDescending(c => c.gcDate).FirstOrDefaultAsync();
+                            if (sgcd != null)
+                            {
+                                i++;
+                            }
+
+                        }
+
+                        if (beatcount.BitCount == i)
+                        {
+                            result.ID = obj.OfflineID;
+                            result.status = "success";
+                            result.message = "Street Sweeping Completed Successfully";
+                            result.messageMar = "मार्गाची सफाई यशस्वीरित्या पूर्ण झाली";
+                        }
+                        else
+                        {
+                            result.ID = obj.OfflineID;
+                            result.status = "success";
+                            result.message = "Street Sweeping Partially Completed";
+                            result.messageMar = "मार्गाची सफाई अर्धवट पूर्ण झाली";
                         }
 
                     }
-
-                    if (beatcount.BitCount == i)
-                    {
-                        result.ID = obj.OfflineID;
-                        result.status = "success";
-                        result.message = "Street Sweeping Completed Successfully";
-                        result.messageMar = "सबमिट यशस्वी";
-                    }
-                    else
-                    {
-                        result.ID = obj.OfflineID;
-                        result.status = "success";
-                        result.message = "Street Sweeping Partially Completed";
-                        result.messageMar = "सबमिट यशस्वी";
-                    }
-
                     if (result.status == "success")
                     {
                         try
@@ -5968,7 +5989,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
             {
                 var distCount = "";
-               // double New_Lat = 0;
+                // double New_Lat = 0;
                 //double New_Long = 0;
                 try
                 {
@@ -6450,7 +6471,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         {
             Result result = new Result();
 
-           
+
             using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
             using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
             {
@@ -6487,7 +6508,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 DateTime cts = Convert.ToDateTime(obj.createTs, culture);
                                 DateTime uts = Convert.ToDateTime(obj.updateTs, culture);
 
-                             
+
 
                                 using (SqlConnection con = new SqlConnection(db.Database.GetDbConnection().ConnectionString))
                                 {
@@ -6516,16 +6537,16 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             connection.Close();
                         }
 
-                   
-                }
+
+                    }
                     else
-                {
-                    result.message = "Your duty is currently off, please start again.. ";
-                    result.messageMar = "आपली ड्यूटी सध्या बंद आहे, कृपया पुन्हा सुरू करा..";
-                    result.status = "error";
+                    {
+                        result.message = "Your duty is currently off, please start again.. ";
+                        result.messageMar = "आपली ड्यूटी सध्या बंद आहे, कृपया पुन्हा सुरू करा..";
+                        result.status = "error";
+                        return result;
+                    }
                     return result;
-                }
-                return result;
                 }
                 catch (Exception ex)
                 {
@@ -6829,7 +6850,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     //GIS Code Start (28-12-2022)
 
                                     Result objDetail1 = new Result();
-                                 
+
                                     var message = "";
 
 
@@ -7151,7 +7172,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         status = "success",
                                         message = "Uploaded successfully",
                                         messageMar = "सबमिट यशस्वी",
-                                        referenceID= item.ReferanceId,
+                                        referenceID = item.ReferanceId,
                                     });
 
 
@@ -7420,7 +7441,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 referenceID = item.ReferanceId,
                             });
 
-                           
+
                         }
 
                     }
@@ -7439,7 +7460,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         message = ex.Message,
                         messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..",
                         status = "error",
-                        referenceID= refId,
+                        referenceID = refId,
                     });
                     return myresult;
                 }
@@ -9878,7 +9899,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             List<LatLongD> obj = new List<LatLongD>();
             using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(appId))
             {
-                var data =await db.HouseMasters.Where(c => c.userId == userid && EF.Functions.DateDiffDay(c.modified, date) == 0).OrderByDescending(c => c.modified).ToListAsync();
+                var data = await db.HouseMasters.Where(c => c.userId == userid && EF.Functions.DateDiffDay(c.modified, date) == 0).OrderByDescending(c => c.modified).ToListAsync();
                 foreach (var x in data)
                 {
 
