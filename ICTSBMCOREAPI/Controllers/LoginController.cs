@@ -94,6 +94,8 @@ namespace ICTSBMCOREAPI.Controllers
 
             objDetail.code = result.code;
             objDetail.Status = result.Status;
+            objDetail.Message = result.Message;
+            objDetail.timestamp = result.timestamp;
             objDetail.data = result.data;
            
             return Ok(objDetail);
