@@ -1860,7 +1860,7 @@ namespace ICTSBMCOREAPI.Controllers
         }
 
         [HttpPost]
-        [Route("GisHouseTrail/search")]
+        [Route("oldGisHouseTrail/search")]
         [EnableCors("MyCorsPolicy")]
         public async Task<ActionResult<HouseGisDetails>> HouseTrailgisSearch([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] GisSearch obj)
         {
@@ -3301,7 +3301,7 @@ namespace ICTSBMCOREAPI.Controllers
 
 
         [HttpPost]
-        [Route("MyGisHouseTrail/search")]
+        [Route("GisHouseTrail/search")]
         [EnableCors("MyCorsPolicy")]
         public async Task<ActionResult<HouseGisDetails>> MyHouseTrailgisSearch([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] GisSearch obj)
         {
@@ -3363,8 +3363,8 @@ namespace ICTSBMCOREAPI.Controllers
                                 //var dynamicobject = JsonConvert.DeserializeObject<dynamic>(json);
                                 if (dynamicobject == null)
                                 {
-                                   
-                                    objDetail.data = null;
+                                    List<GisTrailResult> myresult = new List<GisTrailResult>();
+                                    objDetail.data = myresult;
                                 }
                                 else
                                 {
