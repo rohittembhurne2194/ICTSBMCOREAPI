@@ -141,6 +141,16 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         GisuserDetails.data = data;
 
                     }
+                    else
+                    {
+                       
+
+                        GisuserDetails.code = 200;
+                        GisuserDetails.Status = "Failed";
+                        GisuserDetails.Message = "Enter Username And Password Does Not Match";
+                        GisuserDetails.timestamp = DateTime.Now.ToString();
+                        GisuserDetails.data = null;
+                    }
                     return GisuserDetails;
                 }
                    
@@ -148,6 +158,12 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString(), ex);
+
+                GisuserDetails.code = 400;
+                GisuserDetails.Status = "Failed";
+                GisuserDetails.Message = ex.Message.ToString();
+                GisuserDetails.timestamp = DateTime.Now.ToString();
+                GisuserDetails.data = null;
                 return GisuserDetails;
             }
         }
