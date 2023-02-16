@@ -69,6 +69,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
         //Task<SBUser> CheckUserLoginForNormalAsync(string userName, string password, string imi, int AppId, string EmpType);
         public Task<string> LoginAsync(int AppId);
+        public Task<GisLoginResult> GisLoginAsync(string userLoginId, string userPassword);
         Task<CollectionSyncResult> SaveAddEmployeeAsync(HouseScanifyEmployeeDetails obj, int AppId);
         Task<CollectionSyncResult> SaveAddUserRoleAsync(UserRoleDetails obj);
         Task<List<SBAAttendenceSettingsGridRow>> SaveAttendenceSettingsDetailAsync(int AppId, string hour);
