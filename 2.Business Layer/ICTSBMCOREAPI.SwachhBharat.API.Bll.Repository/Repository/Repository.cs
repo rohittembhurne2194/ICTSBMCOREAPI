@@ -5888,6 +5888,24 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
             using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
             {
+                if ((string.IsNullOrEmpty(obj.startLat)) == true && (string.IsNullOrEmpty(obj.startLong)) == true && type == 0)
+                {
+                    result.status = "error";
+                    result.message = "Your start Lat / Long are Empty ";
+                    result.messageMar = "तुमची सुरुवात लॅट / लॉन्ग  रिक्त आहेत";
+                    return result;
+                }
+
+
+
+                if ((string.IsNullOrEmpty(obj.endLat)) == true && (string.IsNullOrEmpty(obj.endLong)) == true && type == 1)
+                {
+                    result.status = "error";
+                    result.message = "Your End Lat / Long are Empty ";
+                    result.messageMar = "तुमचा शेवट लॅट / लॉन्ग रिक्त आहेत";
+                    return result;
+                }
+
                 if (type == 0)
                 {
                     //Daily_Attendance data = db.Daily_Attendance.Where(c => c.daDate == EntityFunctions.TruncateTime(obj.daDate) && c.userId == obj.userId && (c.endTime == null || c.endTime == "")).FirstOrDefault();

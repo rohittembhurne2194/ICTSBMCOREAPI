@@ -1860,7 +1860,7 @@ namespace ICTSBMCOREAPI.Controllers
         }
 
         [HttpPost]
-        [Route("oldGisHouseTrail/search")]
+        [Route("GisHouseTrail/search")]
         [EnableCors("MyCorsPolicy")]
         public async Task<ActionResult<HouseGisDetails>> HouseTrailgisSearch([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] GisSearch obj)
         {
@@ -3301,7 +3301,7 @@ namespace ICTSBMCOREAPI.Controllers
 
 
         [HttpPost]
-        [Route("GisHouseTrail/search")]
+        [Route("NewGisHouseTrail/search")]
         [EnableCors("MyCorsPolicy")]
         public async Task<ActionResult<HouseGisDetails>> MyHouseTrailgisSearch([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] GisSearch obj)
         {
