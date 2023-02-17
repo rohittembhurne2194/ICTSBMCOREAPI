@@ -373,6 +373,18 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 user.message = "Contact To Administrator.";
                                 user.messageMar = "प्रशासकाशी संपर्क साधा.";
                             }
+                            else if (objEmpMst1 != null && (objEmpMst1.qrEmpLoginId != userName || objEmpMst1.qrEmpPassword != password))
+                            {
+                                user.userId = 0;
+                                user.userLoginId = "";
+                                user.userPassword = "";
+                                user.status = "error";
+                                user.gtFeatures = false;
+                                user.imiNo = "";
+                                user.EmpType = "";
+                                user.message = "UserName or Passward not Match.";
+                                user.messageMar = "वापरकर्ता नाव किंवा पासवर्ड जुळत नाही.";
+                            }
                         }
                         else if (objEmpMst2 != null)
                         {
@@ -387,6 +399,18 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 user.EmpType = "";
                                 user.message = "Contact To Administrator.";
                                 user.messageMar = "प्रशासकाशी संपर्क साधा.";
+                            }
+                            else if(objEmpMst2!=null && (objEmpMst2.userLoginId!= userName || objEmpMst2.userPassword != password))
+                            {
+                                user.userId = 0;
+                                user.userLoginId = "";
+                                user.userPassword = "";
+                                user.status = "error";
+                                user.gtFeatures = false;
+                                user.imiNo = "";
+                                user.EmpType = "";
+                                user.message = "UserName or Passward not Match.";
+                                user.messageMar = "वापरकर्ता नाव किंवा पासवर्ड जुळत नाही.";
                             }
                         }
                         else
@@ -3546,7 +3570,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             _logger.LogError(ex.ToString(), ex);
                             //await tx.RollbackAsync();
                             result.ID = obj.OfflineID;
-                            result.message = "Something is wrong,Try Again.. ";
+                            result.message = ex.Message;
+                           // result.message = "Something is wrong,Try Again.. ";
                             result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
                             result.status = "error";
                             return result;
