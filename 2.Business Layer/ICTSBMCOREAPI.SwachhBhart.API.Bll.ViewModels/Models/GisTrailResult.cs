@@ -19,16 +19,16 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public int? updateUser { get; set; }
         [JsonProperty("updateTs")]
         public string? updateTs { get; set; }
-        [JsonProperty("geom")]
-        public geomt? geom { get; set; }
-        [JsonProperty("Housegeom")]
-         public  dynamic HouseList { get; set; }
         [JsonProperty("startTs")]
         public string startTs { get; set; }
         [JsonProperty("endTs")]
         public string endTs { get; set; }
-        //public int? houseid { get; set; }
-        //public IList<string> Categories { get; set; }
+        [JsonProperty("geom")]
+        public geomt? geom { get; set; }
+        [JsonProperty("Housegeom")]
+        public  dynamic HouseList { get; set; }
+      
+   
     }
 
     public class geomt
@@ -36,7 +36,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         [JsonProperty("type")]
         public string type { get; set; }
         [JsonProperty("coordinates")]
-        public string[][] coordinates { get; set; }
+        public double[][] coordinates { get; set; }
     }
 
     public class GisHouseList

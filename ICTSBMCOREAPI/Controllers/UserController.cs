@@ -3299,6 +3299,189 @@ namespace ICTSBMCOREAPI.Controllers
         }
 
 
+
+        [HttpPost]
+        [Route("NewGisHouseTrail/search")]
+        [EnableCors("MyCorsPolicy")]
+        public async Task<ActionResult<HouseGisDetails>> MyHouseTrailgisSearch([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] GisSearch obj)
+        {
+            using DevICTSBMMainEntities dbMain = new();
+            HouseGisDetails objDetail = new();
+
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                try
+                {
+
+
+                    using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+                    using (SqlConnection connection = new SqlConnection(db.Database.GetDbConnection().ConnectionString))
+                    {
+                        connection.Open();
+
+                        var command = connection.CreateCommand();
+
+                        const string CheckIfTableExistsStatement = "SELECT * FROM sys.objects WHERE name = N'GetHouseTrail'";
+                        command.CommandText = CheckIfTableExistsStatement;
+                        var executeScalar = command.ExecuteScalar();
+                        if (executeScalar != null)
+                        {
+
+                            string sprocname = "GetHouseTrail";
+                            string jsonOutputParam = "@JsonResult";
+                            CultureInfo culture = new CultureInfo("en-US");
+
+                            DateTime sd = Convert.ToDateTime(obj.startDate, culture);
+                            DateTime ed = Convert.ToDateTime(obj.endDate, culture);
+
+                            using (SqlCommand cmd = new SqlCommand(sprocname, connection))
+                            {
+                                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                                // Create output parameter. "-1" is used for nvarchar(max)
+                                cmd.Parameters.Add(jsonOutputParam, SqlDbType.NVarChar, -1).Direction = ParameterDirection.Output;
+                                cmd.Parameters.Add("@id", SqlDbType.NVarChar).Value = obj.id == null ? DBNull.Value : obj.id;
+                                cmd.Parameters.Add("@startDate", SqlDbType.NVarChar).Value = obj.startDate == null ? DBNull.Value : sd;
+
+                                // Execute the command
+                                cmd.ExecuteNonQuery();
+
+                                // Get the values
+                                string json = cmd.Parameters[jsonOutputParam].Value.ToString();
+
+                                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(json, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
+                                //var dynamicobject = JsonConvert.DeserializeObject<dynamic>(json);
+                                if (dynamicobject == null)
+                                {
+                                    List<GisTrailResult> myresult = new List<GisTrailResult>();
+                                    objDetail.data = myresult;
+                                }
+                                else
+                                {
+                                    var jsonResult = dynamicobject["data"];
+
+                                    List<GisTrailResult> myresult = jsonResult.ToObject<List<GisTrailResult>>();
+
+                               
+                                        foreach (var c in myresult)
+                                        {
+
+                                            //var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) && x.gcDate >= Convert.ToDateTime(tn.startTs) && x.gcDate <= Convert.ToDateTime(tn.endTs)).Select(x => new { x.houseId, x.userId, x.gcDate, houselat = x.Lat, houselong = x.Long  }).ToListAsync();
+                                            var hid = c.id;
+                                            string st = c.startTs;
+                                            string et = c.endTs;
+                                            // performs multiple replacement  
+                                            string starttime = st.Replace("T", " ").Replace("+00:00", "");
+                                            string endtime = et.Replace("T", " ").Replace("+00:00", "");
+
+                                            var query = (from hm in db.HouseMasters
+                                                         from em in db.QrEmployeeMasters
+                                                         where hm.userId == em.qrEmpId
+                                                         where hm.userId == Convert.ToInt32(c.createUser) && hm.modified >= Convert.ToDateTime(starttime) && hm.modified <= Convert.ToDateTime(endtime)
+                                                         select new
+                                                         {
+                                                             houseId = hm.houseId,
+                                                             userId = em.qrEmpId,
+                                                             gcDate = hm.modified,
+                                                             ReferanceId = hm.ReferanceId,
+                                                             houseOwner = hm.houseOwner,
+                                                             houseOwnerMobile = hm.houseOwnerMobile,
+                                                             houseAddress = hm.houseAddress,
+                                                             employeename = em.qrEmpName
+                                                         }).ToList();
+
+
+
+                                            if (query.Count > 0)
+                                            {
+                                                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                                var output = serializer.Serialize(query);
+                                                var housedatalist = new JavaScriptSerializer().Deserialize<GisHouseList[]>(output);
+
+                                                var result1 = myresult.Where(i => i.id == c.id).Select(i =>
+                                                {
+                                                    i.HouseList = housedatalist;
+
+                                                    return i;
+
+                                                }).FirstOrDefault();
+
+                                                var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
+                                                var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
+                                                //ArrayList al = new ArrayList();
+                                                //al.Add(result1);
+
+                                            }
+                                            
+                                        }
+
+                                    
+                                    objDetail.data = myresult;
+                                }
+                             
+
+                               
+
+                              
+                                objDetail.code = 200;
+                                objDetail.status = "Success";
+
+                                objDetail.timestamp = DateTime.Now.ToString();
+                               
+
+                                result = objDetail;
+                            }
+
+                
+
+                            
+
+                        }
+
+
+                    }
+
+
+                    return Ok(result);
+                }
+                catch (Exception ex)
+                {
+
+                    objDetail.code = 400;
+                    objDetail.status = "Failed";
+                    objDetail.message = ex.Message.ToString();
+                    objDetail.timestamp = DateTime.Now.ToString();
+
+                    result = objDetail;
+
+                    return NotFound(result);
+                }
+
+            }
+            else
+            {
+                objDetail.code = 401;
+                objDetail.status = "Failed";
+                objDetail.message = "Unauthorized";
+                objDetail.timestamp = DateTime.Now.ToString();
+
+
+                result = objDetail;
+                return Unauthorized(result);
+            }
+        }
+
+     
         private object checkNull(string str)
         {
             string result = "";

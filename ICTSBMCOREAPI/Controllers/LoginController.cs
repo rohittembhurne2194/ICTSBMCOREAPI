@@ -84,6 +84,22 @@ namespace ICTSBMCOREAPI.Controllers
           
         }
 
+        [HttpPost("GisLogin")]
+        [AllowAnonymous]
+        public async Task<ActionResult<GisLoginResult>> LoginGis([FromBody] GisUsers loginobj)
+        {
+            GisLoginResult objDetail = new GisLoginResult();
+
+            var result = await objRep.GisLoginAsync(loginobj.userLoginId, loginobj.userPassword);
+
+            objDetail.code = result.code;
+            objDetail.Status = result.Status;
+            objDetail.Message = result.Message;
+            objDetail.timestamp = result.timestamp;
+            objDetail.data = result.data;
+           
+            return Ok(objDetail);
+        }
 
     }
 }

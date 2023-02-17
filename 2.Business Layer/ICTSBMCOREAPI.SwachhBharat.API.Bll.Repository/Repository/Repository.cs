@@ -90,6 +90,84 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
         }
 
+        public async Task<GisLoginResult> GisLoginAsync(string userLoginId, string userPassword)
+        {
+            GisLoginResult GisuserDetails = new GisLoginResult();
+            try
+            {
+                using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
+                {
+                    // Check the User exists
+                    var GIS_CON = dbMain.AspNetGisUsers.Where(c => c.UserName == userLoginId && c.Password == userPassword).FirstOrDefault();
+
+                    if(GIS_CON != null)
+                    {
+                        var UserId = await dbMain.UserInApps.Where(a => a.AppId == GIS_CON.AppId).Select(a => a.UserId).FirstOrDefaultAsync();
+                        string Email = string.Empty;
+                        //var result = await _signInManager.PasswordSignInAsync(signInModel.Email, signInModel.Password, false, false);
+                        if (!string.IsNullOrEmpty(UserId))
+                        {
+                            Email = await dbMain.AspNetUsers.Where(a => a.Id == UserId).Select(a => a.Email).FirstOrDefaultAsync();
+                        }
+
+                        if (string.IsNullOrEmpty(Email))
+                        {
+                            return null;
+                        }
+                        var authClaims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.Name,Email),
+                             new Claim("AppId",GIS_CON.AppId.ToString()),
+                            new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
+                        };
+
+                        var authSigninkey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]));
+                        var token = new JwtSecurityToken(
+                            issuer: _configuration["JWT:ValidIssuer"],
+                            audience: _configuration["JWT:ValidAudience"],
+                            expires: DateTime.Now.AddHours(12),
+                            claims: authClaims,
+                            signingCredentials: new SigningCredentials(authSigninkey, SecurityAlgorithms.HmacSha256Signature));
+
+
+                        logindata data = new logindata();
+                        data.Appid = GIS_CON.AppId;
+                        data.token = new JwtSecurityTokenHandler().WriteToken(token);
+
+                        GisuserDetails.code = 200;
+                        GisuserDetails.Status = "Success";
+                        GisuserDetails.Message = "Login Successfully Done";
+                        GisuserDetails.timestamp = DateTime.Now.ToString();
+                        GisuserDetails.data = data;
+
+                    }
+                    else
+                    {
+                       
+
+                        GisuserDetails.code = 200;
+                        GisuserDetails.Status = "Failed";
+                        GisuserDetails.Message = "Enter Username And Password Does Not Match";
+                        GisuserDetails.timestamp = DateTime.Now.ToString();
+                        GisuserDetails.data = null;
+                    }
+                    return GisuserDetails;
+                }
+                   
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+
+                GisuserDetails.code = 400;
+                GisuserDetails.Status = "Failed";
+                GisuserDetails.Message = ex.Message.ToString();
+                GisuserDetails.timestamp = DateTime.Now.ToString();
+                GisuserDetails.data = null;
+                return GisuserDetails;
+            }
+        }
+
         public async Task<SBUser> CheckUserLoginAsync(string userName, string password, string imi, int AppId, string EmpType)
         {
             SBUser user = new SBUser();
@@ -5835,6 +5913,24 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
             using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
             {
+                if ((string.IsNullOrEmpty(obj.startLat)) == true && (string.IsNullOrEmpty(obj.startLong)) == true && type == 0)
+                {
+                    result.status = "error";
+                    result.message = "Your start Lat / Long are Empty ";
+                    result.messageMar = "तुमची सुरुवात लॅट / लॉन्ग  रिक्त आहेत";
+                    return result;
+                }
+
+
+
+                if ((string.IsNullOrEmpty(obj.endLat)) == true && (string.IsNullOrEmpty(obj.endLong)) == true && type == 1)
+                {
+                    result.status = "error";
+                    result.message = "Your End Lat / Long are Empty ";
+                    result.messageMar = "तुमचा शेवट लॅट / लॉन्ग रिक्त आहेत";
+                    return result;
+                }
+
                 if (type == 0)
                 {
                     //Daily_Attendance data = db.Daily_Attendance.Where(c => c.daDate == EntityFunctions.TruncateTime(obj.daDate) && c.userId == obj.userId && (c.endTime == null || c.endTime == "")).FirstOrDefault();
