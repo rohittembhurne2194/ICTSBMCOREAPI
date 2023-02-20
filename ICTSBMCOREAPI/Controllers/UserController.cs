@@ -2541,27 +2541,29 @@ namespace ICTSBMCOREAPI.Controllers
                                         var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
                                         var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
 
-
-                                        var result1 = myresult.Select(i =>
+                                        if (house != null)
                                         {
-                                            if (i.id == house.dyId)
+                                            var result1 = myresult.Select(i =>
                                             {
-                                                //i.ReferanceId = house.ReferanceId;
-                                                //i.HouseOwnerName = house.houseOwner;
-                                                //i.HouseOwnerMobileNo = house.houseOwnerMobile;
-                                                //i.HouseAddress = house.houseAddress;
-                                                //i.CreateEmployeeName = EmployeeName.qrEmpName.ToString();
-                                                //if(Update_EmployeeName != null)
-                                                //{
-                                                //    i.UpdateEmployeeName = Update_EmployeeName.qrEmpName.ToString();
 
-                                                //}
-                                                //else
-                                                //{
-                                                //    i.UpdateEmployeeName = "";
-                                                //}
+                                                if (i.id == house.dyId)
+                                                {
+                                                    //i.ReferanceId = house.ReferanceId;
+                                                    //i.HouseOwnerName = house.houseOwner;
+                                                    //i.HouseOwnerMobileNo = house.houseOwnerMobile;
+                                                    //i.HouseAddress = house.houseAddress;
+                                                    //i.CreateEmployeeName = EmployeeName.qrEmpName.ToString();
+                                                    //if(Update_EmployeeName != null)
+                                                    //{
+                                                    //    i.UpdateEmployeeName = Update_EmployeeName.qrEmpName.ToString();
 
-                                                var value = new List<HouseProperty> {
+                                                    //}
+                                                    //else
+                                                    //{
+                                                    //    i.UpdateEmployeeName = "";
+                                                    //}
+
+                                                    var value = new List<HouseProperty> {
                                                     new HouseProperty { name = "ReferanceId", value = house.ReferanceId, type = "String", Index = 0 },
                                                     new HouseProperty { name = "Create Employee Name", value = (EmployeeName == null ? "" : EmployeeName.qrEmpName.ToString()), type = "String", Index = 1 },
                                                     new HouseProperty { name = "Update Employee Name", value = (Update_EmployeeName == null ? "" : Update_EmployeeName.qrEmpName.ToString()), type = "String", Index = 2 },
@@ -2569,12 +2571,14 @@ namespace ICTSBMCOREAPI.Controllers
                                                 };
 
 
-                                                i.HouseProperty = value;
+                                                    i.HouseProperty = value;
+                                                    return i;
+                                                }
                                                 return i;
-                                            }
-                                            return i;
 
-                                        }).Where(i => i.id == house.dyId).ToList();
+                                            }).Where(i => i.id == house.dyId).ToList();
+                                        }
+                                        
 
                                     }
                                 }
