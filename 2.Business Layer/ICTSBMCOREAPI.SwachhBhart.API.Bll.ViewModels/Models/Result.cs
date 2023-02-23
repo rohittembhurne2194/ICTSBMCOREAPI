@@ -6,6 +6,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
 {
     public class Result
     {
+        public int code { get; set; }
         public string status { get; set; }
         public string message { get; set; }
         public string gismessage { get; set; }

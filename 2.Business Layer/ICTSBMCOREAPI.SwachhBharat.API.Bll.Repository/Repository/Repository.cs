@@ -6742,6 +6742,11 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         int rowsAffected = cmd.ExecuteNonQuery();
 
                                         con.Close();
+
+                                        result.code = 201;
+                                        result.message = "Created";
+                                        result.status = "Success";
+                                        return result;
                                     }
                                 }
                                 //var data = await db.HouseTrail_Insert_Results.FromSqlRaw<HouseTrail_Insert_Result>("EXEC HouseTrail_Insert @Id,@Start_ts,@End_ts,@Create_user,@Create_ts,@Update_user,@Update_ts,@geom", parms.ToArray()).ToListAsync();

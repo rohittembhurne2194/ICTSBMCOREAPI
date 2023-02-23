@@ -655,6 +655,12 @@ namespace ICTSBMCOREAPI.Controllers
 
 
                         objDetail1 = await objRep.SaveGarbageTrail(obj, AppId);
+
+                        //if(objDetail1.status == "Success")
+                        //{
+
+                        //}
+                    
                         //foreach (var item in obj)
                         //{
                         //    tn.id = item.id;
