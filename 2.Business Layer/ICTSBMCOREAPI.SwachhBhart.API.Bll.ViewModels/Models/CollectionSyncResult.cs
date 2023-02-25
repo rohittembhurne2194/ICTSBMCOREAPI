@@ -7,6 +7,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
     public class CollectionSyncResult
     {
         public int ID { get; set; }
+        public int code { get; set; }
         public string status { get; set; }
         public string message { get; set; }
         public string messageMar { get; set; }
@@ -15,7 +16,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public bool IsExist { get; set; }
         public string giserrorMessages { get; set; }
         public string referenceID { get; set; }
-
+        public string timestamp { get; set; }
 
 
     }

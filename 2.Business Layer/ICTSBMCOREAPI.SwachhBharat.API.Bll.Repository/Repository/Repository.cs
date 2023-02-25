@@ -7571,8 +7571,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                                     objDetail.Add(new DumpTripStatusResult()
                                                     {
                                                         code = (int)response.StatusCode,
-                                                        status = "Success",
-                                                        message = "Created",
+                                                        status = dynamicobject2.status.ToString(),
+                                                        message = dynamicobject2.message.ToString(),
                                                         errorMessages = dynamicobject2.errorMessages.ToString(),
                                                         timestamp = DateTime.Now.ToString(),
                                                         data = dynamicobject2.data
@@ -7585,22 +7585,26 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                                                 else
                                                 {
-                                                    objDetail.Add(new DumpTripStatusResult()
+                                                    var responseString = await response.Content.ReadAsStringAsync();
+                                                    var dynamicobject2 = JsonConvert.DeserializeObject<dynamic>(responseString);
+                                                    myresult.Add(new CollectionSyncResult()
                                                     {
                                                         code = (int)response.StatusCode,
-                                                        status = "Failed",
-                                                        message = "Failed",
+                                                        status = dynamicobject2.status.ToString(),
+                                                        message = dynamicobject2.message.ToString(),
                                                         timestamp = DateTime.Now.ToString()
                                                     });
                                                 }
                                             }
                                             else
                                             {
-                                                objDetail.Add(new DumpTripStatusResult()
+                                                var responseString1 = await response1.Content.ReadAsStringAsync();
+                                                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString1);
+                                                myresult.Add(new CollectionSyncResult()
                                                 {
                                                     code = (int)response1.StatusCode,
-                                                    status = "Failed",
-                                                    message = "Failed",
+                                                    status = dynamicobject.status.ToString(),
+                                                    message = dynamicobject.message.ToString(),
                                                     timestamp = DateTime.Now.ToString()
                                                 });
                                             }
@@ -7608,7 +7612,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         else
                                         {
 
-                                            objDetail.Add(new DumpTripStatusResult()
+                                            myresult.Add(new CollectionSyncResult()
                                             {
                                                 code = 404,
                                                 status = "Failed",
@@ -7620,7 +7624,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     }
                                     catch (Exception ex)
                                     {
-                                        objDetail.Add(new DumpTripStatusResult()
+                                        myresult.Add(new CollectionSyncResult()
                                         {
                                             code = 400,
                                             status = "Failed",
@@ -7638,6 +7642,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 {
                                     myresult.Add(new CollectionSyncResult()
                                     {
+                                        code = 400,
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "error",
                                         message = "Invalid House ID",
@@ -7652,6 +7657,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         {
                             myresult.Add(new CollectionSyncResult()
                             {
+                                code = 400,
                                 ID = Convert.ToInt32(item.OfflineId),
                                 status = "Error",
                                 message = "Your outside the area,please go to inside the area.. ",
@@ -7673,6 +7679,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     _logger.LogError(ex.ToString(), ex);
                     myresult.Add(new CollectionSyncResult()
                     {
+                        code = 400,
                         ID = 0,
                         //  message = "Something is wrong,Try Again.. ",
                         message = ex.Message,

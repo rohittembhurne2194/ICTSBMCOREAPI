@@ -654,7 +654,7 @@ namespace ICTSBMCOREAPI.Controllers
                         Result objDetail1 = new();
 
 
-                        objDetail1 = await objRep.SaveGarbageTrail(obj, AppId);
+                       // objDetail1 = await objRep.SaveGarbageTrail(obj, AppId);
 
                         //if(objDetail1.status == "Success")
                         //{
@@ -838,7 +838,7 @@ namespace ICTSBMCOREAPI.Controllers
                         Result objDetail1 = new();
 
 
-                        objDetail1 = await objRep.SaveHouseTrail(obj, AppId);
+                       // objDetail1 = await objRep.SaveHouseTrail(obj, AppId);
 
                         //foreach (var item in obj)
                         //{
