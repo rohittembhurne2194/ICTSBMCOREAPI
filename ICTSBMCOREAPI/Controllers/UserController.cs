@@ -2193,10 +2193,23 @@ namespace ICTSBMCOREAPI.Controllers
 
                                 foreach (var x in data)
                                 {
+
                                     if (x.houseId > 0)
                                     {
                                         DateTime dt = DateTime.Parse(x.gcDate == null ? DateTime.Now.ToString() : x.gcDate.ToString());
                                         //string gcTime = x.gcDate.ToString();
+                                        double X = Convert.ToDouble(x.houseLong);
+                                        double Y = Convert.ToDouble(x.houseLat);
+
+                                        double[] latlong = { Convert.ToDouble(x.houseLong), Convert.ToDouble(x.houseLat) };
+                                        var value = new List<GeomProperty> {
+                                                    new GeomProperty { type = "Point", coordinates = latlong  }
+                                                };
+
+
+
+                                       
+
                                         houseLocation.Add(new HouseOnMapVM()
                                         {
                                             //dyid = Convert.ToInt32(x.dyid),
@@ -2214,12 +2227,14 @@ namespace ICTSBMCOREAPI.Controllers
                                                                              //myDateTime.ToString("HH:mm:ss")
                                             ///date = Convert.ToDateTime(x.datt).ToString("dd/MM/yyyy"),
                                             //time = Convert.ToDateTime(x.datt).ToString("hh:mm:ss tt"),
-                                            //houseLat = x.houseLat,
-                                            //houseLong = x.houseLong,
+                                            //houseLat = Convert.ToDouble(x.houseLat),
+                                            //houseLong = Convert.ToDouble(x.houseLong),
                                             // address = x.houseAddress,
                                             //vehcileNumber = x.v,
                                             //userMobile = x.mobile,
                                             garbageType = x.garbageType,
+
+                                            geom = value,
                                         });
                                     }
 

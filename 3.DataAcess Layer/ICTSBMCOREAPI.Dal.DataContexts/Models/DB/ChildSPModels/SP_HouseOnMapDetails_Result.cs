@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,7 +28,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildSPModels
 
         public string houseLat { get; set; }
         public string houseLong { get; set; }
-        
+
 
 
         //public string userName { get; set; }
@@ -43,5 +45,10 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildSPModels
         //public int areaId { get; set; }
         //public int BeatId { get; set; }
         //public bool IsIn { get; set; }
+       
     }
+
+
+
+  
 }

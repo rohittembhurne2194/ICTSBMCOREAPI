@@ -88,6 +88,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB
             modelBuilder.Entity<SP_DumpYardDetailsApp_Result>().HasNoKey();
             modelBuilder.Entity<SP_LiquidDetailsApp_Result>().HasNoKey();
             modelBuilder.Entity<SP_StreetDetailsApp_Result>().HasNoKey();
+            modelBuilder.Entity<SP_HouseOnMapDetails_Result>().HasNoKey();
 
         }
     }
