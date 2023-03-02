@@ -6,6 +6,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
 {
     public class Result
     {
+        public int code { get; set; }
         public string status { get; set; }
         public string message { get; set; }
         public string gismessage { get; set; }
@@ -22,5 +23,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public bool IsExixts { get; set; }
         public string referenceID { get; set; }
         public int dyId { get; set; }
+
+        public int Id {get; set;}
     }
 }

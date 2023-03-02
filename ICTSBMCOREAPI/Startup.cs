@@ -97,13 +97,14 @@ namespace ICTSBMCOREAPI
     
             services.AddCors(p => p.AddPolicy("MyCorsPolicy", build =>
              {
-                 build.WithOrigins("http://114.143.244.130:8080").AllowAnyHeader().WithMethods("GET","POST");
+                 build.WithOrigins("http://114.143.244.130:8080", "https://coreapi.ictsbm.com").AllowAnyHeader().WithMethods("GET","POST");
              }));
 
             services.AddControllers()
         .AddJsonOptions(options =>
             options.JsonSerializerOptions.Converters.Add(new TimeSpanToStringConverter()));
 
+          
 
         }
         public class TimeSpanToStringConverter : JsonConverter<TimeSpan>

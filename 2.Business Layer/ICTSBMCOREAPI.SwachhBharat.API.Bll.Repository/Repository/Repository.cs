@@ -6690,6 +6690,103 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 }
             }
         }
+        public async Task<Result> SaveGarbageTrail(Trial obj, int AppId)
+        {
+            Result result = new Result();
+
+
+            using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+            using (DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities())
+            {
+                try
+                {
+                    var appdetails = await dbMain.AppDetails.Where(c => c.AppId == AppId).FirstOrDefaultAsync();
+                    DateTime Dateeee = DateTime.Now;
+                    var atten = await db.Daily_Attendances.Where(c => c.userId == obj.createUser && EF.Functions.DateDiffDay(c.daDate, Dateeee) == 0).FirstOrDefaultAsync();
+                    var Activeuser = await db.UserMasters.Where(c => c.userId == obj.createUser).FirstOrDefaultAsync();
+                    if (Activeuser.isActive == false)
+                    {
+                        result.message = "Contact To Administrator";
+                        result.messageMar = "प्रशासकाशी संपर्क साधा.";
+                        result.status = "error";
+                        return result;
+                    }
+                    else if (atten != null)
+                    {
+                        using (SqlConnection connection = new SqlConnection(db.Database.GetDbConnection().ConnectionString))
+                        {
+                            connection.Open();
+
+                            var command = connection.CreateCommand();
+
+                            const string CheckIfTableExistsStatement = "SELECT * FROM sys.objects WHERE name = N'GarbageTrail_Insert'";
+                            command.CommandText = CheckIfTableExistsStatement;
+                            var executeScalar = command.ExecuteScalar();
+                            if (executeScalar != null)
+                            {
+                                CultureInfo culture = new CultureInfo("en-US");
+
+                                DateTime sts = Convert.ToDateTime(obj.startTs, culture);
+                                DateTime ets = Convert.ToDateTime(obj.endTs, culture);
+                                DateTime cts = Convert.ToDateTime(obj.createTs, culture);
+                                DateTime uts = Convert.ToDateTime(obj.updateTs, culture);
+
+
+
+                                using (SqlConnection con = new SqlConnection(db.Database.GetDbConnection().ConnectionString))
+                                {
+                                    using (SqlCommand cmd = new SqlCommand("GarbageTrail_Insert", con))
+                                    {
+                                        cmd.CommandType = CommandType.StoredProcedure;
+
+                                        cmd.Parameters.Add("@Id", SqlDbType.NVarChar).Value = obj.id;
+                                        cmd.Parameters.Add("@Start_ts", SqlDbType.DateTime).Value = sts;
+                                        cmd.Parameters.Add("@End_ts", SqlDbType.DateTime).Value = ets;
+                                        cmd.Parameters.Add("@Create_user", SqlDbType.Int).Value = obj.createUser;
+                                        cmd.Parameters.Add("@Create_ts", SqlDbType.DateTime).Value = cts;
+                                        cmd.Parameters.Add("@Update_user", SqlDbType.Int).Value = obj.updateUser;
+                                        cmd.Parameters.Add("@Update_ts", SqlDbType.DateTime).Value = uts;
+                                        cmd.Parameters.Add("@geom", SqlDbType.NVarChar).Value = obj.geom;
+
+                                        con.Open();
+                                        int rowsAffected = cmd.ExecuteNonQuery();
+
+                                        con.Close();
+
+                                        result.code = 201;
+                                        result.message = "Created";
+                                        result.status = "Success";
+                                        return result;
+                                    }
+                                }
+                                //var data = await db.HouseTrail_Insert_Results.FromSqlRaw<HouseTrail_Insert_Result>("EXEC HouseTrail_Insert @Id,@Start_ts,@End_ts,@Create_user,@Create_ts,@Update_user,@Update_ts,@geom", parms.ToArray()).ToListAsync();
+
+                            }
+                            connection.Close();
+                        }
+
+
+                    }
+                    else
+                    {
+                        result.message = "Your duty is currently off, please start again.. ";
+                        result.messageMar = "आपली ड्यूटी सध्या बंद आहे, कृपया पुन्हा सुरू करा..";
+                        result.status = "error";
+                        return result;
+                    }
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString(), ex);
+                    result.message = "Something is wrong,Try Again.. ";
+                    result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
+                    //result.name = "";
+                    result.status = "error";
+                    return result;
+                }
+            }
+        }
 
         //private TrailHouse FillHouseTrailDataModel(Trial obj)
         //{
@@ -7484,8 +7581,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                                     objDetail.Add(new DumpTripStatusResult()
                                                     {
                                                         code = (int)response.StatusCode,
-                                                        status = "Success",
-                                                        message = "Created",
+                                                        status = dynamicobject2.status.ToString(),
+                                                        message = dynamicobject2.message.ToString(),
                                                         errorMessages = dynamicobject2.errorMessages.ToString(),
                                                         timestamp = DateTime.Now.ToString(),
                                                         data = dynamicobject2.data
@@ -7498,22 +7595,26 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                                                 else
                                                 {
-                                                    objDetail.Add(new DumpTripStatusResult()
+                                                    var responseString = await response.Content.ReadAsStringAsync();
+                                                    var dynamicobject2 = JsonConvert.DeserializeObject<dynamic>(responseString);
+                                                    myresult.Add(new CollectionSyncResult()
                                                     {
                                                         code = (int)response.StatusCode,
-                                                        status = "Failed",
-                                                        message = "Failed",
+                                                        status = dynamicobject2.status.ToString(),
+                                                        message = dynamicobject2.message.ToString(),
                                                         timestamp = DateTime.Now.ToString()
                                                     });
                                                 }
                                             }
                                             else
                                             {
-                                                objDetail.Add(new DumpTripStatusResult()
+                                                var responseString1 = await response1.Content.ReadAsStringAsync();
+                                                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString1);
+                                                myresult.Add(new CollectionSyncResult()
                                                 {
                                                     code = (int)response1.StatusCode,
-                                                    status = "Failed",
-                                                    message = "Failed",
+                                                    status = dynamicobject.status.ToString(),
+                                                    message = dynamicobject.message.ToString(),
                                                     timestamp = DateTime.Now.ToString()
                                                 });
                                             }
@@ -7521,7 +7622,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         else
                                         {
 
-                                            objDetail.Add(new DumpTripStatusResult()
+                                            myresult.Add(new CollectionSyncResult()
                                             {
                                                 code = 404,
                                                 status = "Failed",
@@ -7533,7 +7634,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     }
                                     catch (Exception ex)
                                     {
-                                        objDetail.Add(new DumpTripStatusResult()
+                                        myresult.Add(new CollectionSyncResult()
                                         {
                                             code = 400,
                                             status = "Failed",
@@ -7551,6 +7652,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 {
                                     myresult.Add(new CollectionSyncResult()
                                     {
+                                        code = 400,
                                         ID = Convert.ToInt32(item.OfflineId),
                                         status = "error",
                                         message = "Invalid House ID",
@@ -7565,6 +7667,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         {
                             myresult.Add(new CollectionSyncResult()
                             {
+                                code = 400,
                                 ID = Convert.ToInt32(item.OfflineId),
                                 status = "Error",
                                 message = "Your outside the area,please go to inside the area.. ",
@@ -7586,6 +7689,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     _logger.LogError(ex.ToString(), ex);
                     myresult.Add(new CollectionSyncResult()
                     {
+                        code = 400,
                         ID = 0,
                         //  message = "Something is wrong,Try Again.. ",
                         message = ex.Message,

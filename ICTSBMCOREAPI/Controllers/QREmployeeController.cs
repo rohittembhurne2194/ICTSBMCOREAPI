@@ -122,7 +122,7 @@ namespace ICTSBMCOREAPI.Controllers
                 double New_Lat = 0;
                 double New_Long = 0;
 
-                if(obj.new_const == 0 && gcType == 1)
+                if(obj.new_const == 0 && obj.gcType == 1)
                 {
                  
 
@@ -197,7 +197,7 @@ namespace ICTSBMCOREAPI.Controllers
                 {
                     objDetail1 = await objRep.SaveQrHPDCollectionsAsync(obj, AppId, gcType);
                 }
-               
+
                 if (objDetail1.status == "success")
                 {
                     var message = "";
@@ -229,7 +229,7 @@ namespace ICTSBMCOREAPI.Controllers
 
 
                             GisSearch stn = new GisSearch();
-                           if(gcType == 1)
+                           if(obj.gcType == 1)
                             {
                                 stn.id = objDetail1.houseid.ToString();
                                 tn.id = objDetail1.houseid.ToString();
@@ -313,17 +313,22 @@ namespace ICTSBMCOREAPI.Controllers
                                         objDetail.Add(new DumpTripStatusResult()
                                         {
                                             code = (int)response.StatusCode,
-                                            status = "Success",
+                                            status = dynamicobject.status.ToString(),
                                             message = dynamicobject.message.ToString(),
                                             errorMessages = dynamicobject.errorMessages.ToString(),
                                             timestamp = DateTime.Now.ToString(),
                                             data = dynamicobject.data
                                         });
-                                        //objDetail1.gismessage = dynamicobject.message.ToString();
-                                        //objDetail1.giserrorMessages = dynamicobject.errorMessages.ToString();
+
+                                        objDetail1.code = (int)response.StatusCode;
+                                        objDetail1.gismessage = dynamicobject.message.ToString();
+                                        objDetail1.giserrorMessages = dynamicobject.errorMessages.ToString();
                                     }
                                     else
                                     {
+                                        var responseString = await response.Content.ReadAsStringAsync();
+                                        var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+
                                         objDetail.Add(new DumpTripStatusResult()
                                         {
                                             code = (int)response.StatusCode,
@@ -331,10 +336,15 @@ namespace ICTSBMCOREAPI.Controllers
                                             message = "",
                                             timestamp = DateTime.Now.ToString()
                                         });
+                                        objDetail1.code = (int)response.StatusCode;
+                                        objDetail1.gismessage = dynamicobject.message.ToString();
+                                        objDetail1.giserrorMessages = dynamicobject.errorMessages.ToString();
                                     }
                                 }
                                 else
                                 {
+                                    var responseString1 = await response1.Content.ReadAsStringAsync();
+                                    var dynamicobject1 = JsonConvert.DeserializeObject<dynamic>(responseString1);
                                     objDetail.Add(new DumpTripStatusResult()
                                     {
                                         code = (int)response1.StatusCode,
@@ -342,9 +352,12 @@ namespace ICTSBMCOREAPI.Controllers
                                         message = "Bad Request",
                                         timestamp = DateTime.Now.ToString()
                                     });
+                                    objDetail1.code = (int)response1.StatusCode;
+                                    objDetail1.gismessage = dynamicobject1.message.ToString();
+                                    objDetail1.giserrorMessages = dynamicobject1.errorMessages.ToString();
                                 }
                             }
-                           else if(gcType == 3)
+                           else if(obj.gcType == 3)
                             {
                                 stn.id = objDetail1.dyId.ToString();
                                 tn.id = objDetail1.dyId.ToString();
@@ -413,6 +426,7 @@ namespace ICTSBMCOREAPI.Controllers
                                             timestamp = DateTime.Now.ToString(),
                                             data = dynamicobject.data
                                         });
+
                                         //objDetail1.gismessage = dynamicobject.message.ToString();
                                         //objDetail1.giserrorMessages = dynamicobject.errorMessages.ToString();
                                     }
@@ -436,6 +450,8 @@ namespace ICTSBMCOREAPI.Controllers
                                         message = "Bad Request",
                                         timestamp = DateTime.Now.ToString()
                                     });
+                                    objDetail1.gismessage = "Failed";
+                                    objDetail1.giserrorMessages = "Bad Request";
                                 }
                             }
                         }
@@ -449,7 +465,9 @@ namespace ICTSBMCOREAPI.Controllers
                                 message = "GIS Connection Are Not Available",
                                 timestamp = DateTime.Now.ToString()
                             });
-                           
+                            objDetail1.code = 404;
+                            objDetail1.gismessage = "Failed";
+                            objDetail1.giserrorMessages = "GIS Connection Are Not Available";
                         }
                     }
                     catch (Exception ex)
@@ -461,12 +479,18 @@ namespace ICTSBMCOREAPI.Controllers
                             message = ex.Message.ToString(),
                             timestamp = DateTime.Now.ToString()
                         });
-                       
+                        objDetail1.code = 400;
+                        objDetail1.gismessage = "Failed";
+                        objDetail1.giserrorMessages = ex.Message.ToString();
                     }
 
                     // }
                     //   return objDetail;
                 }
+
+                objDetail1.Id = obj.OfflineId;
+                //objDetail1.gismessage = "Test";
+                //objDetail1.giserrorMessages = "Test Error";
                 return objDetail1;
             }
             else
@@ -497,6 +521,7 @@ namespace ICTSBMCOREAPI.Controllers
             {
                 List<CollectionSyncResult> objDetail = new List<CollectionSyncResult>();
                 objDetail = await objRep.SaveQrHPDCollectionsOfflineAsync(obj, AppId);
+              
                 return objDetail;
             }
             else
