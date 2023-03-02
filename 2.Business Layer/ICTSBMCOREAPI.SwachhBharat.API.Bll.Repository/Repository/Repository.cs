@@ -4212,7 +4212,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 catch (Exception ex)
                 {
                     _logger.LogError(ex.ToString(), ex);
-                    result.message = "Something is wrong,Try Again.. ";
+                    //result.message = "Something is wrong,Try Again.. ";
+                    result.message = ex.Message;
                     result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
                     result.status = "error";
                     return result;
@@ -4511,7 +4512,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 catch (Exception ex)
                 {
                     _logger.LogError(ex.ToString(), ex);
-                    result.message = "Something is wrong,Try Again.. ";
+                    // result.message = "Something is wrong,Try Again.. ";
+                    result.message = ex.Message;
                     result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
                     result.status = "error";
                     return result;
@@ -4810,7 +4812,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 catch (Exception ex)
                 {
                     _logger.LogError(ex.ToString(), ex);
-                    result.message = "Something is wrong,Try Again.. ";
+                    // result.message = "Something is wrong,Try Again.. ";
+                    result.message = ex.Message;
                     result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
                     result.status = "error";
                     return result;
@@ -5108,7 +5111,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 catch (Exception ex)
                 {
                     _logger.LogError(ex.ToString(), ex);
-                    result.message = "Something is wrong,Try Again.. ";
+                    //result.message = "Something is wrong,Try Again.. ";
+                    result.message = ex.Message;
                     result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
                     result.status = "error";
                     return result;
@@ -5433,7 +5437,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 catch (Exception ex)
                 {
                     _logger.LogError(ex.ToString(), ex);
-                    result.message = "Something is wrong,Try Again.. ";
+                    // result.message = "Something is wrong,Try Again.. ";
+                    result.message = ex.Message;
                     result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
                     result.status = "error";
                     return result;
@@ -5733,7 +5738,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 catch (Exception ex)
                 {
                     _logger.LogError(ex.ToString(), ex);
-                    result.message = "Something is wrong,Try Again.. ";
+                    // result.message = "Something is wrong,Try Again.. ";
+                    result.message = ex.Message;
                     result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
                     result.status = "error";
                     return result;
@@ -5897,7 +5903,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     result.ID = 0;
                     result.status = "error";
                     result.message = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
-                    result.messageMar = "Something is wrong,Try Again.. ";
+                    //result.messageMar = "Something is wrong,Try Again.. ";
+                    result.message = ex.Message;
 
                     return result;
                 }
@@ -5981,7 +5988,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     {
                         _logger.LogError(ex.ToString(), ex);
                         result.status = "error";
-                        result.message = "Something is wrong,Try Again.. ";
+                        //result.message = "Something is wrong,Try Again.. ";
+                        result.message = ex.Message;
                         result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
                         return result;
                     }
@@ -6071,7 +6079,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     {
                         _logger.LogError(ex.ToString(), ex);
                         result.status = "error";
-                        result.message = "Something is wrong,Try Again.. ";
+                        result.message = ex.Message;
+                        //result.message = "Something is wrong,Try Again.. ";
                         result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
                         return result;
                     }
@@ -6578,7 +6587,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 catch (Exception ex)
                 {
                     _logger.LogError(ex.ToString(), ex);
-                    result.message = "Something is wrong,Try Again.. ";
+                    result.message = ex.Message;
+                    //result.message = "Something is wrong,Try Again.. ";
                     result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
                     //result.name = "";
                     result.status = "error";
