@@ -2098,8 +2098,8 @@ namespace ICTSBMCOREAPI.Controllers
                 {
                     var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
 
-                    if (GIS_CON != null)
-                    {
+                    //if (GIS_CON != null)
+                    //{
                         var gis_url = GIS_CON.DataSource;
                         var gis_DBName = GIS_CON.InitialCatalog;
                         var gis_username = GIS_CON.UserId;
@@ -2194,7 +2194,7 @@ namespace ICTSBMCOREAPI.Controllers
                                 foreach (var x in data)
                                 {
 
-                                    if (x.houseId > 0)
+                                    if (x.houseId > 0 || x.dyid > 0)
                                     {
                                         DateTime dt = DateTime.Parse(x.gcDate == null ? DateTime.Now.ToString() : x.gcDate.ToString());
                                         //string gcTime = x.gcDate.ToString();
@@ -2206,19 +2206,27 @@ namespace ICTSBMCOREAPI.Controllers
                                                     new GeomProperty { type = "Point", coordinates = latlong  }
                                                 };
 
+                                        var housevalue = new List<HouseProperty> {
+                                                    new HouseProperty { name = "ReferanceId", value = x.ReferanceId, type = "String", Index = 0 },
+                                                    new HouseProperty { name = "House Owner Name", value = (x.houseOwner ?? ""), type = "String", Index = 1 },
+                                                    new HouseProperty { name = "House Owner Mobile No.", value = (x.houseOwnerMobile ?? ""), type = "String", Index = 2 },
+                                                    new HouseProperty { name = "House Address", value = x.houseAddress, type = "String", Index = 3 }
+                                                };
 
 
-                                       
+                                        
+
+
 
                                         houseLocation.Add(new HouseOnMapVM()
                                         {
-                                            //dyid = Convert.ToInt32(x.dyid),
+                                            dyid = Convert.ToInt32(x.dyid),
                                             //ssid = Convert.ToInt32(x.ssid),
                                             //lwid = Convert.ToInt32(x.lwid),
                                             houseId = Convert.ToInt32(x.houseId),
-                                            ReferanceId = x.ReferanceId,
-                                            houseOwner = (x.houseOwner ?? ""),
-                                            houseOwnerMobile = (x.houseOwnerMobile ?? ""),
+                                            //ReferanceId = x.ReferanceId,
+                                            //houseOwner = (x.houseOwner ?? ""),
+                                            //houseOwnerMobile = (x.houseOwnerMobile ?? ""),
                                             // houseAddress = checkNull(x.houseAddress).Replace("Unnamed Road, ", ""),
                                             gcDate = dt.ToString("dd-MM-yyyy"),
                                             gcTime = dt.ToString("h:mm tt"), // 7:00 AM // 12 hour clock
@@ -2235,6 +2243,7 @@ namespace ICTSBMCOREAPI.Controllers
                                             garbageType = x.garbageType,
 
                                             geom = value,
+                                            HouseProperty = housevalue,
                                         });
                                     }
 
@@ -2260,18 +2269,18 @@ namespace ICTSBMCOREAPI.Controllers
                         }
                         result = objDetail;
                         return Ok(result);
-                    }
-                    else
-                    {
+                    //}
+                    //else
+                    //{
 
-                        objDetail.code = 404;
-                        objDetail.status = "Failed";
-                        objDetail.message = "GIS Connection Are Not Available";
-                        objDetail.timestamp = DateTime.Now.ToString();
+                    //    objDetail.code = 404;
+                    //    objDetail.status = "Failed";
+                    //    objDetail.message = "GIS Connection Are Not Available";
+                    //    objDetail.timestamp = DateTime.Now.ToString();
 
-                        result = objDetail;
-                        return NotFound(result);
-                    }
+                    //    result = objDetail;
+                    //    return NotFound(result);
+                    //}
                 }
                 catch (Exception ex)
                 {

@@ -6581,6 +6581,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         //List<AppDetail> AppDetailss = dbMain.Database.SqlQuery<AppDetail>("exec [Update_Trigger]").ToList();
                         List<AppDetail> AppDetailss = dbMain.AppDetails.FromSqlRaw<AppDetail>("exec [Update_Trigger]").ToList();
 
+                        var updateappdetails = await dbMain.SP_DailyScanCount_Results.FromSqlRaw<SP_DailyScanCount_Result>($"EXEC DailyScanCount {AppId.ToString()}").ToListAsync();
                     }
                     return result;
                 }
@@ -6921,6 +6922,9 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         messageMar = "सबमिट यशस्वी",
                                         referenceID = item.ReferanceId,
                                     });
+
+                                  
+                                    
                                 }
                                 else
                                 {
@@ -6998,6 +7002,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         messageMar = "सबमिट यशस्वी",
                                         referenceID = item.ReferanceId,
                                     });
+                                  
+
                                 }
                                 else
                                 {
@@ -7074,7 +7080,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         messageMar = "सबमिट यशस्वी",
                                         referenceID = item.ReferanceId,
                                     });
-
+                                 
+                                    
                                     //GIS Code Start (28-12-2022)
 
                                     Result objDetail1 = new Result();
@@ -7304,6 +7311,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         messageMar = "सबमिट यशस्वी",
                                         referenceID = item.ReferanceId,
                                     });
+                                 
+                                    
                                 }
                                 else
                                 {
@@ -7403,7 +7412,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         referenceID = item.ReferanceId,
                                     });
 
-
+                                
                                     //GIS Code Start (28-12-2022)
 
                                     double New_Lat = 0;
@@ -7662,6 +7671,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 }
 
                             }
+
+                     
                         }
                         else
                         {
@@ -7679,6 +7690,18 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         }
 
                     }
+
+
+                    if (appdetails != null)
+                    {
+                        appdetails.FAQ = "1";
+                        await dbMain.SaveChangesAsync();
+                    }
+                    //List<AppDetail> AppDetailss = dbMain.Database.SqlQuery<AppDetail>("exec [Update_Trigger]").ToList();
+                    List<AppDetail> AppDetailss = dbMain.AppDetails.FromSqlRaw<AppDetail>("exec [Update_Trigger]").ToList();
+
+                    var updateappdetails = await dbMain.SP_DailyScanCount_Results.FromSqlRaw<SP_DailyScanCount_Result>($"EXEC DailyScanCount {AppId.ToString()}").ToListAsync();
+
 
                     return myresult;
 

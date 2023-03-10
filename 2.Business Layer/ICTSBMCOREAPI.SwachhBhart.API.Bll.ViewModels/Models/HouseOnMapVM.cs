@@ -12,11 +12,11 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public int houseId { get; set; }
         //public int lwid { get; set; }
         //public int ssid { get; set; }
-        //public int dyid { get; set; }
-        public string ReferanceId { get; set; }
+        public int dyid { get; set; }
+        //public string ReferanceId { get; set; }
         //public string houseNumber { get; set; }
-        public string houseOwner { get; set; }
-        public string houseOwnerMobile { get; set; }
+        //public string houseOwner { get; set; }
+        //public string houseOwnerMobile { get; set; }
         //public string houseAddress { get; set; }
         public Nullable<int> garbageType { get; set; }
         public string gcDate { get; set; }
@@ -25,6 +25,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         //public double houseLat { get; set; }
         //public double houseLong { get; set; }
         public dynamic geom { get; set; }
+        public dynamic HouseProperty { get; set; }
     }
 
  
