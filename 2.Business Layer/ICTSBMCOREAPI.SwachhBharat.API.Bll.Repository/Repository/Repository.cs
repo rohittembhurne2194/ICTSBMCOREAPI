@@ -13707,5 +13707,193 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             return lstCord;
         }
 
+        public async Task<CollectionSyncResult>SaveSurveyDetails(SurveyFormDetails obj, int AppId)
+        {
+            CollectionSyncResult result = new CollectionSyncResult();
+            SurveyFormDetail objdata = new SurveyFormDetail();
+
+            using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+            {
+                try
+                {
+                    if (obj.ReferanceId != null)
+                    {
+                        var model = await db.SurveyFormDetails.Where(c => c.ReferanceId == obj.ReferanceId).FirstOrDefaultAsync();
+                        if (model != null)
+                        {
+
+                            model.ReferanceId = obj.ReferanceId;
+                            model.HouseId = model.HouseId;
+                            model.Name = obj.name;
+
+                            model.HouseLat = obj.houseLat;
+                            model.HouseLong = obj.houseLong;
+                            model.MobileNumber = obj.mobileNumber;
+                            model.Age = obj.age;
+
+                            model.DateOfBirth = Convert.ToDateTime(obj.dateOfBirth);
+                            model.Gender = obj.gender;
+
+                            model.BloodGroup = obj.bloodGroup;
+                            model.Qualification = obj.qualification;
+                            model.Occupation = obj.occupation;
+                            model.MaritalStatus = obj.maritalStatus;
+                            if (obj.marriageDate != "")
+                            {
+                                model.MarriageDate = Convert.ToDateTime(obj.marriageDate);
+                            }
+
+
+                            model.LivingStatus = obj.livingStatus;
+
+                            model.TotalAdults = obj.totalAdults;
+                            model.TotalChildren = obj.totalChildren;
+                            model.TotalSrCitizen = obj.totalSrCitizen;
+                            model.TotalMember = obj.totalMember;
+
+                            model.WillingStart = obj.willingStart;
+                            model.ResourcesAvailable = obj.resourcesAvailable;
+
+                            model.MemberJobOtherCity = obj.memberJobOtherCity;
+
+                            model.NoOfVehicle = obj.noOfVehicle;
+                            model.VehicleType = obj.vehicleType;
+                            model.TwoWheelerQty = obj.twoWheelerQty;
+                            //model.threeWheelerQty = obj.threeWheelerQty;
+                            model.FourWheelerQty = obj.fourWheelerQty;
+                            model.NoPeopleVote = obj.noPeopleVote;
+                            model.SocialMedia = obj.socialMedia;
+                            model.OnlineShopping = obj.onlineShopping;
+                            model.PaymentModePrefer = obj.paymentModePrefer;
+                            model.OnlinePayApp = obj.onlinePayApp;
+                            model.Insurance = obj.insurance;
+
+                            model.UnderInsurer = obj.underInsurer;
+                            model.AyushmanBeneficiary = obj.ayushmanBeneficiary;
+                            model.BoosterShot = obj.boosterShot;
+                            model.MemberDivyang = obj.memberDivyang;
+
+                            //model.createUserId = obj.createUserId;
+                            //model.createDate = DateTime.Now;
+
+                            model.UpdateUserId = obj.updateUserId;
+                            model.UpdateDate = DateTime.Now;
+
+
+                            db.SaveChanges();
+                            result.houseId = obj.ReferanceId;
+                            result.status = "success";
+                            result.message = "Survey Details Updated Successfully";
+                            result.messageMar = "सर्वेक्षण तपशील यशस्वीरित्या अद्यतनित केले";
+                            return result;
+                        }
+                        else
+                        {
+                            var Housemodel = db.HouseMasters.Where(c => c.ReferanceId == obj.ReferanceId).FirstOrDefault();
+                            if (Housemodel != null)
+                            {
+                                objdata.ReferanceId = obj.ReferanceId;
+                                objdata.HouseId = Housemodel.houseId;
+                                objdata.Name = obj.name;
+
+                                objdata.HouseLat = obj.houseLat;
+                                objdata.HouseLong = obj.houseLong;
+                                objdata.MobileNumber = obj.mobileNumber;
+                                objdata.Age = obj.age;
+
+                                objdata.DateOfBirth = Convert.ToDateTime(obj.dateOfBirth);
+                                objdata.Gender = obj.gender;
+
+                                objdata.BloodGroup = obj.bloodGroup;
+                                objdata.Qualification = obj.qualification;
+                                objdata.Occupation = obj.occupation;
+                                objdata.MaritalStatus = obj.maritalStatus;
+                                if (obj.marriageDate != "")
+                                {
+                                    objdata.MarriageDate = Convert.ToDateTime(obj.marriageDate);
+                                }
+
+
+
+                                objdata.LivingStatus = obj.livingStatus;
+
+                                objdata.TotalAdults = obj.totalAdults;
+                                objdata.TotalChildren = obj.totalChildren;
+                                objdata.TotalSrCitizen = obj.totalSrCitizen;
+                                objdata.TotalMember = obj.totalMember;
+
+                                objdata.WillingStart = obj.willingStart;
+                                objdata.ResourcesAvailable = obj.resourcesAvailable;
+
+                                objdata.MemberJobOtherCity = obj.memberJobOtherCity;
+
+                                objdata.NoOfVehicle = obj.noOfVehicle;
+                                objdata.VehicleType = obj.vehicleType;
+                                objdata.TwoWheelerQty = obj.twoWheelerQty;
+                                //objdata.threeWheelerQty = obj.threeWheelerQty;
+                                objdata.FourWheelerQty = obj.fourWheelerQty;
+                                objdata.NoPeopleVote = obj.noPeopleVote;
+                                objdata.SocialMedia = obj.socialMedia;
+                                objdata.OnlineShopping = obj.onlineShopping;
+                                objdata.PaymentModePrefer = obj.paymentModePrefer;
+                                objdata.OnlinePayApp = obj.onlinePayApp;
+                                objdata.Insurance = obj.insurance;
+
+                                objdata.UnderInsurer = obj.underInsurer;
+                                objdata.AyushmanBeneficiary = obj.ayushmanBeneficiary;
+                                objdata.BoosterShot = obj.boosterShot;
+                                objdata.MemberDivyang = obj.memberDivyang;
+
+                                objdata.CreateUserId = obj.createUserId;
+                                objdata.CreateDate = DateTime.Now;
+
+                                //objdata.updateUserId = obj.updateUserId;
+                                //objdata.updateDate = DateTime.Now;
+
+
+                                db.SurveyFormDetails.Add(objdata);
+                                db.SaveChanges();
+
+                                result.status = "success";
+                                result.houseId = obj.ReferanceId;
+                                result.message = "Survey Details Added Successfully";
+                                result.messageMar = "सर्वेक्षण तपशील यशस्वीरित्या जोडले";
+                                return result;
+                            }
+                            else
+                            {
+                                result.houseId = obj.ReferanceId;
+                                result.message = "Invalid House ID.. ";
+                                result.messageMar = "अवैध घर आयडी..";
+                                result.status = "error";
+                                return result;
+                            }
+
+                        }
+
+                    }
+                    else
+                    {
+
+                        result.message = "House Id Is Empty.. ";
+                        result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
+                        result.status = "error";
+                        return result;
+
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    result.message = "Something is wrong,Try Again.. ";
+                    result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
+                    result.status = "error";
+                    return result;
+                }
+
+            }
+
+            return result;
+        }
     }
 }

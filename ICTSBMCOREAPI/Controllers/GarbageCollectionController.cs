@@ -563,5 +563,119 @@ namespace ICTSBMCOREAPI.Controllers
             }
 
         }
+
+        [HttpPost]
+        [Route("Save/SurveyDetails")]
+
+        public async Task<ActionResult<List<CollectionSyncResult>>> AddSurveyDetails([FromHeader] int AppId,List<SurveyFormDetails> objRaw)
+        {
+           
+            SurveyFormDetails svDetail = new SurveyFormDetails();
+            List<CollectionSyncResult> objres = new List<CollectionSyncResult>();
+            try
+            {
+                foreach (var item in objRaw)
+                {
+                    svDetail.ReferanceId = item.ReferanceId;
+                    svDetail.name = item.name;
+                    svDetail.houseLat = item.houseLat;
+                    svDetail.houseLong = item.houseLong;
+                    svDetail.mobileNumber = item.mobileNumber;
+                    svDetail.age = item.age;
+                    svDetail.dateOfBirth = item.dateOfBirth;
+                    svDetail.gender = item.gender;
+                    svDetail.bloodGroup = item.bloodGroup;
+                    svDetail.qualification = item.qualification;
+                    svDetail.occupation = item.occupation;
+                    svDetail.maritalStatus = item.maritalStatus;
+                    svDetail.marriageDate = item.marriageDate;
+                    svDetail.livingStatus = item.livingStatus;
+
+                    svDetail.totalAdults = item.totalAdults;
+                    svDetail.totalChildren = item.totalChildren;
+                    svDetail.totalSrCitizen = item.totalSrCitizen;
+                    svDetail.totalMember = item.totalMember;
+
+                    svDetail.willingStart = item.willingStart;
+                    svDetail.resourcesAvailable = item.resourcesAvailable;
+
+                    svDetail.memberJobOtherCity = item.memberJobOtherCity;
+
+                    svDetail.noOfVehicle = item.noOfVehicle;
+                    svDetail.vehicleType = item.vehicleType;
+                    svDetail.twoWheelerQty = item.twoWheelerQty;
+                    svDetail.threeWheelerQty = item.threeWheelerQty;
+                    svDetail.fourWheelerQty = item.fourWheelerQty;
+                    svDetail.noPeopleVote = item.noPeopleVote;
+                    svDetail.socialMedia = item.socialMedia;
+                    svDetail.onlineShopping = item.onlineShopping;
+                    svDetail.paymentModePrefer = item.paymentModePrefer;
+                    svDetail.onlinePayApp = item.onlinePayApp;
+                    svDetail.insurance = item.insurance;
+
+                    svDetail.underInsurer = item.underInsurer;
+                    svDetail.ayushmanBeneficiary = item.ayushmanBeneficiary;
+                    svDetail.boosterShot = item.boosterShot;
+                    svDetail.memberDivyang = item.memberDivyang;
+
+                    svDetail.createUserId = item.createUserId;
+                    svDetail.createDate = item.createDate;
+                    svDetail.updateUserId = item.updateUserId;
+                    svDetail.updateDate = item.updateDate;
+
+                    CollectionSyncResult detail = await objRep.SaveSurveyDetails(svDetail, AppId);
+
+                    if (detail.message == "")
+                    {
+                        objres.Add(new CollectionSyncResult()
+                        {
+                            ID = detail.ID,
+                            status = "error",
+                            message = "Record not inserted",
+                            messageMar = "रेकॉर्ड सबमिट केले नाही"
+                        });
+                    }
+
+                    objres.Add(new CollectionSyncResult()
+                    {
+
+                        status = detail.status,
+                        messageMar = detail.messageMar,
+                        message = detail.message,
+                        houseId = detail.houseId
+
+                    });
+
+
+
+                }
+                return objres;
+
+            }
+            catch (Exception ex)
+            {
+
+                objres.Add(new CollectionSyncResult()
+                {
+                    ID = 0,
+                    status = "error",
+                    message = "Something is wrong,Try Again.. ",
+                    messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..",
+                });
+                return objres;
+
+            }
+
+            objres.Add(new CollectionSyncResult()
+            {
+                ID = 0,
+                status = "error",
+                message = "Record not inserted",
+                messageMar = "रेकॉर्ड सबमिट केले नाही",
+            });
+
+            return objres;
+        }
+
     }
 }
