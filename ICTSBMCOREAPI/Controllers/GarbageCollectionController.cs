@@ -677,5 +677,16 @@ namespace ICTSBMCOREAPI.Controllers
             return objres;
         }
 
+        [HttpGet]
+        [Route("Get/SurveyDetails")]
+
+        public async Task<ActionResult<List<SurveyFormDetail>>>GetSurveyDetails([FromHeader] int AppId,[ FromHeader] string ReferanceId)
+        {
+           
+            List<SurveyFormDetail> objDetail = new List<SurveyFormDetail>();
+            objDetail =await objRep.GetSurveyDetailsById(AppId, ReferanceId);
+            return objDetail;
+        }
+
     }
 }

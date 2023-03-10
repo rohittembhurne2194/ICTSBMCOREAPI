@@ -13895,5 +13895,63 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
             return result;
         }
+
+        public async Task<List<SurveyFormDetail>>GetSurveyDetailsById(int AppId, string ReferanceId)
+        {
+            List<SurveyFormDetail> obj = new List<SurveyFormDetail>();
+            using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(AppId))
+            {
+                var data = await db.SurveyFormDetails.Where(c => c.ReferanceId == ReferanceId).ToListAsync();
+                foreach (var x in data)
+                {
+
+                    obj.Add(new SurveyFormDetail()
+                    {
+                        ReferanceId = x.ReferanceId,
+                        HouseId = x.HouseId,
+                        Name = x.Name,
+                        HouseLat = x.HouseLat,
+                        HouseLong = x.HouseLong,
+                        MobileNumber = x.MobileNumber,
+                        DateOfBirth = (x.DateOfBirth),
+                        Age = x.Age,
+                        Gender = x.Gender,
+                        BloodGroup = x.BloodGroup,
+                        Qualification = x.Qualification,
+                        Occupation = x.Occupation,
+                        MaritalStatus = x.MaritalStatus,
+                        MarriageDate = (x.MarriageDate),
+                        LivingStatus = x.LivingStatus,
+                        TotalMember = x.TotalMember,
+                        TotalAdults = x.TotalAdults,
+                        TotalChildren = x.TotalChildren,
+                        TotalSrCitizen = x.TotalSrCitizen,
+                        WillingStart = x.WillingStart,
+                        ResourcesAvailable = x.ResourcesAvailable,
+                        MemberJobOtherCity = x.MemberJobOtherCity,
+                        NoOfVehicle = x.NoOfVehicle,
+                        TwoWheelerQty = x.TwoWheelerQty,
+                        FourWheelerQty = x.FourWheelerQty,
+                        NoPeopleVote = x.NoPeopleVote,
+                        SocialMedia = x.SocialMedia,
+                        OnlineShopping = x.OnlineShopping,
+                        PaymentModePrefer = x.PaymentModePrefer,
+                        OnlinePayApp = x.OnlinePayApp,
+                        Insurance = x.Insurance,
+                        UnderInsurer = x.UnderInsurer,
+                        AyushmanBeneficiary = x.AyushmanBeneficiary,
+                        BoosterShot = x.BoosterShot,
+                        MemberDivyang = x.MemberDivyang,
+                        CreateUserId = x.CreateUserId,
+                        CreateDate = x.CreateDate,
+                        UpdateUserId = x.UpdateUserId,
+                        UpdateDate = x.UpdateDate,
+
+                    });
+                }
+
+            }
+            return obj;
+        }
     }
 }

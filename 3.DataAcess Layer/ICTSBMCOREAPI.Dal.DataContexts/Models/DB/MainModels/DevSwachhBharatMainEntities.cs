@@ -57,8 +57,8 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.MainModels
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("data source=124.153.94.110;initial catalog=LIVEAdvanceDevSwachhBharatMain;persist security info=True;user id=sa;password=sa@123;MultipleActiveResultSets=True;App=EntityFramework");
-                //optionsBuilder.UseSqlServer("data source=202.65.157.253;initial catalog=LIVEAdvanceDevSwachhBharatMain;persist security info=True;user id=appynitty;password=BigV$Telecom;MultipleActiveResultSets=True;App=EntityFramework");
+                //optionsBuilder.UseSqlServer("data source=124.153.94.110;initial catalog=LIVEAdvanceDevSwachhBharatMain;persist security info=True;user id=sa;password=sa@123;MultipleActiveResultSets=True;App=EntityFramework");
+                optionsBuilder.UseSqlServer("data source=202.65.157.253;initial catalog=LIVEAdvanceDevSwachhBharatMain;persist security info=True;user id=appynitty;password=BigV$Telecom;MultipleActiveResultSets=True;App=EntityFramework");
             }
         }
 

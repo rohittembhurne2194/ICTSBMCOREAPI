@@ -108,5 +108,6 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         Task<IEnumerable<UREmployeeAttendence>> UserRoleAttendanceAsync(int userid, DateTime FromDate, DateTime Todate, bool type);
         Task<List<UserRoleDetails>> UserRoleListAsync(int userId, string EmpType, bool status, int EmpId);
         Task<CollectionSyncResult> SaveSurveyDetails(SurveyFormDetails svDetail, int appId);
+        Task<List<SurveyFormDetail>> GetSurveyDetailsById(int AppId, string ReferanceId);
     }
 }
