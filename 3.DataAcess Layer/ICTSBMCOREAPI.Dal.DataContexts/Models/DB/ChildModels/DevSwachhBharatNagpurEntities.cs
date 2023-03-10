@@ -86,7 +86,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
         public virtual DbSet<view_SLocation> view_SLocations { get; set; }
 
         public virtual DbSet<TrailHouse> TrailHouses { get; set; }
-
+        public virtual DbSet<SurveyFormDetail> SurveyFormDetails { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -97,7 +97,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
             }
         }
 
-       
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
@@ -1257,6 +1257,13 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
                 entity.Property(e => e.Distnace).HasColumnType("decimal(6, 2)");
 
                 entity.Property(e => e.LocDate).HasColumnType("date");
+            });
+
+            modelBuilder.Entity<SurveyFormDetail>(entity =>
+            {
+                entity.Property(e => e.HouseId).ValueGeneratedNever();
+
+                entity.Property(e => e.SvId).ValueGeneratedOnAdd();
             });
 
             OnModelCreatingPartial(modelBuilder);
