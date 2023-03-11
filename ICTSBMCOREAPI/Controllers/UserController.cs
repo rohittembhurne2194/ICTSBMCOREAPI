@@ -1620,25 +1620,31 @@ namespace ICTSBMCOREAPI.Controllers
                                                      employeename = um.userName
                                                  }).ToList();
 
+                                    var EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.createUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
+                                    var Update_EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.updateUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
 
+                                    var result1 = myresult.Where(i => i.id == c.id).Select(i =>
+                                    {
+                                        i.EmpName = EmployeeName.userName;
+                                        return i;
+
+                                    }).FirstOrDefault();
 
                                     if (query.Count > 0)
                                     {
                                         JavaScriptSerializer serializer = new();
                                         var output = serializer.Serialize(query);
                                         var housedatalist = new JavaScriptSerializer().Deserialize<GisHouseList[]>(output);
+                                      
 
-                                       
-                                        var result1 = myresult.Where(i => i.id == c.id).Select(i =>
+                                        var result2 = myresult.Where(i => i.id == c.id).Select(i =>
                                         {
                                             i.HouseList = housedatalist;
 
                                             return i;
 
                                         }).FirstOrDefault();
-                                        var EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.createUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
-                                        var Update_EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.updateUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
-
+                                      
 
                                     }
 
@@ -1966,24 +1972,32 @@ namespace ICTSBMCOREAPI.Controllers
                                                      employeename = em.qrEmpName
                                                  }).ToList();
 
+                                    var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
+                                    var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
 
+                                    var result1 = myresult.Where(i => i.id == c.id).Select(i =>
+                                    {
+                                        i.EmpName = EmployeeName.qrEmpName;
+
+                                        return i;
+
+                                    }).FirstOrDefault();
 
                                     if (query.Count > 0)
                                     {
                                         JavaScriptSerializer serializer = new JavaScriptSerializer();
                                         var output = serializer.Serialize(query);
                                         var housedatalist = new JavaScriptSerializer().Deserialize<GisHouseList[]>(output);
-
-                                        var result1 = myresult.Where(i=>i.id==c.id).Select(i =>
+                                     
+                                        var result2 = myresult.Where(i=>i.id==c.id).Select(i =>
                                         {
+                                            
                                             i.HouseList = housedatalist;
 
                                             return i;
 
                                         }).FirstOrDefault();
 
-                                        var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
-                                        var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
                                         //ArrayList al = new ArrayList();
                                         //al.Add(result1);
 
