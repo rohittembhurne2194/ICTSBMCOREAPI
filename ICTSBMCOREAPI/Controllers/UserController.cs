@@ -638,6 +638,11 @@ namespace ICTSBMCOREAPI.Controllers
             {
                 try
                 {
+                    Result objDetail1 = new();
+
+
+                    objDetail1 = await objRep.SaveGarbageTrail(obj, AppId);
+
                     var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
 
                     if (GIS_CON != null)
@@ -651,10 +656,7 @@ namespace ICTSBMCOREAPI.Controllers
                         Trial tn = new Trial();
 
 
-                        Result objDetail1 = new();
-
-
-                        objDetail1 = await objRep.SaveGarbageTrail(obj, AppId);
+                       
 
                         //if(objDetail1.status == "Success")
                         //{
@@ -821,6 +823,11 @@ namespace ICTSBMCOREAPI.Controllers
             {
                 try
                 {
+                    Result objDetail1 = new();
+
+
+                    objDetail1 = await objRep.SaveHouseTrail(obj, AppId);
+
                     var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
 
                     if (GIS_CON != null)
@@ -835,10 +842,7 @@ namespace ICTSBMCOREAPI.Controllers
                         Trial tn = new Trial();
 
 
-                        Result objDetail1 = new();
-
-
-                        objDetail1 = await objRep.SaveHouseTrail(obj, AppId);
+                      
 
                         //foreach (var item in obj)
                         //{
