@@ -23,10 +23,14 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string startTs { get; set; }
         [JsonProperty("endTs")]
         public string endTs { get; set; }
+        public string EmpName { get; set; }
         [JsonProperty("geom")]
         public geomt? geom { get; set; }
+       
+
         [JsonProperty("Housegeom")]
         public  dynamic HouseList { get; set; }
+      
       
    
     }
