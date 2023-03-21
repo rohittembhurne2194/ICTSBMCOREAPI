@@ -1554,7 +1554,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 objdata.endLong = obj.endLong;
                                 objdata.endTime = obj.endTime;
                                 objdata.daEndNote = obj.daEndNote;
-                                objdata.batteryStatus = batteryStatus;
+                                objdata.OutbatteryStatus = batteryStatus;
                                 objdata.totalKm = obj.totalKm;
                                 objdata.EmployeeType = null;
                                 if ((string.IsNullOrEmpty(obj.QrCodeImage)) == false)
@@ -1614,7 +1614,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 objdata2.endLong = obj.endLong;
                                 objdata2.endTime = obj.endTime;
                                 objdata2.daEndNote = obj.daEndNote;
-                                objdata2.batteryStatus = batteryStatus;
+                                objdata2.OutbatteryStatus = batteryStatus;
                                 objdata2.EmployeeType = null;
                                 if ((string.IsNullOrEmpty(obj.QrCodeImage)) == false)
                                 {
