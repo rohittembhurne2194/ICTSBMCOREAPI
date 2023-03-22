@@ -6581,6 +6581,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         //List<AppDetail> AppDetailss = dbMain.Database.SqlQuery<AppDetail>("exec [Update_Trigger]").ToList();
                         List<AppDetail> AppDetailss = dbMain.AppDetails.FromSqlRaw<AppDetail>("exec [Update_Trigger]").ToList();
 
+
                         var updateappdetails = await dbMain.SP_DailyScanCount_Results.FromSqlRaw<SP_DailyScanCount_Result>($"EXEC DailyScanCount {AppId.ToString()}").ToListAsync();
                     }
                     return result;
@@ -7801,6 +7802,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             Date = Convert.ToDateTime(y.modified).ToString("MM/dd/yyyy"),
                             time = Convert.ToDateTime(y.modified).ToString("HH:mm"),
                             PointNo = y.ReferanceId,
+
                             type = 2
                         });
                     }
@@ -7842,6 +7844,32 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         });
                     }
                     return obj.OrderBy(c => c.Date).OrderBy(c => c.time).ToList();
+
+                    //List<SqlParameter> parms = new List<SqlParameter>
+                    //                            {
+                    //                                // Create parameter(s)    
+                    //                                new SqlParameter { ParameterName = "@userId", Value = userId },
+                    //                                new SqlParameter { ParameterName = "@date", Value =  Convert.ToDateTime(date).ToString("MM/dd/yyyy") }
+                    //                            };
+                    //var Newdata = await db.GetQrWorkHistoryDetails_Results.FromSqlRaw<GetQrWorkHistoryDetails_Result>("EXEC GetQrWorkHistoryDetails @userId,@date", parms.ToArray()).ToListAsync();
+
+                    //foreach(var x in Newdata)
+                    //{
+                    //    obj.Add(new BigVQrworkhistorydetails()
+                    //    {
+                    //        Date = Convert.ToDateTime(x.Date).ToString("MM/dd/yyyy"),
+                    //        time = Convert.ToDateTime(x.time).ToString("HH:mm"),
+                    //        DumpYardNo = x.DumpYardNo,
+                    //        HouseNo = x.HouseNo,
+                    //        LiquidNo = x.LiquidNo,
+                    //        StreetNo = x.StreetNo,
+                    //        type = x.type
+
+                    //    });
+                    //}
+                    //return obj.OrderBy(c => c.Date).OrderBy(c => c.time).ToList();  // Better Response Time 
+
+
                 }
                 catch (Exception ex)
                 {
