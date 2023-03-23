@@ -47,6 +47,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB
         public DbSet<GetQrWorkHistory_Result> GetQrWorkHistory_Results { get; set; }
 
         public DbSet<GetQrWorkHistoryDetails_Result> GetQrWorkHistoryDetails_Results { get; set; }
+        public DbSet<GetEmployeeWorkHistoryDetails_Result> GetEmployeeWorkHistoryDetails_Results { get; set; }
         public DbSet<SP_HousePointDumpDetails_Scanify_Result> SP_HousePointDumpDetails_Scanify_Results { get; set; }
         public DbSet<VehicleList_TypeWise_Result> VehicleList_TypeWise_Results { get; set; }
         public DbSet<GetAttendenceDetailsTotal_Result> GetAttendenceDetailsTotal_Results { get; set; }
@@ -75,6 +76,7 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB
             modelBuilder.Entity<sp_MsgNotification_Result>().HasNoKey();
             modelBuilder.Entity<GetQrWorkHistory_Result>().HasNoKey();
             modelBuilder.Entity<GetQrWorkHistoryDetails_Result>().HasNoKey();
+            modelBuilder.Entity<GetEmployeeWorkHistoryDetails_Result>().HasNoKey();
             modelBuilder.Entity<SP_HousePointDumpDetails_Scanify_Result>().HasNoKey();
             modelBuilder.Entity<VehicleList_TypeWise_Result>().HasNoKey();
             modelBuilder.Entity<GetAttendenceDetailsTotal_Result>().HasNoKey();
