@@ -265,9 +265,10 @@ namespace ICTSBMCOREAPI.Controllers
                         houseId = gcDetail.houseId,
                         ID = gcDetail.OfflineID,
                         status = "error",
-                        message = "Something is wrong,Try Again.. ",
+                        //message = "Something is wrong,Try Again.. ",
+                        message = ex.Message.ToString(),
                         messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..",
-                    });
+                    }) ;
                     return objres;
 
                 }
@@ -607,10 +608,10 @@ namespace ICTSBMCOREAPI.Controllers
                     svDetail.threeWheelerQty = item.threeWheelerQty;
                     svDetail.fourWheelerQty = item.fourWheelerQty;
                     svDetail.noPeopleVote = item.noPeopleVote;
-                    svDetail.socialMedia = item.socialMedia;
-                    svDetail.onlineShopping = item.onlineShopping;
-                    svDetail.paymentModePrefer = item.paymentModePrefer;
-                    svDetail.onlinePayApp = item.onlinePayApp;
+                    svDetail.socialMedia = item.socialMedia.Trim();
+                    svDetail.onlineShopping = item.onlineShopping.Trim();
+                    svDetail.paymentModePrefer = item.paymentModePrefer.Trim();
+                    svDetail.onlinePayApp = item.onlinePayApp.Trim();
                     svDetail.insurance = item.insurance;
 
                     svDetail.underInsurer = item.underInsurer;

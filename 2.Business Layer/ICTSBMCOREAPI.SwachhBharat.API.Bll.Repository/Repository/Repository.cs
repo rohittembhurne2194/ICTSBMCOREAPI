@@ -3647,11 +3647,13 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         {
                             _logger.LogError(ex.ToString(), ex);
                             //await tx.RollbackAsync();
+                            result.referenceID = obj.ReferenceID;
                             result.ID = obj.OfflineID;
                             result.message = ex.Message;
                            // result.message = "Something is wrong,Try Again.. ";
                             result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
-                            result.status = "error";
+                            result.status = Convert.ToInt32(HttpStatusCode.RequestTimeout).ToString();
+                            //result.status = "error";
                             return result;
                         }
 
@@ -7867,7 +7869,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                     //    });
                     //}
-                    //return obj.OrderBy(c => c.Date).OrderBy(c => c.time).ToList();  // Better Response Time 
+                    //return obj.OrderBy(c => c.Date).OrderBy(c => c.time).ToList();  // Bad Response Time 
 
 
                 }
@@ -10644,7 +10646,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                     }
 
-                    //// Better Response
+                    //// Bad Response
                     ///
                     //List<SqlParameter> parms = new List<SqlParameter>
                     //                            {
@@ -13790,7 +13792,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             model.Qualification = obj.qualification;
                             model.Occupation = obj.occupation;
                             model.MaritalStatus = obj.maritalStatus;
-                            if (obj.marriageDate != "")
+                            if (obj.marriageDate != "" && obj.marriageDate != "0000-00-00")
                             {
                                 model.MarriageDate = Convert.ToDateTime(obj.marriageDate);
                             }
@@ -13860,7 +13862,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 objdata.Qualification = obj.qualification;
                                 objdata.Occupation = obj.occupation;
                                 objdata.MaritalStatus = obj.maritalStatus;
-                                if (obj.marriageDate != "")
+                                if (obj.marriageDate != "" && obj.marriageDate != "0000-00-00")
                                 {
                                     objdata.MarriageDate = Convert.ToDateTime(obj.marriageDate);
                                 }
