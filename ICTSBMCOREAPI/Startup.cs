@@ -97,7 +97,7 @@ namespace ICTSBMCOREAPI
     
             services.AddCors(p => p.AddPolicy("MyCorsPolicy", build =>
              {
-                 build.WithOrigins("http://114.143.244.130:8080", "https://coreapi.ictsbm.com").AllowAnyHeader().WithMethods("GET","POST");
+                 build.WithOrigins("http://103.26.97.75:8080", "https://coreapi.ictsbm.com").AllowAnyHeader().WithMethods("GET","POST");
              }));
 
             services.AddControllers()

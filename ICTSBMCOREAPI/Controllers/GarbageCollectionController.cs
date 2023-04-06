@@ -272,13 +272,13 @@ namespace ICTSBMCOREAPI.Controllers
 
                 }
 
-                objres.Add(new CollectionSyncResult()
-                {
-                    ID = 0,
-                    status = "error",
-                    message = "Record not inserted",
-                    messageMar = "रेकॉर्ड सबमिट केले नाही",
-                });
+                //objres.Add(new CollectionSyncResult()
+                //{
+                //    ID = 0,
+                //    status = "error",
+                //    message = "Record not inserted",
+                //    messageMar = "रेकॉर्ड सबमिट केले नाही",
+                //});
 
                 return objres;
             }
@@ -547,13 +547,13 @@ namespace ICTSBMCOREAPI.Controllers
 
                 }
 
-                objres.Add(new CollectionSyncResult()
-                {
-                    ID = 0,
-                    status = "error",
-                    message = "Record not inserted",
-                    messageMar = "रेकॉर्ड सबमिट केले नाही",
-                });
+                //objres.Add(new CollectionSyncResult()
+                //{
+                //    ID = 0,
+                //    status = "error",
+                //    message = "Record not inserted",
+                //    messageMar = "रेकॉर्ड सबमिट केले नाही",
+                //});
 
                 return objres;
             }
@@ -666,13 +666,13 @@ namespace ICTSBMCOREAPI.Controllers
 
             }
 
-            objres.Add(new CollectionSyncResult()
-            {
-                ID = 0,
-                status = "error",
-                message = "Record not inserted",
-                messageMar = "रेकॉर्ड सबमिट केले नाही",
-            });
+            //objres.Add(new CollectionSyncResult()
+            //{
+            //    ID = 0,
+            //    status = "error",
+            //    message = "Record not inserted",
+            //    messageMar = "रेकॉर्ड सबमिट केले नाही",
+            //});
 
             return objres;
         }
