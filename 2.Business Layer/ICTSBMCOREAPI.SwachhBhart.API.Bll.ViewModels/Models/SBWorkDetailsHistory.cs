@@ -12,5 +12,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string vehicleNumber { get; set; }
         public string areaName { get; set; }
         public int type { get; set; }
+
+
     }
 }

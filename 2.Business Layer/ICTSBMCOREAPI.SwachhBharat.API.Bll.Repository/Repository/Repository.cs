@@ -1554,7 +1554,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 objdata.endLong = obj.endLong;
                                 objdata.endTime = obj.endTime;
                                 objdata.daEndNote = obj.daEndNote;
-                                objdata.batteryStatus = batteryStatus;
+                                objdata.OutbatteryStatus = batteryStatus;
                                 objdata.totalKm = obj.totalKm;
                                 objdata.EmployeeType = null;
                                 if ((string.IsNullOrEmpty(obj.QrCodeImage)) == false)
@@ -1614,7 +1614,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 objdata2.endLong = obj.endLong;
                                 objdata2.endTime = obj.endTime;
                                 objdata2.daEndNote = obj.daEndNote;
-                                objdata2.batteryStatus = batteryStatus;
+                                objdata2.OutbatteryStatus = batteryStatus;
                                 objdata2.EmployeeType = null;
                                 if ((string.IsNullOrEmpty(obj.QrCodeImage)) == false)
                                 {
@@ -1793,7 +1793,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 objdata.endLong = obj.endLong;
                                 objdata.endTime = obj.endTime;
                                 objdata.daEndNote = obj.daEndNote;
-                                objdata.batteryStatus = batteryStatus;
+                                objdata.OutbatteryStatus = batteryStatus;
                                 objdata.totalKm = obj.totalKm;
                                 objdata.EmployeeType = "L";
                                 //       objdata.endAddress = Address(objdata.endLat + "," + objdata.endLong);
@@ -1836,7 +1836,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 objdata2.endLong = obj.endLong;
                                 objdata2.endTime = obj.endTime;
                                 objdata2.daEndNote = obj.daEndNote;
-                                objdata2.batteryStatus = batteryStatus;
+                                objdata2.OutbatteryStatus = batteryStatus;
                                 objdata2.EmployeeType = "L";
                                 //       objdata.endAddress = Address(objdata.endLat + "," + objdata.endLong);
                                 Location loc = new Location();
@@ -1992,7 +1992,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 objdata.endLong = obj.endLong;
                                 objdata.endTime = obj.endTime;
                                 objdata.daEndNote = obj.daEndNote;
-                                objdata.batteryStatus = batteryStatus;
+                                objdata.OutbatteryStatus = batteryStatus;
                                 objdata.totalKm = obj.totalKm;
                                 objdata.EmployeeType = "S";
                                 //       objdata.endAddress = Address(objdata.endLat + "," + objdata.endLong);
@@ -2035,7 +2035,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 objdata2.endLong = obj.endLong;
                                 objdata2.endTime = obj.endTime;
                                 objdata2.daEndNote = obj.daEndNote;
-                                objdata2.batteryStatus = batteryStatus;
+                                objdata2.OutbatteryStatus = batteryStatus;
                                 objdata2.EmployeeType = "S";
                                 //       objdata.endAddress = Address(objdata.endLat + "," + objdata.endLong);
                                 Location loc = new Location();
@@ -3647,11 +3647,13 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         {
                             _logger.LogError(ex.ToString(), ex);
                             //await tx.RollbackAsync();
+                            result.referenceID = obj.ReferenceID;
                             result.ID = obj.OfflineID;
                             result.message = ex.Message;
                            // result.message = "Something is wrong,Try Again.. ";
                             result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
-                            result.status = "error";
+                            result.status = Convert.ToInt32(HttpStatusCode.RequestTimeout).ToString();
+                            //result.status = "error";
                             return result;
                         }
 
@@ -6581,6 +6583,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         //List<AppDetail> AppDetailss = dbMain.Database.SqlQuery<AppDetail>("exec [Update_Trigger]").ToList();
                         List<AppDetail> AppDetailss = dbMain.AppDetails.FromSqlRaw<AppDetail>("exec [Update_Trigger]").ToList();
 
+
                         var updateappdetails = await dbMain.SP_DailyScanCount_Results.FromSqlRaw<SP_DailyScanCount_Result>($"EXEC DailyScanCount {AppId.ToString()}").ToListAsync();
                     }
                     return result;
@@ -7801,6 +7804,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             Date = Convert.ToDateTime(y.modified).ToString("MM/dd/yyyy"),
                             time = Convert.ToDateTime(y.modified).ToString("HH:mm"),
                             PointNo = y.ReferanceId,
+
                             type = 2
                         });
                     }
@@ -7842,6 +7846,32 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         });
                     }
                     return obj.OrderBy(c => c.Date).OrderBy(c => c.time).ToList();
+
+                    //List<SqlParameter> parms = new List<SqlParameter>
+                    //                            {
+                    //                                // Create parameter(s)    
+                    //                                new SqlParameter { ParameterName = "@userId", Value = userId },
+                    //                                new SqlParameter { ParameterName = "@date", Value =  Convert.ToDateTime(date).ToString("MM/dd/yyyy") }
+                    //                            };
+                    //var Newdata = await db.GetQrWorkHistoryDetails_Results.FromSqlRaw<GetQrWorkHistoryDetails_Result>("EXEC GetQrWorkHistoryDetails @userId,@date", parms.ToArray()).ToListAsync();
+
+                    //foreach(var x in Newdata)
+                    //{
+                    //    obj.Add(new BigVQrworkhistorydetails()
+                    //    {
+                    //        Date = Convert.ToDateTime(x.Date).ToString("MM/dd/yyyy"),
+                    //        time = Convert.ToDateTime(x.time).ToString("HH:mm"),
+                    //        DumpYardNo = x.DumpYardNo,
+                    //        HouseNo = x.HouseNo,
+                    //        LiquidNo = x.LiquidNo,
+                    //        StreetNo = x.StreetNo,
+                    //        type = x.type
+
+                    //    });
+                    //}
+                    //return obj.OrderBy(c => c.Date).OrderBy(c => c.time).ToList();  // Bad Response Time 
+
+
                 }
                 catch (Exception ex)
                 {
@@ -10335,6 +10365,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
             {
                 using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(appId))
                 {
+
                     var data = await db.GarbageCollectionDetails.Where(c => EF.Functions.DateDiffDay(c.gcDate, date) == 0 && c.userId == userId).OrderByDescending(c => c.gcDate).ToListAsync();
                     foreach (var x in data)
                     {
@@ -10615,8 +10646,31 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
                     }
 
+                    //// Bad Response
+                    ///
+                    //List<SqlParameter> parms = new List<SqlParameter>
+                    //                            {
+                    //                                // Create parameter(s)    
+                    //                                new SqlParameter { ParameterName = "@userId", Value = userId },
+                    //                                new SqlParameter { ParameterName = "@date", Value =  Convert.ToDateTime(date).ToString("MM/dd/yyyy") }
+                    //                            };
+                    //var Newdata = await db.GetEmployeeWorkHistoryDetails_Results.FromSqlRaw<GetEmployeeWorkHistoryDetails_Result>("EXEC GetEmployeeWorkHistoryDetails @userId,@date", parms.ToArray()).ToListAsync();
+                    //foreach (var c in Newdata)
+                    //{
+                    //    obj.Add(new SBWorkDetailsHistory()
+                    //    {
+
+                    //        time = Convert.ToDateTime(c.gcDate).ToString("hh:mm tt"),
+                    //        Refid = c.ReferanceId,
+                    //        name = c.Name,
+                    //        vehicleNumber = checkNull(c.vehicleNumber),
+                    //        areaName = c.Area,
+                    //        type = Convert.ToInt32(c.gcType),
+                    //    });
+                    //}
+
                 }
-                //return obj.OrderByDescending(c => c.time).ToList(); 
+                //return obj.OrderByDescending(c => c.id).ToList(); 
                 return obj.ToList();
             }
             catch (Exception ex)
@@ -13738,7 +13792,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             model.Qualification = obj.qualification;
                             model.Occupation = obj.occupation;
                             model.MaritalStatus = obj.maritalStatus;
-                            if (obj.marriageDate != "")
+                            if (obj.marriageDate != "" && obj.marriageDate != "0000-00-00")
                             {
                                 model.MarriageDate = Convert.ToDateTime(obj.marriageDate);
                             }
@@ -13808,7 +13862,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                 objdata.Qualification = obj.qualification;
                                 objdata.Occupation = obj.occupation;
                                 objdata.MaritalStatus = obj.maritalStatus;
-                                if (obj.marriageDate != "")
+                                if (obj.marriageDate != "" && obj.marriageDate != "0000-00-00")
                                 {
                                     objdata.MarriageDate = Convert.ToDateTime(obj.marriageDate);
                                 }
