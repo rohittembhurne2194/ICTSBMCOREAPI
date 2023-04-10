@@ -13,6 +13,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
 
         public int LiquidCollection { get; set; }
         public int StreetCollection { get; set; }
+        public int SurveyCollection { get; set; }
 
         public int DumpYardPlantCollection { get; set; }
 
