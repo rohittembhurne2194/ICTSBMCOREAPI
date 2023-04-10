@@ -3643,7 +3643,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             return result;
                         }
 
-                        catch (Exception ex)
+                        catch (WebException ex)
                         {
                             _logger.LogError(ex.ToString(), ex);
                             //await tx.RollbackAsync();
@@ -3652,8 +3652,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             result.message = ex.Message;
                            // result.message = "Something is wrong,Try Again.. ";
                             result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
-                            result.status = Convert.ToInt32(HttpStatusCode.RequestTimeout).ToString();
-                            //result.status = "error";
+                            //result.status = Convert.ToInt32(HttpStatusCode.RequestTimeout).ToString();
+                            result.status = ((HttpWebResponse)ex.Response).StatusCode.ToString();
                             return result;
                         }
 
