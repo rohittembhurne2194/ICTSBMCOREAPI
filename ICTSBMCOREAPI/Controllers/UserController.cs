@@ -3719,6 +3719,309 @@ namespace ICTSBMCOREAPI.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("GisGarbageTrail/live")]
+        [EnableCors("MyCorsPolicy")]
+        public async Task<ActionResult<TrailsDetails>> GarbageTrailgisLive([FromHeader] string authorization, [FromHeader] int AppId)
+        {
+            //var message = "";
+
+            using DevICTSBMMainEntities dbMain = new();
+            TrailsDetails objDetail = new();
+
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                try
+                {
+                    var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                    if (GIS_CON != null)
+                    {
+                        var gis_url = GIS_CON.DataSource;
+                        var gis_DBName = GIS_CON.InitialCatalog;
+                        var gis_username = GIS_CON.UserId;
+                        var gis_password = GIS_CON.Password;
+
+                        HttpClient client = new();
+                        //Trial tn = new Trial();
+
+                        //Start Old Code
+                        //client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                        //client.DefaultRequestHeaders.Add("username", gis_username);
+                        //client.DefaultRequestHeaders.Add("password", gis_password);
+
+                        //var url = "http://114.143.244.130:9091/garbage-trail/all";
+
+                        //var response = await client.GetAsync(url);
+                        //End Old Code
+
+                        //Start New Code.
+                        client.BaseAddress = new Uri(GIS_CON.url);
+                        //client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                        client.DefaultRequestHeaders.Add("username", gis_username);
+                        client.DefaultRequestHeaders.Add("password", gis_password);
+                        HttpResponseMessage response = await client.GetAsync("garbage-trail/live");
+                        //End New Code
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var responseString = await response.Content.ReadAsStringAsync();
+                            //var jsonParsed = JObject.Parse(responseString);
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
+
+                            var jsonResult = dynamicobject["data"];
+
+
+                            List<GisTrailResult> myresult = jsonResult.ToObject<List<GisTrailResult>>();
+
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Success";
+                            objDetail.message = "Data Found";
+                            objDetail.timestamp = DateTime.Now.ToString();
+                            objDetail.data = myresult;
+
+                            result = objDetail;
+                            return Ok(result);
+
+                        }
+                        else
+                        {
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Failed";
+                            objDetail.message = "";
+                            objDetail.timestamp = DateTime.Now.ToString();
+
+                            result = objDetail;
+                            return NotFound(result);
+                        }
+
+
+                    }
+                    else
+                    {
+
+                        objDetail.code = 404;
+                        objDetail.status = "Failed";
+                        objDetail.message = "GIS Connection Are Not Available";
+                        objDetail.timestamp = DateTime.Now.ToString();
+
+                        result = objDetail;
+
+                        return NotFound(result);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //objDetail.Add(new TrailsDetails()
+                    //{
+                    //    code = "",
+                    //    status = "",
+                    //    message = ex.Message.ToString(),
+                    //    //errorMessages = ex.Message.ToString(),
+                    //    timestamp = "",
+                    //    data = ""
+                    //});
+
+                    objDetail.code = 400;
+                    objDetail.status = "Failed";
+                    objDetail.message = ex.Message.ToString();
+                    objDetail.timestamp = DateTime.Now.ToString();
+
+                    result = objDetail;
+                    return BadRequest(result);
+                }
+
+            }
+            else
+            {
+                objDetail.code = 401;
+                objDetail.status = "Failed";
+                objDetail.message = "Unauthorized";
+                objDetail.timestamp = DateTime.Now.ToString();
+
+
+                result = objDetail;
+                return Unauthorized(result);
+            }
+
+        }
+
+
+        [HttpGet]
+        [Route("GisHouseTrail/live")]
+        [EnableCors("MyCorsPolicy")]
+        public async Task<ActionResult<TrailsDetails>> HouseTrailgisLive([FromHeader] string authorization, [FromHeader] int AppId)
+        {
+            var message = "";
+
+            using DevICTSBMMainEntities dbMain = new DevICTSBMMainEntities();
+            TrailsDetails objDetail = new TrailsDetails();
+
+
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                try
+                {
+                    var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                    if (GIS_CON != null)
+                    {
+                        var gis_url = GIS_CON.DataSource;
+                        var gis_DBName = GIS_CON.InitialCatalog;
+                        var gis_username = GIS_CON.UserId;
+                        var gis_password = GIS_CON.Password;
+
+                        HttpClient client = new HttpClient();
+                        //Trial tn = new Trial();
+
+                        //Start Old Code
+                        //var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                        //var stringContent = new StringContent(json);
+
+                        //client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                        //client.DefaultRequestHeaders.Add("username", gis_username);
+                        //client.DefaultRequestHeaders.Add("password", gis_password);
+
+                        //var url = "http://114.143.244.130:9091/house-trail/all";
+
+                        //var response = await client.GetAsync(url);
+                        //End Old Code
+
+
+                        //Start New Code
+                        client.BaseAddress = new Uri(GIS_CON.url);
+                        //client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                        client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                        client.DefaultRequestHeaders.Add("username", gis_username);
+                        client.DefaultRequestHeaders.Add("password", gis_password);
+                        HttpResponseMessage response = await client.GetAsync("house-trail/live");
+                        //End New Code
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var responseString = await response.Content.ReadAsStringAsync();
+                            //var jsonParsed = JObject.Parse(responseString);
+                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
+
+                            var jsonResult = dynamicobject["data"];
+
+
+                            List<GisTrailResult> myresult = jsonResult.ToObject<List<GisTrailResult>>();
+
+                            //objDetail.Add(new TrailsDetails()
+                            //{
+                            //    code = dynamicobject.code.ToString(),
+                            //    status = dynamicobject.status.ToString(),
+                            //    message = dynamicobject.message.ToString(),
+                            //    timestamp = dynamicobject.timestamp.ToString(),
+                            //    data = result
+                            //});
+
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Success";
+                            objDetail.message = "Data Found";
+                            objDetail.timestamp = DateTime.Now.ToString();
+                            objDetail.data = myresult;
+
+                            result = objDetail;
+                            return Ok(result);
+
+                        }
+                        else
+                        {
+                            objDetail.code = (int)response.StatusCode;
+                            objDetail.status = "Failed";
+                            objDetail.message = "Not Found";
+                            objDetail.timestamp = DateTime.Now.ToString();
+
+                            result = objDetail;
+                            return NotFound(result);
+                        }
+
+
+                    }
+                    else
+                    {
+
+                        //objDetail.Add(new TrailsDetails()
+                        //{
+                        //    code = "",
+                        //    status = "",
+                        //    message = "GIS Connection Are Not Available",
+                        //    //errorMessages = "GIS Connection Are Not Available",
+                        //    timestamp = "",
+                        //    data = ""
+                        //});
+
+                        objDetail.code = 404;
+                        objDetail.status = "Failed";
+                        objDetail.message = "GIS Connection Are Not Available";
+                        objDetail.timestamp = DateTime.Now.ToString();
+
+                        result = objDetail;
+
+                        return NotFound(result);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //objDetail.Add(new TrailsDetails()
+                    //{
+                    //    code = "",
+                    //    status = "",
+                    //    message = ex.Message.ToString(),
+                    //    //errorMessages = ex.Message.ToString(),
+                    //    timestamp = "",
+                    //    data = ""
+                    //});
+
+                    objDetail.code = 400;
+                    objDetail.status = "Failed";
+                    objDetail.message = ex.Message.ToString();
+                    objDetail.timestamp = DateTime.Now.ToString();
+
+                    result = objDetail;
+                    return NotFound(result);
+                }
+                //return objDetail;
+            }
+            else
+            {
+                objDetail.code = 401;
+                objDetail.status = "Failed";
+                objDetail.message = "Unauthorized";
+                objDetail.timestamp = DateTime.Now.ToString();
+
+
+                result = objDetail;
+                return Unauthorized(result);
+            }
+
+        }
+
         private object checkNull(string str)
         {
             string result = "";
