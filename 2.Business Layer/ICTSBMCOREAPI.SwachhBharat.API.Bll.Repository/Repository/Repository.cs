@@ -3643,7 +3643,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             return result;
                         }
 
-                        catch (Exception ex)
+                        catch (WebException ex)
                         {
                             _logger.LogError(ex.ToString(), ex);
                             //await tx.RollbackAsync();
@@ -3652,8 +3652,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             result.message = ex.Message;
                            // result.message = "Something is wrong,Try Again.. ";
                             result.messageMar = "काहीतरी चुकीचे आहे, पुन्हा प्रयत्न करा..";
-                            result.status = Convert.ToInt32(HttpStatusCode.RequestTimeout).ToString();
-                            //result.status = "error";
+                            //result.status = Convert.ToInt32(HttpStatusCode.RequestTimeout).ToString();
+                            result.status = ((HttpWebResponse)ex.Response).StatusCode.ToString();
                             return result;
                         }
 
@@ -7759,6 +7759,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             DumpYardCollection = checkIntNull(x.DumpYardCollection.ToString()),
                             LiquidCollection = checkIntNull(x.LiquidCollection.ToString()),
                             StreetCollection = checkIntNull(x.StreetCollection.ToString()),
+                            SurveyCollection = checkIntNull(x.SurveyCollection.ToString()),
                         });
                     }
                 }
@@ -7842,6 +7843,18 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             time = Convert.ToDateTime(z.lastModifiedDate).ToString("HH:mm"),
                             StreetNo = z.ReferanceId,
                             type = 5
+
+                        });
+                    }
+                    var data5 = await db.SurveyFormDetails.Where(c => EF.Functions.DateDiffDay(c.CreateDate, date) == 0 && c.CreateUserId == userId).ToListAsync();
+                    foreach (var z in data5)
+                    {
+                        obj.Add(new BigVQrworkhistorydetails()
+                        {
+                            Date = Convert.ToDateTime(z.CreateDate).ToString("MM/dd/yyyy"),
+                            time = Convert.ToDateTime(z.CreateDate).ToString("HH:mm"),
+                            SurveyNo = z.ReferanceId,
+                            type = 11
 
                         });
                     }
