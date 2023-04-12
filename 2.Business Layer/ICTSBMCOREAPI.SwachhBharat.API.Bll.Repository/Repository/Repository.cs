@@ -6672,7 +6672,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             connection.Close();
                         }
 
-
+                        result.status = "Success";
+                        return result;
                     }
                     else
                     {
@@ -6769,7 +6770,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                             connection.Close();
                         }
 
-
+                        result.status = "Success";
+                        return result;
                     }
                     else
                     {

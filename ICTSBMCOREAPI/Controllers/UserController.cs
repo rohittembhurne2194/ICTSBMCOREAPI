@@ -643,116 +643,129 @@ namespace ICTSBMCOREAPI.Controllers
 
                     objDetail1 = await objRep.SaveGarbageTrail(obj, AppId);
 
-                    var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
-
-                    if (GIS_CON != null)
+                    if (objDetail1.status == "Success")
                     {
-                        var gis_url = GIS_CON.DataSource;
-                        var gis_DBName = GIS_CON.InitialCatalog;
-                        var gis_username = GIS_CON.UserId;
-                        var gis_password = GIS_CON.Password;
+                        var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
 
-                        HttpClient client = new HttpClient();
-                        Trial tn = new Trial();
-
-
-                       
-
-                        //if(objDetail1.status == "Success")
-                        //{
-
-                        //}
-                    
-                        //foreach (var item in obj)
-                        //{
-                        //    tn.id = item.id;
-                        //    tn.startTs = item.startTs;
-                        //    tn.endTs = item.endTs;
-                        //    tn.createUser = item.createUser;
-                        //    tn.geom = item.geom;
-                        //    tn.createTs = item.createTs;
-                        //    tn.updateTs = item.updateTs;
-                        //    tn.updateUser = item.updateUser;
-
-
-                        //var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
-                        //var stringContent = new StringContent(json);
-                        //stringContent.Headers.ContentType.MediaType = "application/json";
-                        //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
-                        //stringContent.Headers.Add("username", gis_username);
-                        //stringContent.Headers.Add("password", gis_password);
-                        //var response = await client.PostAsync("http://114.143.244.130:9091/garbage-trail", stringContent);
-
-
-                        client.BaseAddress = new Uri(GIS_CON.url);
-                        //client.DefaultRequestHeaders.Accept.Clear();
-                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                        client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
-                        client.DefaultRequestHeaders.Add("username", gis_username);
-                        client.DefaultRequestHeaders.Add("password", gis_password);
-                        var response = await client.PostAsJsonAsync("garbage-trail", obj);
-
-                        if (response.IsSuccessStatusCode)
+                        if (GIS_CON != null)
                         {
-                            var responseString = await response.Content.ReadAsStringAsync();
-                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                            //objDetail.Add(new DumpTripStatusResult()
+                            var gis_url = GIS_CON.DataSource;
+                            var gis_DBName = GIS_CON.InitialCatalog;
+                            var gis_username = GIS_CON.UserId;
+                            var gis_password = GIS_CON.Password;
+
+                            HttpClient client = new HttpClient();
+                            Trial tn = new Trial();
+
+
+
+
+                            //if(objDetail1.status == "Success")
                             //{
-                            //    code = (int)response.StatusCode,
-                            //    status = dynamicobject.status.ToString(),
-                            //    message = dynamicobject.message.ToString(),
-                            //    errorMessages = dynamicobject.errorMessages.ToString(),
-                            //    timestamp = DateTime.Now.ToString(),
-                            //    data = dynamicobject.data.ToString()
-                            //});
-                            objDetail.code = (int)response.StatusCode;
-                            objDetail.status = dynamicobject.status.ToString();
-                            objDetail.message = dynamicobject.message.ToString();
-                            objDetail.errorMessages = dynamicobject.errorMessages.ToString();
-                            objDetail.timestamp = DateTime.Now.ToString();
-                            objDetail.data = dynamicobject.data.ToString();
-                            objDetail.offlineId = obj.offlineId;
+
+                            //}
+
+                            //foreach (var item in obj)
+                            //{
+                            //    tn.id = item.id;
+                            //    tn.startTs = item.startTs;
+                            //    tn.endTs = item.endTs;
+                            //    tn.createUser = item.createUser;
+                            //    tn.geom = item.geom;
+                            //    tn.createTs = item.createTs;
+                            //    tn.updateTs = item.updateTs;
+                            //    tn.updateUser = item.updateUser;
+
+
+                            //var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                            //var stringContent = new StringContent(json);
+                            //stringContent.Headers.ContentType.MediaType = "application/json";
+                            //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                            //stringContent.Headers.Add("username", gis_username);
+                            //stringContent.Headers.Add("password", gis_password);
+                            //var response = await client.PostAsync("http://114.143.244.130:9091/garbage-trail", stringContent);
+
+
+                            client.BaseAddress = new Uri(GIS_CON.url);
+                            //client.DefaultRequestHeaders.Accept.Clear();
+                            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                            client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                            client.DefaultRequestHeaders.Add("username", gis_username);
+                            client.DefaultRequestHeaders.Add("password", gis_password);
+                            var response = await client.PostAsJsonAsync("garbage-trail", obj);
+
+                            if (response.IsSuccessStatusCode)
+                            {
+                                var responseString = await response.Content.ReadAsStringAsync();
+                                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                                //objDetail.Add(new DumpTripStatusResult()
+                                //{
+                                //    code = (int)response.StatusCode,
+                                //    status = dynamicobject.status.ToString(),
+                                //    message = dynamicobject.message.ToString(),
+                                //    errorMessages = dynamicobject.errorMessages.ToString(),
+                                //    timestamp = DateTime.Now.ToString(),
+                                //    data = dynamicobject.data.ToString()
+                                //});
+                                objDetail.code = (int)response.StatusCode;
+                                objDetail.status = dynamicobject.status.ToString();
+                                objDetail.message = dynamicobject.message.ToString();
+                                objDetail.errorMessages = dynamicobject.errorMessages.ToString();
+                                objDetail.timestamp = DateTime.Now.ToString();
+                                objDetail.data = dynamicobject.data.ToString();
+                                objDetail.offlineId = obj.offlineId;
+                            }
+                            else
+                            {
+                                //objDetail.Add(new DumpTripStatusResult()
+                                //{
+                                //    code = (int)response.StatusCode,
+                                //    status = "Failed",
+                                //    message = "Not Found",
+                                //    timestamp = DateTime.Now.ToString()
+                                //});
+                                objDetail.code = (int)response.StatusCode;
+                                objDetail.status = "Failed";
+                                objDetail.message = "Not Found";
+                                objDetail.timestamp = DateTime.Now.ToString();
+                                objDetail.offlineId = obj.offlineId;
+                            }
+                            //}
+                            result = objDetail;
+                            return Ok(result);
                         }
                         else
                         {
+
                             //objDetail.Add(new DumpTripStatusResult()
                             //{
-                            //    code = (int)response.StatusCode,
+                            //    code = 404,
                             //    status = "Failed",
-                            //    message = "Not Found",
+                            //    message = "GIS Connection Are Not Available",
                             //    timestamp = DateTime.Now.ToString()
                             //});
-                            objDetail.code = (int)response.StatusCode;
+                            objDetail.code = 404;
                             objDetail.status = "Failed";
-                            objDetail.message = "Not Found";
+                            objDetail.message = "GIS Connection Are Not Available";
                             objDetail.timestamp = DateTime.Now.ToString();
                             objDetail.offlineId = obj.offlineId;
+
+                            result = objDetail;
+
+                            return NotFound(result);
+
+
                         }
-                        //}
-                        result = objDetail;
-                        return Ok(result);
                     }
                     else
                     {
-
-                        //objDetail.Add(new DumpTripStatusResult()
-                        //{
-                        //    code = 404,
-                        //    status = "Failed",
-                        //    message = "GIS Connection Are Not Available",
-                        //    timestamp = DateTime.Now.ToString()
-                        //});
-                        objDetail.code = 404;
+                        objDetail.code = 200;
                         objDetail.status = "Failed";
-                        objDetail.message = "GIS Connection Are Not Available";
+                        objDetail.message = objDetail1.message;
                         objDetail.timestamp = DateTime.Now.ToString();
                         objDetail.offlineId = obj.offlineId;
 
                         result = objDetail;
-
-                        return NotFound(result);
-
-
                     }
                 }
 
@@ -828,113 +841,127 @@ namespace ICTSBMCOREAPI.Controllers
 
                     objDetail1 = await objRep.SaveHouseTrail(obj, AppId);
 
-                    var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
-
-                    if (GIS_CON != null)
+                    if(objDetail1.status == "Success")
                     {
-                        var gis_url = GIS_CON.DataSource;
-                        var gis_DBName = GIS_CON.InitialCatalog;
-                        var gis_username = GIS_CON.UserId;
-                        var gis_password = GIS_CON.Password;
+                        var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
 
-
-                        HttpClient client = new HttpClient();
-                        Trial tn = new Trial();
-
-
-                      
-
-                        //foreach (var item in obj)
-                        //{
-                        //    tn.id = item.id;
-                        //    tn.startTs = item.startTs;
-                        //    tn.endTs = item.endTs;
-                        //    tn.createUser = item.createUser;
-                        //    tn.geom = item.geom;
-                        //    tn.createTs = item.createTs;
-                        //    tn.updateTs = item.updateTs;
-                        //    tn.updateUser = item.updateUser;
-
-                        //var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
-                        //var stringContent = new StringContent(json);
-                        //stringContent.Headers.ContentType.MediaType = "application/json";
-                        //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
-                        //stringContent.Headers.Add("username", gis_username);
-                        //stringContent.Headers.Add("password", gis_password);
-
-                        //var response = await client.PostAsync("http://114.143.244.130:9091/house-trail", stringContent);
-
-
-
-                        client.BaseAddress = new Uri(GIS_CON.url);
-                        //client.DefaultRequestHeaders.Accept.Clear();
-                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                        client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
-                        client.DefaultRequestHeaders.Add("username", gis_username);
-                        client.DefaultRequestHeaders.Add("password", gis_password);
-                        var response = await client.PostAsJsonAsync("house-trail", obj);
-
-                        if (response.IsSuccessStatusCode)
+                        if (GIS_CON != null)
                         {
-                            var responseString = await response.Content.ReadAsStringAsync();
-                            var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
-                            //objDetail.Add(new DumpTripStatusResult()
-                            //{
-                            //    code = (int)response.StatusCode,
-                            //    status = dynamicobject.status.ToString(),
-                            //    message = dynamicobject.message.ToString(),
-                            //    errorMessages = dynamicobject.errorMessages.ToString(),
-                            //    timestamp = dynamicobject.timestamp.ToString(),
-                            //    data = dynamicobject.data.ToString()
-                            //});
+                            var gis_url = GIS_CON.DataSource;
+                            var gis_DBName = GIS_CON.InitialCatalog;
+                            var gis_username = GIS_CON.UserId;
+                            var gis_password = GIS_CON.Password;
 
-                            objDetail.code = (int)response.StatusCode;
-                            objDetail.status = dynamicobject.status.ToString();
-                            objDetail.message = dynamicobject.message.ToString();
-                            objDetail.errorMessages = dynamicobject.errorMessages.ToString();
-                            objDetail.timestamp = DateTime.Now.ToString();
-                            objDetail.data = dynamicobject.data.ToString();
-                            objDetail.offlineId = obj.offlineId;
+
+                            HttpClient client = new HttpClient();
+                            Trial tn = new Trial();
+
+
+
+
+                            //foreach (var item in obj)
+                            //{
+                            //    tn.id = item.id;
+                            //    tn.startTs = item.startTs;
+                            //    tn.endTs = item.endTs;
+                            //    tn.createUser = item.createUser;
+                            //    tn.geom = item.geom;
+                            //    tn.createTs = item.createTs;
+                            //    tn.updateTs = item.updateTs;
+                            //    tn.updateUser = item.updateUser;
+
+                            //var json = JsonConvert.SerializeObject(tn, Formatting.Indented);
+                            //var stringContent = new StringContent(json);
+                            //stringContent.Headers.ContentType.MediaType = "application/json";
+                            //stringContent.Headers.Add("url", gis_url + "/" + gis_DBName);
+                            //stringContent.Headers.Add("username", gis_username);
+                            //stringContent.Headers.Add("password", gis_password);
+
+                            //var response = await client.PostAsync("http://114.143.244.130:9091/house-trail", stringContent);
+
+
+
+                            client.BaseAddress = new Uri(GIS_CON.url);
+                            //client.DefaultRequestHeaders.Accept.Clear();
+                            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                            client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                            client.DefaultRequestHeaders.Add("username", gis_username);
+                            client.DefaultRequestHeaders.Add("password", gis_password);
+                            var response = await client.PostAsJsonAsync("house-trail", obj);
+
+                            if (response.IsSuccessStatusCode)
+                            {
+                                var responseString = await response.Content.ReadAsStringAsync();
+                                var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+                                //objDetail.Add(new DumpTripStatusResult()
+                                //{
+                                //    code = (int)response.StatusCode,
+                                //    status = dynamicobject.status.ToString(),
+                                //    message = dynamicobject.message.ToString(),
+                                //    errorMessages = dynamicobject.errorMessages.ToString(),
+                                //    timestamp = dynamicobject.timestamp.ToString(),
+                                //    data = dynamicobject.data.ToString()
+                                //});
+
+                                objDetail.code = (int)response.StatusCode;
+                                objDetail.status = dynamicobject.status.ToString();
+                                objDetail.message = dynamicobject.message.ToString();
+                                objDetail.errorMessages = dynamicobject.errorMessages.ToString();
+                                objDetail.timestamp = DateTime.Now.ToString();
+                                objDetail.data = dynamicobject.data.ToString();
+                                objDetail.offlineId = obj.offlineId;
+                            }
+                            else
+                            {
+                                //objDetail.Add(new DumpTripStatusResult()
+                                //{
+                                //    code = (int)response.StatusCode,
+                                //    status = "Failed",
+                                //    message = response.RequestMessage.ToString(),
+                                //    timestamp = DateTime.Now.ToString(),
+                                //});
+                                objDetail.code = (int)response.StatusCode;
+                                objDetail.status = "Failed";
+                                objDetail.message = "Not Found";
+                                objDetail.timestamp = DateTime.Now.ToString();
+                                objDetail.offlineId = obj.offlineId;
+                            }
+                            //}
+                            result = objDetail;
+                            return Ok(result);
                         }
                         else
                         {
+
                             //objDetail.Add(new DumpTripStatusResult()
                             //{
-                            //    code = (int)response.StatusCode,
+                            //    code = 404,
                             //    status = "Failed",
-                            //    message = response.RequestMessage.ToString(),
+                            //    message = "GIS Connection Are Not Available",
                             //    timestamp = DateTime.Now.ToString(),
+                            //    data = ""
                             //});
-                            objDetail.code = (int)response.StatusCode;
+                            objDetail.code = 404;
                             objDetail.status = "Failed";
-                            objDetail.message = "Not Found";
+                            objDetail.message = "GIS Connection Are Not Available";
                             objDetail.timestamp = DateTime.Now.ToString();
                             objDetail.offlineId = obj.offlineId;
+
+                            result = objDetail;
+                            return NotFound(result);
                         }
-                        //}
-                        result = objDetail;
-                        return Ok(result);
                     }
                     else
                     {
-
-                        //objDetail.Add(new DumpTripStatusResult()
-                        //{
-                        //    code = 404,
-                        //    status = "Failed",
-                        //    message = "GIS Connection Are Not Available",
-                        //    timestamp = DateTime.Now.ToString(),
-                        //    data = ""
-                        //});
-                        objDetail.code = 404;
+                        objDetail.code = 200;
                         objDetail.status = "Failed";
-                        objDetail.message = "GIS Connection Are Not Available";
+                        objDetail.message = objDetail1.message;
                         objDetail.timestamp = DateTime.Now.ToString();
                         objDetail.offlineId = obj.offlineId;
 
                         result = objDetail;
-                        return NotFound(result);
                     }
+                    
                 }
                 catch (Exception ex)
                 {
