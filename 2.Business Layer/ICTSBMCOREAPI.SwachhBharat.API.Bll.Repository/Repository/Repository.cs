@@ -100,9 +100,13 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     // Check the User exists
                     var GIS_CON = dbMain.AspNetGisUsers.Where(c => c.UserName == userLoginId && c.Password == userPassword).FirstOrDefault();
 
-                    if(GIS_CON != null)
+                    string str = userLoginId;
+                    string gisgeoserver_user = userLoginId.Replace("@ulb.com", "");
+                    if (GIS_CON != null)
                     {
                         var UserId = await dbMain.UserInApps.Where(a => a.AppId == GIS_CON.AppId).Select(a => a.UserId).FirstOrDefaultAsync();
+                        var Center_Lat = await dbMain.AppDetails.Where(a => a.AppId == GIS_CON.AppId).Select(a => a.Latitude).FirstOrDefaultAsync();
+                        var Center_Long = await dbMain.AppDetails.Where(a => a.AppId == GIS_CON.AppId).Select(a => a.Logitude).FirstOrDefaultAsync();
                         string Email = string.Empty;
                         //var result = await _signInManager.PasswordSignInAsync(signInModel.Email, signInModel.Password, false, false);
                         if (!string.IsNullOrEmpty(UserId))
@@ -133,6 +137,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         logindata data = new logindata();
                         data.Appid = GIS_CON.AppId;
                         data.token = new JwtSecurityTokenHandler().WriteToken(token);
+                        data.WMS_LAYERS = "Roads-"+ gisgeoserver_user + ":roads,Buildings-" + gisgeoserver_user + ":buildings,Area-" + gisgeoserver_user + ":area";
+                        data.MAP_CENTER = Center_Long + "," + Center_Lat ;
 
                         GisuserDetails.code = 200;
                         GisuserDetails.Status = "Success";

@@ -22,5 +22,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
     {
         public int Appid { get; set; }
         public string token { get; set; }
+        public string WMS_LAYERS { get; set; }
+        public string MAP_CENTER { get; set; }
     }
 }
