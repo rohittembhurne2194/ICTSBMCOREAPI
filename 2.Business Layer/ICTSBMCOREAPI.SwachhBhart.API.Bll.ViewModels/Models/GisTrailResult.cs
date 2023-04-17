@@ -30,6 +30,7 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
 
         [JsonProperty("Housegeom")]
         public  dynamic HouseList { get; set; }
+        public  dynamic DumpList { get; set; }
       
       
    
@@ -53,6 +54,18 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string? houseOwner { get; set; }
         public string? houseOwnerMobile { get; set; }
         public string? houseAddress { get; set; }
+        public string? employeename { get; set; }
+    }
+
+    public class GisDumpList
+    {
+        public int? dyid { get; set; }
+
+        //public string? houselat { get; set; }
+        //public string? houselong { get; set; }
+        public string? ReferanceId { get; set; }
+        public string? dyname { get; set; }
+        public string? dyAddress { get; set; }
         public string? employeename { get; set; }
     }
 }

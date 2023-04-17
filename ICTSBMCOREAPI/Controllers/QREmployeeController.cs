@@ -29,6 +29,7 @@ namespace ICTSBMCOREAPI.Controllers
         private readonly ILogger<QREmployeeController> _logger;
         private readonly IRepository objRep;
         private readonly DevICTSBMMainEntities dbMain;
+        private object result;
         public QREmployeeController(ILogger<QREmployeeController> logger, IRepository repository, DevICTSBMMainEntities dbMain)
         {
             _logger = logger;
@@ -66,7 +67,7 @@ namespace ICTSBMCOREAPI.Controllers
         }
         [HttpPost]
         [Route("Save/QrEmployeeAttendenceOut")]
-        public async Task<ActionResult<Result>> SaveQrEmployeeAttendenceOut([FromHeader] string authorization, [FromHeader] int AppId, [FromBody] BigVQREmployeeAttendenceVM obj)
+        public async Task<ActionResult<Result>> SaveQrEmployeeAttendenceOut([FromHeader] string authorization, [FromHeader] int AppId, [FromHeader] string Trail_id, [FromBody] BigVQREmployeeAttendenceVM obj)
         {
             
 
@@ -74,6 +75,7 @@ namespace ICTSBMCOREAPI.Controllers
             var handler = new JwtSecurityTokenHandler();
             var jsonToken = handler.ReadToken(stream);
             var tokenS = jsonToken as JwtSecurityToken;
+            Result objDetail = new Result();
 
             var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
 
@@ -82,10 +84,71 @@ namespace ICTSBMCOREAPI.Controllers
 
             if (Auth_AppId == AppId)
             {
-                Result objDetail = new Result();
+               
                 objDetail = await objRep.SaveQrEmployeeAttendenceAsync(obj, AppId, 1);
-                return objDetail;
+
+                var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                if (GIS_CON != null)
+                {
+                    var gis_url = GIS_CON.DataSource;
+                    var gis_DBName = GIS_CON.InitialCatalog;
+                    var gis_username = GIS_CON.UserId;
+                    var gis_password = GIS_CON.Password;
+
+
+                    HttpClient client = new HttpClient();
+                    Trial tn = new Trial();
+
+
+
+                    client.BaseAddress = new Uri(GIS_CON.url);
+                    //client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                    client.DefaultRequestHeaders.Add("username", gis_username);
+                    client.DefaultRequestHeaders.Add("password", gis_password);
+                    //var response = await client.PutAsJsonAsync("house-trail/stop/",Trail_id);
+
+                    HttpResponseMessage response = await client.PutAsJsonAsync("house-trail/stop/"+ Trail_id, Trail_id);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseString = await response.Content.ReadAsStringAsync();
+                        var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+
+
+                        objDetail.code = (int)response.StatusCode;
+                        objDetail.status = dynamicobject.status.ToString();
+                        objDetail.message = dynamicobject.message.ToString();
+                        objDetail.timestamp = DateTime.Now.ToString();
+                    }
+                    else
+                    {
+                        objDetail.code = (int)response.StatusCode;
+                        objDetail.status = "Failed";
+                        objDetail.message = "Not Found";
+                        objDetail.timestamp = DateTime.Now.ToString();
+                    }
+                    //}
+                    result = objDetail;
+                    return Ok(result);
+                }
+                else
+                {
+
+                    objDetail.code = 404;
+                    objDetail.status = "Failed";
+                    objDetail.message = "GIS Connection Are Not Available";
+                    objDetail.timestamp = DateTime.Now.ToString();
+
+                    result = objDetail;
+                    return NotFound(result);
+                }
             }
+         
+            //return objDetail;
+            
             else
             {
                 return Unauthorized();

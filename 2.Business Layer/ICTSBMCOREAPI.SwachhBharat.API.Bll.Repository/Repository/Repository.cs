@@ -6659,6 +6659,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         cmd.Parameters.Add("@Update_user", SqlDbType.Int).Value = obj.updateUser;
                                         cmd.Parameters.Add("@Update_ts", SqlDbType.DateTime).Value = uts;
                                         cmd.Parameters.Add("@geom", SqlDbType.NVarChar).Value = obj.geom;
+                                        cmd.Parameters.Add("@is_running", SqlDbType.NVarChar).Value = obj.isRunning;
 
                                         con.Open();
                                         int rowsAffected = cmd.ExecuteNonQuery();
@@ -6752,6 +6753,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         cmd.Parameters.Add("@Update_user", SqlDbType.Int).Value = obj.updateUser;
                                         cmd.Parameters.Add("@Update_ts", SqlDbType.DateTime).Value = uts;
                                         cmd.Parameters.Add("@geom", SqlDbType.NVarChar).Value = obj.geom;
+                                        cmd.Parameters.Add("@is_running", SqlDbType.NVarChar).Value = obj.isRunning;
 
                                         con.Open();
                                         int rowsAffected = cmd.ExecuteNonQuery();

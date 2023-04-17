@@ -79,10 +79,10 @@ namespace ICTSBMCOREAPI.Controllers
         [HttpPost]
         [Route("Save/UserAttendenceOut")]
 
-        public async Task<ActionResult<Result>> SaveUserAttendenceOut([FromHeader] string authorization, [FromHeader] int AppId, [FromHeader] string batteryStatus, SBUserAttendence obj)
+        public async Task<ActionResult<Result>> SaveUserAttendenceOut([FromHeader] string authorization, [FromHeader] int AppId, [FromHeader] string batteryStatus, [FromHeader] string Trail_id, SBUserAttendence obj)
         {
 
-
+            using DevICTSBMMainEntities dbMain = new();
             var stream = authorization.Replace("Bearer ", string.Empty);
             var handler = new JwtSecurityTokenHandler();
             var jsonToken = handler.ReadToken(stream);
@@ -97,7 +97,65 @@ namespace ICTSBMCOREAPI.Controllers
             {
                 Result objDetail = new Result();
                 objDetail = await objRep.SaveUserAttendenceAsync(obj, AppId, 1, batteryStatus);
-                return objDetail;
+
+                var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
+
+                if (GIS_CON != null)
+                {
+                    var gis_url = GIS_CON.DataSource;
+                    var gis_DBName = GIS_CON.InitialCatalog;
+                    var gis_username = GIS_CON.UserId;
+                    var gis_password = GIS_CON.Password;
+
+
+                    HttpClient client = new HttpClient();
+                    Trial tn = new Trial();
+
+
+
+                    client.BaseAddress = new Uri(GIS_CON.url);
+                    //client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    client.DefaultRequestHeaders.Add("url", gis_url + "/" + gis_DBName);
+                    client.DefaultRequestHeaders.Add("username", gis_username);
+                    client.DefaultRequestHeaders.Add("password", gis_password);
+                    //var response = await client.PutAsJsonAsync("house-trail/stop/",Trail_id);
+
+                    HttpResponseMessage response = await client.PutAsJsonAsync("garbage-trail/stop/" + Trail_id, Trail_id);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseString = await response.Content.ReadAsStringAsync();
+                        var dynamicobject = JsonConvert.DeserializeObject<dynamic>(responseString);
+
+
+                        objDetail.code = (int)response.StatusCode;
+                        objDetail.status = dynamicobject.status.ToString();
+                        objDetail.message = dynamicobject.message.ToString();
+                        objDetail.timestamp = DateTime.Now.ToString();
+                    }
+                    else
+                    {
+                        objDetail.code = (int)response.StatusCode;
+                        objDetail.status = "Failed";
+                        objDetail.message = "Not Found";
+                        objDetail.timestamp = DateTime.Now.ToString();
+                    }
+                    //}
+                    result = objDetail;
+                    return Ok(result);
+                }
+                else
+                {
+
+                    objDetail.code = 404;
+                    objDetail.status = "Failed";
+                    objDetail.message = "GIS Connection Are Not Available";
+                    objDetail.timestamp = DateTime.Now.ToString();
+
+                    result = objDetail;
+                    return NotFound(result);
+                }
             }
             else
             {
@@ -643,8 +701,8 @@ namespace ICTSBMCOREAPI.Controllers
 
                     objDetail1 = await objRep.SaveGarbageTrail(obj, AppId);
 
-                    if (objDetail1.status == "Success")
-                    {
+                    //if (objDetail1.status == "Success")
+                    //{
                         var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
 
                         if (GIS_CON != null)
@@ -756,17 +814,17 @@ namespace ICTSBMCOREAPI.Controllers
 
 
                         }
-                    }
-                    else
-                    {
-                        objDetail.code = 200;
-                        objDetail.status = "Failed";
-                        objDetail.message = objDetail1.message;
-                        objDetail.timestamp = DateTime.Now.ToString();
-                        objDetail.offlineId = obj.offlineId;
+                    //}
+                    //else
+                    //{
+                    //    objDetail.code = 200;
+                    //    objDetail.status = "Failed";
+                    //    objDetail.message = objDetail1.message;
+                    //    objDetail.timestamp = DateTime.Now.ToString();
+                    //    objDetail.offlineId = obj.offlineId;
 
-                        result = objDetail;
-                    }
+                    //    result = objDetail;
+                    //}
                 }
 
                 catch (Exception ex)
@@ -841,8 +899,8 @@ namespace ICTSBMCOREAPI.Controllers
 
                     objDetail1 = await objRep.SaveHouseTrail(obj, AppId);
 
-                    if(objDetail1.status == "Success")
-                    {
+                    //if(objDetail1.status == "Success")
+                    //{
                         var GIS_CON = dbMain.GIS_AppConnections.Where(c => c.AppId == AppId).FirstOrDefault();
 
                         if (GIS_CON != null)
@@ -950,17 +1008,17 @@ namespace ICTSBMCOREAPI.Controllers
                             result = objDetail;
                             return NotFound(result);
                         }
-                    }
-                    else
-                    {
-                        objDetail.code = 200;
-                        objDetail.status = "Failed";
-                        objDetail.message = objDetail1.message;
-                        objDetail.timestamp = DateTime.Now.ToString();
-                        objDetail.offlineId = obj.offlineId;
+                    //}
+                    //else
+                    //{
+                    //    objDetail.code = 200;
+                    //    objDetail.status = "Failed";
+                    //    objDetail.message = objDetail1.message;
+                    //    objDetail.timestamp = DateTime.Now.ToString();
+                    //    objDetail.offlineId = obj.offlineId;
 
-                        result = objDetail;
-                    }
+                    //    result = objDetail;
+                    //}
                     
                 }
                 catch (Exception ex)
@@ -1651,6 +1709,25 @@ namespace ICTSBMCOREAPI.Controllers
                                                      employeename = um.userName
                                                  }).ToList();
 
+                                    var query2 = (from s in db.GarbageCollectionDetails
+                                                 from cs in db.DumpYardDetails
+                                                 from um in db.UserMasters
+                                                 where s.dyId == cs.dyId
+                                                 where s.userId == um.userId
+                                                 where s.userId == Convert.ToInt32(c.createUser) && s.gcDate >= Convert.ToDateTime(starttime) && s.gcDate <= Convert.ToDateTime(endtime)
+                                                 select new
+                                                 {
+                                                     dyId = s.dyId,
+                                                     userId = s.userId,
+                                                     gcDate = s.gcDate,
+                                                     //houselat = s.Lat,
+                                                     //houselong = s.Long,
+                                                     ReferanceId = cs.ReferanceId,
+                                                     dyname = cs.dyName,
+                                                     dyAddress = cs.dyAddress,
+                                                     employeename = um.userName
+                                                 }).ToList();
+
                                     var EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.createUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
                                     var Update_EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.updateUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
 
@@ -1678,7 +1755,23 @@ namespace ICTSBMCOREAPI.Controllers
                                       
 
                                     }
+                                    if (query2.Count > 0)
+                                    {
+                                        JavaScriptSerializer serializer = new();
+                                        var output = serializer.Serialize(query2);
+                                        var dumpdatalist = new JavaScriptSerializer().Deserialize<GisDumpList[]>(output);
 
+
+                                        var result2 = myresult.Where(i => i.id == c.id).Select(i =>
+                                        {
+                                            i.DumpList = dumpdatalist;
+
+                                            return i;
+
+                                        }).FirstOrDefault();
+
+
+                                    }
                                 }
 
                             }
@@ -2003,6 +2096,21 @@ namespace ICTSBMCOREAPI.Controllers
                                                      employeename = em.qrEmpName
                                                  }).ToList();
 
+                                    var query2 = (from dy in db.DumpYardDetails
+                                                 from em in db.QrEmployeeMasters
+                                                 where dy.userId == em.qrEmpId
+                                                 where dy.userId == Convert.ToInt32(c.createUser) && dy.lastModifiedDate >= Convert.ToDateTime(starttime) && dy.lastModifiedDate <= Convert.ToDateTime(endtime)
+                                                 select new
+                                                 {
+                                                     dyId = dy.dyId,
+                                                     userId = em.qrEmpId,
+                                                     gcDate = dy.lastModifiedDate,
+                                                     ReferanceId = dy.ReferanceId,
+                                                     dyname = dy.dyName,
+                                                     dyAddress = dy.dyAddress,
+                                                     employeename = em.qrEmpName
+                                                 }).ToList();
+
                                     var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
                                     var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
 
@@ -2024,6 +2132,25 @@ namespace ICTSBMCOREAPI.Controllers
                                         {
                                             
                                             i.HouseList = housedatalist;
+
+                                            return i;
+
+                                        }).FirstOrDefault();
+
+                                        //ArrayList al = new ArrayList();
+                                        //al.Add(result1);
+
+                                    }
+                                    if (query2.Count > 0)
+                                    {
+                                        JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                        var output = serializer.Serialize(query2);
+                                        var dumpdatalist = new JavaScriptSerializer().Deserialize<GisDumpList[]>(output);
+
+                                        var result2 = myresult.Where(i => i.id == c.id).Select(i =>
+                                        {
+
+                                            i.DumpList = dumpdatalist;
 
                                             return i;
 
@@ -3813,6 +3940,106 @@ namespace ICTSBMCOREAPI.Controllers
 
                             List<GisTrailResult> myresult = jsonResult.ToObject<List<GisTrailResult>>();
 
+                            using (DevICTSBMChildEntities db = new(AppId))
+                            {
+
+                                foreach (var c in myresult)
+                                {
+
+                                    //var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) && x.gcDate >= Convert.ToDateTime(tn.startTs) && x.gcDate <= Convert.ToDateTime(tn.endTs)).Select(x => new { x.houseId, x.userId, x.gcDate, houselat = x.Lat, houselong = x.Long  }).ToListAsync();
+                                    string st = c.startTs;
+                                    string et = c.endTs;
+                                    // performs multiple replacement  
+                                    string starttime = st.Replace("T", " ").Replace("+00:00", "");
+                                    string endtime = et.Replace("T", " ").Replace("+00:00", "");
+
+                                    var query = (from s in db.GarbageCollectionDetails
+                                                 from cs in db.HouseMasters
+                                                 from um in db.UserMasters
+                                                 where s.houseId == cs.houseId
+                                                 where s.userId == um.userId
+                                                 where s.userId == Convert.ToInt32(c.createUser) && s.gcDate >= Convert.ToDateTime(starttime) && s.gcDate <= Convert.ToDateTime(endtime)
+                                                 select new
+                                                 {
+                                                     houseId = s.houseId,
+                                                     userId = s.userId,
+                                                     gcDate = s.gcDate,
+                                                     //houselat = s.Lat,
+                                                     //houselong = s.Long,
+                                                     ReferanceId = cs.ReferanceId,
+                                                     houseOwner = cs.houseOwner,
+                                                     houseOwnerMobile = cs.houseOwnerMobile,
+                                                     houseAddress = cs.houseAddress,
+                                                     employeename = um.userName
+                                                 }).ToList();
+
+                                    var query2 = (from s in db.GarbageCollectionDetails
+                                                  from cs in db.DumpYardDetails
+                                                  from um in db.UserMasters
+                                                  where s.dyId == cs.dyId
+                                                  where s.userId == um.userId
+                                                  where s.userId == Convert.ToInt32(c.createUser) && s.gcDate >= Convert.ToDateTime(starttime) && s.gcDate <= Convert.ToDateTime(endtime)
+                                                  select new
+                                                  {
+                                                      dyId = s.dyId,
+                                                      userId = s.userId,
+                                                      gcDate = s.gcDate,
+                                                      //houselat = s.Lat,
+                                                      //houselong = s.Long,
+                                                      ReferanceId = cs.ReferanceId,
+                                                      dyname = cs.dyName,
+                                                      dyAddress = cs.dyAddress,
+                                                      employeename = um.userName
+                                                  }).ToList();
+
+                                    var EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.createUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
+                                    var Update_EmployeeName = await db.UserMasters.Where(x => x.userId == Convert.ToInt32(c.updateUser)).Select(x => new { x.userName }).FirstOrDefaultAsync();
+
+                                    var result1 = myresult.Where(i => i.id == c.id).Select(i =>
+                                    {
+                                        i.EmpName = EmployeeName.userName;
+                                        return i;
+
+                                    }).FirstOrDefault();
+
+                                    if (query.Count > 0)
+                                    {
+                                        JavaScriptSerializer serializer = new();
+                                        var output = serializer.Serialize(query);
+                                        var housedatalist = new JavaScriptSerializer().Deserialize<GisHouseList[]>(output);
+
+
+                                        var result2 = myresult.Where(i => i.id == c.id).Select(i =>
+                                        {
+                                            i.HouseList = housedatalist;
+
+                                            return i;
+
+                                        }).FirstOrDefault();
+
+
+                                    }
+                                    if (query2.Count > 0)
+                                    {
+                                        JavaScriptSerializer serializer = new();
+                                        var output = serializer.Serialize(query2);
+                                        var dumpdatalist = new JavaScriptSerializer().Deserialize<GisDumpList[]>(output);
+
+
+                                        var result2 = myresult.Where(i => i.id == c.id).Select(i =>
+                                        {
+                                            i.DumpList = dumpdatalist;
+
+                                            return i;
+
+                                        }).FirstOrDefault();
+
+
+                                    }
+                                }
+
+                            }
+
                             objDetail.code = (int)response.StatusCode;
                             objDetail.status = "Success";
                             objDetail.message = "Data Found";
@@ -3958,14 +4185,104 @@ namespace ICTSBMCOREAPI.Controllers
 
                             List<GisTrailResult> myresult = jsonResult.ToObject<List<GisTrailResult>>();
 
-                            //objDetail.Add(new TrailsDetails()
-                            //{
-                            //    code = dynamicobject.code.ToString(),
-                            //    status = dynamicobject.status.ToString(),
-                            //    message = dynamicobject.message.ToString(),
-                            //    timestamp = dynamicobject.timestamp.ToString(),
-                            //    data = result
-                            //});
+                          using (DevICTSBMChildEntities db = new(AppId))
+                            {
+
+                                foreach (var c in myresult)
+                                {
+
+                                    //var GCDetails = await db.GarbageCollectionDetails.Where(x => x.userId == Convert.ToInt32(c.createUser) && x.gcDate >= Convert.ToDateTime(tn.startTs) && x.gcDate <= Convert.ToDateTime(tn.endTs)).Select(x => new { x.houseId, x.userId, x.gcDate, houselat = x.Lat, houselong = x.Long  }).ToListAsync();
+                                    var hid = c.id;
+                                    string st = c.startTs;
+                                    string et = c.endTs;
+                                    // performs multiple replacement  
+                                    string starttime = st.Replace("T", " ").Replace("+00:00", "");
+                                    string endtime = et.Replace("T", " ").Replace("+00:00", "");
+
+                                    var query = (from hm in db.HouseMasters
+                                                 from em in db.QrEmployeeMasters
+                                                 where hm.userId == em.qrEmpId
+                                                 where hm.userId == Convert.ToInt32(c.createUser) && hm.modified >= Convert.ToDateTime(starttime) && hm.modified <= Convert.ToDateTime(endtime)
+                                                 select new
+                                                 {
+                                                     houseId = hm.houseId,
+                                                     userId = em.qrEmpId,
+                                                     gcDate = hm.modified,
+                                                     ReferanceId = hm.ReferanceId,
+                                                     houseOwner = hm.houseOwner,
+                                                     houseOwnerMobile = hm.houseOwnerMobile,
+                                                     houseAddress = hm.houseAddress,
+                                                     employeename = em.qrEmpName
+                                                 }).ToList();
+
+                                    var query2 = (from dy in db.DumpYardDetails
+                                                 from em in db.QrEmployeeMasters
+                                                 where dy.userId == em.qrEmpId
+                                                 where dy.userId == Convert.ToInt32(c.createUser) && dy.lastModifiedDate >= Convert.ToDateTime(starttime) && dy.lastModifiedDate <= Convert.ToDateTime(endtime)
+                                                 select new
+                                                 {
+                                                     dyId = dy.dyId,
+                                                     userId = em.qrEmpId,
+                                                     gcDate = dy.lastModifiedDate,
+                                                     ReferanceId = dy.ReferanceId,
+                                                     dyname = dy.dyName,
+                                                     dyAddress = dy.dyAddress,
+                                                     employeename = em.qrEmpName
+                                                 }).ToList();
+
+                                    var EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.createUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
+                                    var Update_EmployeeName = await db.QrEmployeeMasters.Where(x => x.qrEmpId == Convert.ToInt32(c.updateUser)).Select(x => new { x.qrEmpName }).FirstOrDefaultAsync();
+
+                                    var result1 = myresult.Where(i => i.id == c.id).Select(i =>
+                                    {
+                                        i.EmpName = EmployeeName.qrEmpName;
+
+                                        return i;
+
+                                    }).FirstOrDefault();
+
+                                    if (query.Count > 0)
+                                    {
+                                        JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                        var output = serializer.Serialize(query);
+                                        var housedatalist = new JavaScriptSerializer().Deserialize<GisHouseList[]>(output);
+                                     
+                                        var result2 = myresult.Where(i=>i.id==c.id).Select(i =>
+                                        {
+                                            
+                                            i.HouseList = housedatalist;
+
+                                            return i;
+
+                                        }).FirstOrDefault();
+
+                                        //ArrayList al = new ArrayList();
+                                        //al.Add(result1);
+
+                                    }
+                                    if (query2.Count > 0)
+                                    {
+                                        JavaScriptSerializer serializer = new JavaScriptSerializer();
+                                        var output = serializer.Serialize(query2);
+                                        var dumpdatalist = new JavaScriptSerializer().Deserialize<GisDumpList[]>(output);
+
+                                        var result2 = myresult.Where(i => i.id == c.id).Select(i =>
+                                        {
+
+                                            i.DumpList = dumpdatalist;
+
+                                            return i;
+
+                                        }).FirstOrDefault();
+
+                                        //ArrayList al = new ArrayList();
+                                        //al.Add(result1);
+
+                                    }
+                                 
+                                }
+
+                            }
 
                             objDetail.code = (int)response.StatusCode;
                             objDetail.status = "Success";
