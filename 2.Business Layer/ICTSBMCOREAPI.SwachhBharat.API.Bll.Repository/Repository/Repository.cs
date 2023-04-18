@@ -107,6 +107,16 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                         var UserId = await dbMain.UserInApps.Where(a => a.AppId == GIS_CON.AppId).Select(a => a.UserId).FirstOrDefaultAsync();
                         var Center_Lat = await dbMain.AppDetails.Where(a => a.AppId == GIS_CON.AppId).Select(a => a.Latitude).FirstOrDefaultAsync();
                         var Center_Long = await dbMain.AppDetails.Where(a => a.AppId == GIS_CON.AppId).Select(a => a.Logitude).FirstOrDefaultAsync();
+
+                      
+                        double[] mapcenterArray = new double[] { Convert.ToDouble(Center_Long), Convert.ToDouble(Center_Lat) };
+
+                        var Layers_value = new List<WMS_LAYERS> {
+                            new WMS_LAYERS { label = "Roads", id = gisgeoserver_user+":"+"roads" },
+                            new WMS_LAYERS { label = "Buildings", id = gisgeoserver_user+":"+"buildings"},
+                            new WMS_LAYERS { label = "Area", id = gisgeoserver_user+":"+"area" }
+                        };
+
                         string Email = string.Empty;
                         //var result = await _signInManager.PasswordSignInAsync(signInModel.Email, signInModel.Password, false, false);
                         if (!string.IsNullOrEmpty(UserId))
@@ -135,14 +145,19 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
 
 
                         logindata data = new logindata();
-                        data.Appid = GIS_CON.AppId;
+                        data.appid = GIS_CON.AppId;
+                        data.mapcenter = mapcenterArray;
+                        data.mapzoom = 12;
+                        //data.WMS_LAYERS = "Roads-"+ gisgeoserver_user + ":roads,Buildings-" + gisgeoserver_user + ":buildings,Area-" + gisgeoserver_user + ":area";
+                        data.wmslayers = Layers_value;
                         data.token = new JwtSecurityTokenHandler().WriteToken(token);
-                        data.WMS_LAYERS = "Roads-"+ gisgeoserver_user + ":roads,Buildings-" + gisgeoserver_user + ":buildings,Area-" + gisgeoserver_user + ":area";
-                        data.MAP_CENTER = Center_Long + "," + Center_Lat ;
+                       
+
+                       
 
                         GisuserDetails.code = 200;
-                        GisuserDetails.Status = "Success";
-                        GisuserDetails.Message = "Login Successfully Done";
+                        GisuserDetails.status = "Success";
+                        GisuserDetails.message = "Login Successfully Done";
                         GisuserDetails.timestamp = DateTime.Now.ToString();
                         GisuserDetails.data = data;
 
@@ -152,8 +167,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                        
 
                         GisuserDetails.code = 200;
-                        GisuserDetails.Status = "Failed";
-                        GisuserDetails.Message = "Enter Username And Password Does Not Match";
+                        GisuserDetails.status = "Failed";
+                        GisuserDetails.message = "Enter Username And Password Does Not Match";
                         GisuserDetails.timestamp = DateTime.Now.ToString();
                         GisuserDetails.data = null;
                     }
@@ -166,8 +181,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                 _logger.LogError(ex.ToString(), ex);
 
                 GisuserDetails.code = 400;
-                GisuserDetails.Status = "Failed";
-                GisuserDetails.Message = ex.Message.ToString();
+                GisuserDetails.status = "Failed";
+                GisuserDetails.message = ex.Message.ToString();
                 GisuserDetails.timestamp = DateTime.Now.ToString();
                 GisuserDetails.data = null;
                 return GisuserDetails;

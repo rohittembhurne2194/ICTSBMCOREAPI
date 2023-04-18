@@ -93,8 +93,8 @@ namespace ICTSBMCOREAPI.Controllers
             var result = await objRep.GisLoginAsync(loginobj.userLoginId, loginobj.userPassword);
 
             objDetail.code = result.code;
-            objDetail.Status = result.Status;
-            objDetail.Message = result.Message;
+            objDetail.status = result.status;
+            objDetail.message = result.message;
             objDetail.timestamp = result.timestamp;
             objDetail.data = result.data;
            
