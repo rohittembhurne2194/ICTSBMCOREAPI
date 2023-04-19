@@ -1,6 +1,7 @@
 ﻿using ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository;
 using ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -85,6 +86,7 @@ namespace ICTSBMCOREAPI.Controllers
         }
 
         [HttpPost("GisLogin")]
+        [EnableCors("MyCorsPolicy")]
         [AllowAnonymous]
         public async Task<ActionResult<GisLoginResult>> LoginGis([FromBody] GisUsers loginobj)
         {

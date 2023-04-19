@@ -62,6 +62,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
         Task<List<SBWorkDetails>> GetUserWorkForStreetAsync(int userId, int year, int month, int appId);
         Task<List<SBVehicleType>> GetVehicleAsync(int appId);
         Task<List<VehicleList>> GetVehicleListAsync(int appId, int VehicleTypeId);
+        Task<List<PropertyTypeList>> GetPropertyTypeListAsync(int appId);
         Task<List<HouseDetailsVM>> GetVehicleListAsync(int AppId);
         Task<Result> GetVersionUpdateAsync(string version, int AppId);
         Task<List<CMSBWardZoneVM>> GetWardZoneListAsync(int AppId);

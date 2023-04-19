@@ -710,5 +710,31 @@ namespace ICTSBMCOREAPI.Controllers
                 return Unauthorized();
             }
         }
+
+        [HttpGet]
+        [Route("Get/PropertyTypeList")]
+        public async Task<ActionResult<List<PropertyTypeList>>> PropertyTypeList([FromHeader] string authorization, [FromHeader] int AppId)
+        {
+            var stream = authorization.Replace("Bearer ", string.Empty);
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(stream);
+            var tokenS = jsonToken as JwtSecurityToken;
+
+            var jti = tokenS.Claims.First(claim => claim.Type == "AppId").Value;
+
+
+            var Auth_AppId = Convert.ToInt32(jti);
+
+            if (Auth_AppId == AppId)
+            {
+                List<PropertyTypeList> objDetail = new List<PropertyTypeList>();
+                objDetail = await objRep.GetPropertyTypeListAsync(AppId);
+                return objDetail;
+            }
+            else
+            {
+                return Unauthorized();
+            }
+        }
     }
 }

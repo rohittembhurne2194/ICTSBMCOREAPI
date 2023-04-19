@@ -6557,6 +6557,7 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                         house.BinaryQrCodeImage = Convert.FromBase64String(obj.QRCodeImage);
                                     }
                                     house.New_Construction = obj.new_const;
+                                    house.Property_Type = obj.property_type;
                                     //////////////////////////////////////////////////////////////////
                                     obj.date = DateTime.Now;
                                     db.Qr_Locations.Add(await FillLocationDetailsAsync(obj, AppId, false));
@@ -7427,6 +7428,8 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                                     {
                                         house.QRCodeImage = item.QRCodeImage;
                                     }
+
+                                    house.Property_Type = item.property_type;
                                     db.Qr_Locations.Add(await FillLocationDetailsAsync(item, AppId, true));
 
                                     await db.SaveChangesAsync();
@@ -8068,6 +8071,39 @@ namespace ICTSBMCOREAPI.SwachhBharat.API.Bll.Repository.Repository
                     }
 
                     return obj.OrderBy(c => c.VehicleId).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString(), ex);
+                return obj;
+            }
+
+        }
+
+        public async Task<List<PropertyTypeList>> GetPropertyTypeListAsync(int appId)
+        {
+            List<PropertyTypeList> obj = new List<PropertyTypeList>();
+            try
+            {
+                using (DevICTSBMChildEntities db = new DevICTSBMChildEntities(appId))
+                {
+                    {
+                    
+                        var data = await db.PropertyTypes.ToListAsync();
+                        foreach (var x in data)
+                        {
+                            obj.Add(new PropertyTypeList()
+                            {
+                                Property_Id = (x.PropertyId.ToString()),
+                                Property_Type = (x.PropertyType1),
+                                Id = (x.Id),
+
+                            });
+                        }
+                    }
+
+                    return obj.OrderBy(c => c.Id).ToList();
                 }
             }
             catch (Exception ex)

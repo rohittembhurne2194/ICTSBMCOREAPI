@@ -48,6 +48,8 @@ namespace ICTSBMCOREAPI.SwachhBhart.API.Bll.ViewModels.Models
         public string updateTs { get; set; }
 
         public int new_const { get; set; }
+
+        public string? property_type { get; set; }
     }
 
 }

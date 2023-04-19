@@ -88,6 +88,8 @@ namespace ICTSBMCOREAPI.Dal.DataContexts.Models.DB.ChildModels
         public virtual DbSet<TrailHouse> TrailHouses { get; set; }
         public virtual DbSet<SurveyFormDetail> SurveyFormDetails { get; set; }
 
+        public virtual DbSet<PropertyType> PropertyTypes { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
